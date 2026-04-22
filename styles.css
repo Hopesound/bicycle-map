@@ -211,8 +211,17 @@ a {
 
 .side-panel {
   top: calc(var(--header-height) + 18px);
-  left: calc(var(--rail-width) + 24px);
-  transform: translateY(250px);
+  left: calc(var(--rail-width) + 8px);
+  transform: translateX(-26px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.side-panel.is-open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .panel-head {
@@ -510,8 +519,7 @@ a {
 
   .side-panel {
     top: 126px;
-    left: calc(var(--rail-width) + 16px);
-    transform: translateY(246px);
+    left: calc(var(--rail-width) + 8px);
   }
 }
 
@@ -589,7 +597,11 @@ a {
   .side-panel {
     top: auto;
     bottom: 106px;
-    transform: none;
+    transform: translateY(18px);
+  }
+
+  .side-panel.is-open {
+    transform: translateY(0);
   }
 
   .status-chip,

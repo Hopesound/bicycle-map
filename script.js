@@ -1,103 +1,58 @@
-const routes = [
+const selectedPlaces = [
   {
-    id: "hangang-seoul",
-    order: "01",
-    name: "한강 스프린트 챌린지",
-    city: "서울",
-    region: "수도권",
-    distance: "28km",
-    climb: "120m",
-    participants: 1940,
-    completions: 1426,
-    color: "#0b8c7a",
-    center: [37.528, 126.934],
-    path: [
-      [37.565, 126.877],
-      [37.556, 126.903],
-      [37.543, 126.925],
-      [37.529, 126.947],
-      [37.52, 126.972],
-      [37.517, 127.012],
-      [37.522, 127.052]
-    ],
-    description:
-      "도심 접근성이 높은 시즌2 대표 루트입니다. 출퇴근형 참여와 야간 스탬프 운영에 잘 맞습니다.",
-    checkpoints: [
-      { id: "hangang-1", name: "여의도 인증존", coords: [37.528, 126.93] },
-      { id: "hangang-2", name: "반포 야간 인증", coords: [37.508, 126.995] },
-      { id: "hangang-3", name: "잠실 피니시", coords: [37.519, 127.081] }
-    ]
+    id: "goui-reservoir",
+    title: "구이저수지",
+    query: "구이저수지 완주",
+    address: "전북특별자치도 완주군 구이면 구이로 1488-31",
+    fallback: [35.7398, 127.1032]
   },
   {
-    id: "bukhangang-loop",
-    order: "02",
-    name: "북한강 루프 챌린지",
-    city: "춘천",
-    region: "강원권",
-    distance: "54km",
-    climb: "360m",
-    participants: 1188,
-    completions: 724,
-    color: "#2f6fed",
-    center: [37.86, 127.71],
-    path: [
-      [37.901, 127.746],
-      [37.885, 127.725],
-      [37.867, 127.706],
-      [37.851, 127.69],
-      [37.834, 127.673],
-      [37.816, 127.699],
-      [37.824, 127.734]
-    ],
-    description:
-      "경치형 장거리 코스로 완주 메달형 챌린지에 적합합니다. 주말 참여자 유입이 높은 코스입니다.",
-    checkpoints: [
-      { id: "bukhangang-1", name: "춘천역 시작점", coords: [37.884, 127.716] },
-      { id: "bukhangang-2", name: "삼악산 전망 포인트", coords: [37.853, 127.682] },
-      { id: "bukhangang-3", name: "의암호 루프 인증", coords: [37.822, 127.729] }
-    ]
+    id: "gosan-miso-market",
+    title: "완주군 미소시장",
+    query: "고산미소시장 완주",
+    address: "전북특별자치도 완주군 고산면 남봉로 134",
+    fallback: [35.9751, 127.2027]
   },
-  {
-    id: "gapcheon-night",
-    order: "03",
-    name: "갑천 나이트 라이딩",
-    city: "대전",
-    region: "충청권",
-    distance: "22km",
-    climb: "85m",
-    participants: 920,
-    completions: 644,
-    color: "#845ef7",
-    center: [36.36, 127.378],
-    path: [
-      [36.378, 127.347],
-      [36.372, 127.356],
-      [36.364, 127.369],
-      [36.355, 127.382],
-      [36.348, 127.397],
-      [36.341, 127.412]
-    ],
-    description:
-      "입문 참여자가 부담 없이 도전할 수 있는 저녁형 시즌2 루트입니다. 인증 간격이 짧아 운영이 쉽습니다.",
-    checkpoints: [
-      { id: "gapcheon-1", name: "엑스포교 인증", coords: [36.379, 127.35] },
-      { id: "gapcheon-2", name: "갑천 브리지 포인트", coords: [36.357, 127.379] },
-      { id: "gapcheon-3", name: "도안 피니시", coords: [36.341, 127.412] }
-    ]
-  },
+  { id: "jbnu-museum", title: "전북대 자연사박물관", query: "전북대 자연사박물관", fallback: [35.8473, 127.1293] },
+  { id: "jeonbuk-env", title: "전북환경운동연합", query: "전북환경운동연합 전주", fallback: [35.8185, 127.1537] },
+  { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", fallback: [35.9114, 127.1732] },
+  { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", fallback: [35.9415, 127.1254] },
+  { id: "gijije", title: "기지제", query: "기지제 전주", fallback: [35.8077, 127.1018] },
+  { id: "kkotsingi", title: "전주시 공영자전거 꽃싱이 송천대여소", query: "꽃싱이 송천대여소 전주", fallback: [35.8784, 127.1182] },
+  { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", fallback: [35.8371, 127.0406] },
+  { id: "saechangi-bridge", title: "새창이다리", query: "새창이다리 전주", fallback: [35.8134, 127.1202] },
+  { id: "omokdae", title: "오목대", query: "오목대 전주", fallback: [35.8113, 127.1538] },
+  { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", fallback: [35.7621, 127.1859] },
+  { id: "march-first", title: "전주3.1운동발상지", query: "전주 3.1운동 발상지", fallback: [35.8199, 127.1442] },
+  { id: "bibijeong", title: "비비정", query: "비비정 완주", fallback: [35.8687, 127.0744] },
+  { id: "woosuk-hospital", title: "우석대학교 부속 전주한방볍원", query: "우석대학교 부속 전주한방병원", fallback: [35.8137, 127.0892] },
+  { id: "sebyeongho", title: "세병호", query: "세병호 전주", fallback: [35.8816, 127.1461] },
+  { id: "yeoyu-cafe", title: "무인카페여유(구이로 1575)", query: "무인카페여유 구이로 1575", fallback: [35.7449, 127.1048] },
+  { id: "jeonju-archive", title: "전주시민기록관", query: "전주시민기록관", fallback: [35.8207, 127.1459] },
+  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", fallback: [35.9445, 126.9546] },
+  { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", fallback: [35.8271, 127.1519] },
+  { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", fallback: [35.8328, 127.1768] },
+  { id: "jeonju-fm", title: "전주공동체라디오 전주FM", query: "전주공동체라디오 전주FM", fallback: [35.8148, 127.1211] },
+  { id: "daedeok-elementary", title: "대덕초등학교", query: "대덕초등학교 완주", fallback: [35.9139, 127.2386] },
+  { id: "chucheondae", title: "추천대", query: "추천대 완주", fallback: [35.9589, 127.2656] },
+  { id: "deokjin-park", title: "덕진공원", query: "덕진공원", fallback: [35.8482, 127.1201] },
+  { id: "volunteer-center", title: "전주시 자원봉사센터", query: "전주시 자원봉사센터", fallback: [35.8247, 127.1487] },
+  { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", fallback: [35.8176, 127.1104] },
+  { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", fallback: [35.9302, 127.2269] },
+  { id: "hari-bridge", title: "하리교", query: "하리교 전주", fallback: [35.7861, 127.1143] },
+  { id: "bike-box", title: "바이크박스", query: "바이크박스 전주", fallback: [35.8201, 127.1501] },
+  { id: "palbok-art", title: "팔복예술공장", query: "팔복예술공장", fallback: [35.8464, 127.1029] }
+];
+
+const routePlaces = [
   {
     id: "jeonju-hanok",
-    order: "04",
-    name: "전주 한옥길 챌린지",
+    title: "전주 한옥길 챌린지",
     city: "전주",
     region: "전라권",
-    distance: "31km",
-    climb: "148m",
-    participants: 1626,
-    completions: 1181,
-    color: "#ff9158",
-    center: [35.824, 127.148],
-    path: [
+    description:
+      "전주천과 한옥마을을 잇는 시즌2 메인 루트입니다. 전북 권역 탐색의 기준 루트로 사용합니다.",
+    points: [
       [35.842, 127.101],
       [35.838, 127.118],
       [35.832, 127.131],
@@ -106,27 +61,16 @@ const routes = [
       [35.806, 127.186],
       [35.795, 127.197]
     ],
-    description:
-      "전주천과 한옥마을을 잇는 시즌2 메인 루트입니다. 탄소 감축 캠페인 대표 코스로 우선 노출됩니다.",
-    checkpoints: [
-      { id: "jeonju-1", name: "한옥마을 스타트", coords: [35.815, 127.153] },
-      { id: "jeonju-2", name: "전주천 인증 포인트", coords: [35.833, 127.123] },
-      { id: "jeonju-3", name: "혁신도시 피니시", coords: [35.799, 127.187] }
-    ]
+    color: "#ff9158"
   },
   {
     id: "saemangeum-coast",
-    order: "05",
-    name: "새만금 코스트 챌린지",
+    title: "새만금 코스트 챌린지",
     city: "군산·부안",
     region: "전라권",
-    distance: "67km",
-    climb: "210m",
-    participants: 1384,
-    completions: 812,
-    color: "#0ea5e9",
-    center: [35.842, 126.706],
-    path: [
+    description:
+      "새만금 해안 풍경 중심의 시즌2 확장 루트입니다. 장거리 탄소 감축 캠페인에 연결할 수 있습니다.",
+    points: [
       [35.98, 126.703],
       [35.941, 126.703],
       [35.89, 126.706],
@@ -134,62 +78,11 @@ const routes = [
       [35.8, 126.699],
       [35.74, 126.674]
     ],
-    description:
-      "해안 풍경 중심의 장거리 루트입니다. 탄소 감축 홍보 영상이나 시즌 배너와 잘 어울립니다.",
-    checkpoints: [
-      { id: "saemangeum-1", name: "군산 방조제 북단", coords: [35.979, 126.703] },
-      { id: "saemangeum-2", name: "새만금 중앙 인증", coords: [35.847, 126.705] },
-      { id: "saemangeum-3", name: "변산 피니시", coords: [35.729, 126.677] }
-    ]
-  },
-  {
-    id: "blue-coast-busan",
-    order: "06",
-    name: "부산 블루코스트 챌린지",
-    city: "부산",
-    region: "영남권",
-    distance: "36km",
-    climb: "232m",
-    participants: 1097,
-    completions: 738,
-    color: "#14b8a6",
-    center: [35.158, 129.152],
-    path: [
-      [35.104, 129.035],
-      [35.124, 129.065],
-      [35.146, 129.092],
-      [35.165, 129.126],
-      [35.176, 129.157],
-      [35.194, 129.223]
-    ],
-    description:
-      "해안 라인 관광형 코스로 시즌2 후반부 확장 코스에 적합합니다.",
-    checkpoints: [
-      { id: "busan-1", name: "송도 스타트", coords: [35.078, 129.022] },
-      { id: "busan-2", name: "광안리 인증", coords: [35.153, 129.118] },
-      { id: "busan-3", name: "해운대 피니시", coords: [35.167, 129.181] }
-    ]
+    color: "#0ea5e9"
   }
 ];
 
-const selectedPlaces = [
-  {
-    id: "goui-reservoir",
-    title: "구이저수지",
-    address: "전북특별자치도 완주군 구이면 구이로 1488-31",
-    description:
-      "선정 장소로 지정된 구이저수지입니다. 구이저수지 둘레길 주소를 기준으로 지도에 표시합니다.",
-    fallback: [35.7398, 127.1032]
-  },
-  {
-    id: "gosan-miso-market",
-    title: "완주군 미소시장",
-    address: "전북특별자치도 완주군 고산면 남봉로 134",
-    description:
-      "선정 장소로 지정된 완주군 미소시장입니다. 고산미소시장 주소를 기준으로 지도에 표시합니다.",
-    fallback: [35.9751, 127.2027]
-  }
-];
+const JEONBUK_RECT = "126.45,35.35,127.85,36.20";
 
 const topMenus = {
   intro: {
@@ -202,25 +95,25 @@ const topMenus = {
         tag: "안내",
         detailTitle: "탄소를 감축하는 자전거 챌린지 season2",
         detailBody:
-          "전국 자전거 코스를 연결해 이동 거리만큼 탄소 절감 효과를 체감하도록 설계한 시즌형 캠페인입니다. 지도 중심 구조로 운영자와 참가자가 같은 화면을 공유합니다."
+          "전국 자전거 코스를 연결해 이동 거리만큼 탄소 절감 효과를 체감하도록 설계한 시즌형 캠페인입니다. 메인 화면은 지도와 메뉴 탐색을 중심으로 구성했습니다."
       },
       {
         id: "season-target",
         label: "탄소 감축 목표",
         summary: "시즌 목표 지표",
         tag: "목표",
-        detailTitle: "누적 탄소 감축 목표",
+        detailTitle: "탄소 감축 목표",
         detailBody:
-          "시즌2는 참여 거리 12만 km, 완주 인증 5천 건, 탄소 감축 추정량 21톤을 목표로 운영됩니다. 메뉴 클릭만으로 권역별 코스 이동이 가능합니다."
+          "시즌2는 전북 권역 코스를 중심으로 이동 거리와 지역 참여도를 함께 보여주는 구조입니다. 장소 마커를 통해 캠페인 거점도 한 번에 확인할 수 있습니다."
       },
       {
-        id: "season-city",
-        label: "참여 도시",
-        summary: "현재 운영 도시 확인",
-        tag: "도시",
-        detailTitle: "현재 시즌2 운영 도시",
+        id: "season-area",
+        label: "전북 주요 거점",
+        summary: "표출 장소 안내",
+        tag: "거점",
+        detailTitle: "전북 주요 거점 지도 표출",
         detailBody:
-          "서울, 춘천, 대전, 전주, 군산·부안, 부산을 중심으로 코스가 배치되어 있습니다. 이후 권역별 추가 코스 확장이 가능한 구조입니다."
+          "구이저수지, 완주군 미소시장, 덕진공원, 팔복예술공장 등 요청하신 거점들이 지도 위에 고정 마커로 표출됩니다."
       }
     ]
   },
@@ -234,25 +127,16 @@ const topMenus = {
         tag: "참가",
         detailTitle: "참가 신청 흐름",
         detailBody:
-          "원하는 코스를 선택한 뒤 챌린지 페이지에서 참가 등록을 진행하고, 지도에서 인증 스팟을 따라 이동하면 됩니다."
+          "원하는 코스를 선택한 뒤 참가 페이지와 연결하고, 지도 위 주요 거점과 인증 포인트를 따라 이동하는 흐름으로 확장할 수 있습니다."
       },
       {
-        id: "guide-checkpoint",
-        label: "인증 방법",
-        summary: "포인트 인증 방식",
-        tag: "인증",
-        detailTitle: "인증 방법",
+        id: "guide-map",
+        label: "지도 탐색",
+        summary: "일반/위성지도 전환",
+        tag: "지도",
+        detailTitle: "지도 탐색 방식",
         detailBody:
-          "좌측 메뉴의 인증 스팟에서 포인트를 선택하면 지도 중심이 이동합니다. 해당 포인트에서 QR 또는 위치 기반 인증을 연결하는 흐름에 맞춰 확장할 수 있습니다."
-      },
-      {
-        id: "guide-benefit",
-        label: "완주 혜택",
-        summary: "보상 정책 안내",
-        tag: "혜택",
-        detailTitle: "완주 혜택",
-        detailBody:
-          "완주 메달, 지역 연계 쿠폰, 탄소 절감 배지와 같은 보상 항목을 시즌별로 구성할 수 있도록 메뉴 체계를 열어두었습니다."
+          "지도 우측 상단 토글에서 일반지도와 위성지도를 바꿔 볼 수 있습니다. 상단 메뉴를 누르면 좌측 하위 메뉴는 자동으로 닫힙니다."
       }
     ]
   },
@@ -267,37 +151,27 @@ const topMenus = {
         action: { type: "set-map-type", mapTypeId: "ROADMAP" },
         detailTitle: "일반 지도 모드",
         detailBody:
-          "카카오 기본 도로 지도를 표시합니다. 코스 연결성과 도시 단위 운영 현황을 보기 좋은 기본 모드입니다."
+          "도로와 행정 경계가 잘 보이는 일반 지도를 표시합니다."
       },
       {
         id: "map-type-skyview",
-        label: "위성지도",
+        label: "위성 지도",
         summary: "스카이뷰 보기",
         tag: state.currentMapType === "SKYVIEW" ? "현재" : "위성",
         action: { type: "set-map-type", mapTypeId: "SKYVIEW" },
-        detailTitle: "위성지도 모드",
+        detailTitle: "위성 지도 모드",
         detailBody:
-          "카카오 스카이뷰를 사용해 위성 사진 기반 배경으로 전환합니다. 실제 지형과 주변 환경을 보는 데 적합합니다."
+          "실제 지형과 건물 배경을 확인할 수 있는 스카이뷰 모드입니다."
       },
       {
-        id: "op-all",
-        label: "전체 코스 보기",
-        summary: "전국 코스 한 번에 보기",
-        tag: "코스",
+        id: "fit-all",
+        label: "전체 범위 보기",
+        summary: "코스와 주요 장소 함께 보기",
+        tag: "전체",
         action: { type: "fit-all" },
-        detailTitle: "전국 코스 일괄 보기",
+        detailTitle: "전체 범위 보기",
         detailBody:
-          "등록된 전체 코스를 지도 범위 안에 맞춰 보여줍니다. 전국 운영 상황을 빠르게 확인할 때 쓰는 메뉴입니다."
-      },
-      {
-        id: "op-jeonju",
-        label: "전주 메인 코스",
-        summary: "시즌 대표 코스 이동",
-        tag: "추천",
-        action: { type: "focus-route", routeId: "jeonju-hanok" },
-        detailTitle: "전주 한옥길 코스 바로 이동",
-        detailBody:
-          "운영 중심 코스인 전주 한옥길 챌린지로 지도를 즉시 이동합니다."
+          "주요 코스와 지도에 표시된 장소가 모두 보이도록 범위를 재설정합니다."
       }
     ]
   },
@@ -305,31 +179,22 @@ const topMenus = {
     title: "지원 센터",
     items: [
       {
-        id: "support-faq",
-        label: "FAQ",
-        summary: "자주 묻는 질문",
-        tag: "지원",
-        detailTitle: "FAQ 안내",
-        detailBody:
-          "하위 메뉴 구조는 FAQ, 운영 공지, 문의 접수 등으로 연결되도록 설계했습니다. 현재는 메인 화면 중심의 정보 허브 역할을 합니다."
-      },
-      {
-        id: "support-contact",
-        label: "문의 접수",
-        summary: "운영 문의 흐름",
-        tag: "문의",
-        detailTitle: "문의 접수",
-        detailBody:
-          "참가자 문의, 인증 오류 접수, 운영 요청을 하위 메뉴로 연결할 수 있게 구성했습니다."
-      },
-      {
         id: "support-source",
         label: "데이터 출처",
-        summary: "지도와 코스 데이터",
+        summary: "Kakao Maps 기반",
         tag: "출처",
         detailTitle: "데이터 출처",
         detailBody:
-          "지도는 Kakao 지도 Web API 기반이며, 코스와 인증 포인트는 현재 샘플 데이터로 연결되어 있습니다."
+          "지도는 Kakao 지도 Web API 기반이며, 장소 마커는 주소 검색과 키워드 검색을 조합해 표출합니다."
+      },
+      {
+        id: "support-domain",
+        label: "도메인 등록",
+        summary: "지도 로딩 오류 대응",
+        tag: "점검",
+        detailTitle: "카카오 도메인 등록 확인",
+        detailBody:
+          "지도가 뜨지 않으면 JavaScript 키뿐 아니라 카카오 디벨로퍼스 Web 플랫폼에 현재 접속 도메인이 등록되어 있는지 확인해야 합니다."
       }
     ]
   }
@@ -339,74 +204,53 @@ const sideMenus = {
   course: {
     title: "챌린지 코스",
     getItems: () =>
-      routes.map((route) => ({
+      routePlaces.map((route) => ({
         id: route.id,
-        label: route.name,
-        summary: `${route.city} · ${route.distance}`,
-        tag: route.region,
+        label: route.title,
+        summary: `${route.city} · ${route.region}`,
+        tag: "코스",
         action: { type: "focus-route", routeId: route.id },
-        detailTitle: route.name,
+        detailTitle: route.title,
         detailBody: route.description,
-        detailMeta: [
-          route.city,
-          route.region,
-          route.distance,
-          `${route.participants.toLocaleString()}명 참가`
-        ]
+        detailMeta: [route.city, route.region]
       }))
   },
   checkpoint: {
     title: "인증 스팟",
     getItems: () =>
-      routes.flatMap((route) =>
-        route.checkpoints.map((spot, index) => ({
-          id: spot.id,
-          label: spot.name,
-          summary: `${route.name} · ${index + 1}번째 인증`,
-          tag: route.city,
-          action: { type: "focus-checkpoint", routeId: route.id, checkpointId: spot.id },
-          detailTitle: spot.name,
-          detailBody:
-            `${route.name}에 포함된 인증 포인트입니다. 클릭하면 해당 위치로 지도가 이동하고 관련 코스가 강조됩니다.`,
-          detailMeta: [route.city, route.region, route.distance]
-        }))
-      )
+      selectedPlaces.map((place) => ({
+        id: place.id,
+        label: place.title,
+        summary: place.address || place.query,
+        tag: "장소",
+        action: { type: "focus-place", placeId: place.id },
+        detailTitle: place.title,
+        detailBody: `${place.title} 위치로 지도를 이동합니다.`,
+        detailMeta: ["전북 권역", "고정 마커"]
+      }))
   },
   ranking: {
     title: "랭킹 보드",
     getItems: () => [
       {
-        id: "ranking-participant",
-        label: "참가자 많은 코스",
-        summary: "현재 시즌2 인기 코스",
+        id: "ranking-main",
+        label: "대표 코스 보기",
+        summary: "전주 한옥길 중심",
         tag: "TOP",
-        action: { type: "focus-route", routeId: "hangang-seoul" },
-        detailTitle: "참가자 상위 코스",
-        detailBody:
-          "한강 스프린트 챌린지가 현재 가장 많은 참가자를 확보하고 있습니다. 도시형 루트로 접근성이 높아 시즌 초반 유입이 강합니다.",
-        detailMeta: ["1,940명 참가", "수도권", "도심형"]
-      },
-      {
-        id: "ranking-completion",
-        label: "완주율 높은 코스",
-        summary: "완주 인증 상위 코스",
-        tag: "완주",
         action: { type: "focus-route", routeId: "jeonju-hanok" },
-        detailTitle: "완주 인증 상위 코스",
+        detailTitle: "대표 코스 보기",
         detailBody:
-          "전주 한옥길 챌린지는 시즌 대표 코스로 완주 인증 수가 가장 높은 편입니다. 운영 배너와 연동하기 좋은 코스입니다.",
-        detailMeta: ["1,181회 완주", "전라권", "대표 코스"]
+          "현재 메인 코스는 전주 한옥길 챌린지입니다. 전북 중심의 화면 흐름에 맞게 우선 노출됩니다."
       },
       {
-        id: "ranking-growth",
-        label: "성장 기대 코스",
-        summary: "확장 운영 추천",
+        id: "ranking-route",
+        label: "새만금 확장 코스",
+        summary: "해안형 코스 이동",
         tag: "확장",
         action: { type: "focus-route", routeId: "saemangeum-coast" },
-        detailTitle: "성장 기대 코스",
+        detailTitle: "새만금 확장 코스",
         detailBody:
-          "새만금 코스트 챌린지는 시즌 후반 관광 연계형 캠페인으로 성장 잠재력이 높은 코스입니다.",
-        detailMeta: ["해안형", "장거리", "홍보 적합"]
+          "새만금 코스트 챌린지는 시즌2 확장형 해안 코스로 운영 메뉴와 연결됩니다."
       }
     ]
   },
@@ -414,42 +258,31 @@ const sideMenus = {
     title: "탄소 절감",
     getItems: () => [
       {
-        id: "carbon-total",
-        label: "누적 감축량",
-        summary: "시즌2 전체 추정치",
-        tag: "21t",
-        detailTitle: "누적 탄소 감축량",
+        id: "carbon-place",
+        label: "거점 중심 탐색",
+        summary: "선정 장소 확인",
+        tag: "거점",
+        action: { type: "focus-place", placeId: "goui-reservoir" },
+        detailTitle: "거점 중심 탐색",
         detailBody:
-          "현재 시즌2 운영 기준으로 총 이동 거리와 대중교통/자가용 대체 이동량을 반영한 탄소 감축 추정치를 연결할 수 있습니다.",
-        detailMeta: ["21톤 목표", "12만 km 목표", "전국 기준"]
+          "선정 장소를 기준으로 캠페인 확산 거점을 보여줍니다. 구이저수지와 완주군 미소시장도 포함됩니다."
       },
       {
-        id: "carbon-tree",
-        label: "나무 환산",
-        summary: "감축량 시각화 지표",
-        tag: "환산",
-        detailTitle: "나무 식재 환산 지표",
+        id: "carbon-view",
+        label: "지도로 보기",
+        summary: "전체 범위 재설정",
+        tag: "지도",
+        action: { type: "fit-all" },
+        detailTitle: "지도로 전체 보기",
         detailBody:
-          "탄소 감축량을 나무 식재 수, 도시숲 흡수량 등으로 치환해 시즌 참여 동기를 더 강하게 만들 수 있습니다.",
-        detailMeta: ["시각화 가능", "캠페인 활용", "홍보 지표"]
-      },
-      {
-        id: "carbon-route",
-        label: "대표 탄소 코스",
-        summary: "대표 코스 바로 보기",
-        tag: "전주",
-        action: { type: "focus-route", routeId: "jeonju-hanok" },
-        detailTitle: "대표 탄소 감축 코스",
-        detailBody:
-          "전주 한옥길 코스를 시즌2 탄소 감축 대표 루트로 설정해 상단 배너와 좌측 메뉴에서 동시에 접근할 수 있게 했습니다.",
-        detailMeta: ["전주", "대표 노출", "시즌 메인"]
+          "코스와 고정 마커를 함께 보며 시즌2 전북 거점을 한 번에 살펴볼 수 있습니다."
       }
     ]
   }
 };
 
 const state = {
-  selectedRouteId: (window.DEFAULT_ROUTE_ID || "jeonju-hanok"),
+  selectedRouteId: window.DEFAULT_ROUTE_ID || "jeonju-hanok",
   currentMapType: "ROADMAP",
   openTopMenuId: "intro",
   openSideMenuId: null
@@ -471,16 +304,15 @@ const elements = {
     list: document.getElementById("sidePanelList"),
     detail: document.getElementById("sidePanelDetail")
   },
-  mapTypeButtons: document.querySelectorAll("[data-map-type]"),
   topButtons: document.querySelectorAll("[data-top-menu]"),
   sideButtons: document.querySelectorAll("[data-side-menu]"),
+  mapTypeButtons: document.querySelectorAll("[data-map-type]"),
   closeButtons: document.querySelectorAll("[data-close-panel]")
 };
 
 const mapState = {
   map: null,
-  polylines: new Map(),
-  checkpointMarkers: new Map(),
+  routePolylines: new Map(),
   selectedPlaceMarkers: []
 };
 
@@ -495,7 +327,7 @@ async function bootstrap() {
   const appKey = window.KAKAO_MAP_APPKEY;
   if (!appKey || appKey === "YOUR_KAKAO_JAVASCRIPT_KEY") {
     elements.keyNotice.hidden = false;
-    elements.mapStatus.textContent = "카카오맵 키를 설정하면 지도가 표시됩니다. · 현재 지도: 일반 지도";
+    updateMapStatus("카카오맵 키를 설정하면 지도가 표시됩니다.");
     renderMapFallback();
     return;
   }
@@ -505,7 +337,7 @@ async function bootstrap() {
     initMap();
   } catch (error) {
     elements.keyNotice.hidden = false;
-    elements.mapStatus.textContent = "카카오맵 로딩에 실패했습니다. · 현재 지도: 일반 지도";
+    updateMapStatus("카카오맵 로딩에 실패했습니다.");
     renderMapFallback();
   }
 }
@@ -535,60 +367,25 @@ function loadKakaoMapsSdk(appKey) {
 }
 
 function initMap() {
-  const initialMapType = getKakaoMapTypeId(state.currentMapType);
-  const kakaoMap = new kakao.maps.Map(elements.map, {
-    center: new kakao.maps.LatLng(36.2683, 127.6358),
-    level: 13,
-    mapTypeId: initialMapType
+  const map = new kakao.maps.Map(elements.map, {
+    center: new kakao.maps.LatLng(35.8242, 127.148),
+    level: 9,
+    mapTypeId: getKakaoMapTypeId(state.currentMapType)
   });
 
-  mapState.map = kakaoMap;
-  kakaoMap.setMaxLevel(14);
-  kakaoMap.setMinLevel(1);
+  mapState.map = map;
   elements.keyNotice.hidden = true;
 
-  routes.forEach((route) => {
-    const path = route.path.map(([lat, lng]) => new kakao.maps.LatLng(lat, lng));
-
+  routePlaces.forEach((route) => {
     const polyline = new kakao.maps.Polyline({
-      path,
-      strokeWeight: 5,
+      path: route.points.map(([lat, lng]) => new kakao.maps.LatLng(lat, lng)),
+      strokeWeight: route.id === state.selectedRouteId ? 7 : 5,
       strokeColor: route.color,
-      strokeOpacity: route.id === state.selectedRouteId ? 0.92 : 0.34,
+      strokeOpacity: route.id === state.selectedRouteId ? 0.95 : 0.34,
       strokeStyle: "solid"
     });
-    polyline.setMap(kakaoMap);
-    mapState.polylines.set(route.id, polyline);
-
-    const checkpointMarkers = route.checkpoints.map((spot) => {
-      const checkpointMarker = new kakao.maps.Marker({
-        map: null,
-        position: new kakao.maps.LatLng(spot.coords[0], spot.coords[1]),
-        title: spot.name,
-        image: createCheckpointImage(route.color)
-      });
-
-      const checkpointInfo = new kakao.maps.InfoWindow({
-        content: `
-          <div style="padding:9px 11px;min-width:160px;font-size:13px;line-height:1.5;">
-            <strong style="display:block;font-size:14px;margin-bottom:4px;">${spot.name}</strong>
-            <span>${route.name}</span>
-          </div>
-        `
-      });
-
-      kakao.maps.event.addListener(checkpointMarker, "click", () => {
-        checkpointInfo.open(kakaoMap, checkpointMarker);
-        setTimeout(() => checkpointInfo.close(), 1800);
-      });
-
-      return {
-        id: spot.id,
-        marker: checkpointMarker
-      };
-    });
-
-    mapState.checkpointMarkers.set(route.id, checkpointMarkers);
+    polyline.setMap(map);
+    mapState.routePolylines.set(route.id, polyline);
   });
 
   renderSelectedPlaces();
@@ -596,178 +393,72 @@ function initMap() {
   updateMapStatus("카카오맵에서 시즌2 코스를 탐색할 수 있습니다.");
 }
 
-function createCheckpointImage(color) {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
-      <circle cx="13" cy="13" r="10" fill="${color}" />
-      <circle cx="13" cy="13" r="4.5" fill="#ffffff" />
-    </svg>
-  `;
-  return new kakao.maps.MarkerImage(
-    `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    new kakao.maps.Size(26, 26),
-    { offset: new kakao.maps.Point(13, 13) }
-  );
-}
-
-function selectRoute(routeId, options = {}) {
-  state.selectedRouteId = routeId;
-  if (!mapState.map) {
-    renderSidePanel(state.openSideMenuId);
-    return;
-  }
-
-  routes.forEach((route) => {
-    const polyline = mapState.polylines.get(route.id);
-    const checkpointMarkers = mapState.checkpointMarkers.get(route.id) || [];
-    const isSelected = route.id === routeId;
-
-    polyline.setOptions({
-      strokeWeight: isSelected ? 7 : 5,
-      strokeOpacity: isSelected ? 0.95 : 0.34
-    });
-
-    checkpointMarkers.forEach(({ marker: checkpointMarker }) => {
-      checkpointMarker.setMap(null);
-    });
-  });
-
-  if (options.fitBounds) {
-    fitRouteBounds(routeId);
-  }
-
-  const route = routes.find((item) => item.id === routeId);
-  if (route) {
-    updateMapStatus(`${route.name} · ${route.city} 코스를 보고 있습니다.`);
-  }
-
-  renderSidePanel(state.openSideMenuId);
-}
-
-function fitRouteBounds(routeId) {
-  const route = routes.find((item) => item.id === routeId);
-  if (!route || !mapState.map) {
-    return;
-  }
-
-  const bounds = new kakao.maps.LatLngBounds();
-  route.path.forEach(([lat, lng]) => bounds.extend(new kakao.maps.LatLng(lat, lng)));
-  mapState.map.setBounds(bounds);
-}
-
-function focusCheckpoint(routeId, checkpointId) {
-  const route = routes.find((item) => item.id === routeId);
-  if (!route || !mapState.map) {
-    return;
-  }
-
-  selectRoute(routeId);
-  const checkpoint = route.checkpoints.find((spot) => spot.id === checkpointId);
-  if (!checkpoint) {
-    return;
-  }
-
-  const checkpointMarkers = mapState.checkpointMarkers.get(routeId) || [];
-  checkpointMarkers.forEach(({ id, marker }) => {
-    marker.setMap(id === checkpointId ? mapState.map : null);
-  });
-
-  mapState.map.setLevel(6);
-  mapState.map.panTo(new kakao.maps.LatLng(checkpoint.coords[0], checkpoint.coords[1]));
-  updateMapStatus(`${checkpoint.name} 인증 스팟으로 이동했습니다.`);
-}
-
-function fitAllRoutes() {
-  if (!mapState.map) {
-    return;
-  }
-
-  const bounds = new kakao.maps.LatLngBounds();
-  routes.forEach((route) => {
-    route.path.forEach(([lat, lng]) => bounds.extend(new kakao.maps.LatLng(lat, lng)));
-  });
-  mapState.map.setBounds(bounds);
-  updateMapStatus("시즌2 전체 코스를 한 번에 보고 있습니다.");
-}
-
-function setBaseMapType(mapTypeId) {
-  state.currentMapType = mapTypeId;
-
-  if (mapState.map) {
-    const kakaoMapType = getKakaoMapTypeId(mapTypeId);
-    if (kakaoMapType !== null) {
-      try {
-        mapState.map.setMapTypeId(kakaoMapType);
-      } catch (error) {
-        updateMapStatus("지도 타입 전환 중 오류가 발생했습니다.");
-        return;
-      }
-    }
-  }
-
-  updateMapTypeButtons();
-  const modeName = getMapTypeLabel(mapTypeId);
-  updateMapStatus(`${modeName}로 지도를 전환했습니다.`);
-
-  if (state.openTopMenuId === "operation") {
-    renderTopPanel("operation");
-  }
-}
-
-function getMapTypeLabel(mapTypeId) {
-  if (mapTypeId === "SKYVIEW") {
-    return "위성 지도";
-  }
-  return "일반 지도";
-}
-
-function getKakaoMapTypeId(mapTypeId) {
-  if (!window.kakao?.maps?.MapTypeId) {
-    return null;
-  }
-
-  if (mapTypeId === "SKYVIEW") {
-    return kakao.maps.MapTypeId.SKYVIEW;
-  }
-
-  return kakao.maps.MapTypeId.ROADMAP;
-}
-
-function updateMapStatus(message) {
-  const mode = getMapTypeLabel(state.currentMapType);
-  elements.mapStatus.textContent = `${message} · 현재 지도: ${mode}`;
-}
-
 function renderSelectedPlaces() {
   if (!mapState.map || !window.kakao?.maps?.services) {
-    createSelectedPlaceMarkers(selectedPlaces);
+    createSelectedPlaceMarkers(selectedPlaces.map((place) => ({ ...place, coords: place.fallback })));
     return;
   }
 
   const geocoder = new kakao.maps.services.Geocoder();
+  const placesService = new kakao.maps.services.Places();
 
-  Promise.all(
-    selectedPlaces.map(
-      (place) =>
-        new Promise((resolve) => {
-          geocoder.addressSearch(place.address, (result, status) => {
-            if (status === kakao.maps.services.Status.OK && result?.[0]) {
-              resolve({
-                ...place,
-                coords: [Number(result[0].y), Number(result[0].x)]
-              });
-              return;
-            }
+  resolveSelectedPlaces(selectedPlaces, geocoder, placesService).then((places) => {
+    createSelectedPlaceMarkers(places);
+  });
+}
 
-            resolve({
-              ...place,
-              coords: place.fallback
-            });
-          });
-        })
-    )
-  ).then((resolvedPlaces) => {
-    createSelectedPlaceMarkers(resolvedPlaces);
+async function resolveSelectedPlaces(places, geocoder, placesService) {
+  const resolved = [];
+
+  for (const place of places) {
+    const coords = await resolvePlaceCoords(place, geocoder, placesService);
+    resolved.push({
+      ...place,
+      coords: coords || place.fallback
+    });
+  }
+
+  return resolved;
+}
+
+function resolvePlaceCoords(place, geocoder, placesService) {
+  return new Promise((resolve) => {
+    const tryKeyword = () => {
+      if (!place.query) {
+        resolve(place.fallback);
+        return;
+      }
+
+      placesService.keywordSearch(
+        place.query,
+        (result, status) => {
+          if (status === kakao.maps.services.Status.OK && result?.[0]) {
+            resolve([Number(result[0].y), Number(result[0].x)]);
+            return;
+          }
+
+          resolve(place.fallback);
+        },
+        {
+          rect: JEONBUK_RECT,
+          size: 5
+        }
+      );
+    };
+
+    if (place.address) {
+      geocoder.addressSearch(place.address, (result, status) => {
+        if (status === kakao.maps.services.Status.OK && result?.[0]) {
+          resolve([Number(result[0].y), Number(result[0].x)]);
+          return;
+        }
+
+        tryKeyword();
+      });
+      return;
+    }
+
+    tryKeyword();
   });
 }
 
@@ -789,9 +480,9 @@ function createSelectedPlaceMarkers(places) {
 
     const infoWindow = new kakao.maps.InfoWindow({
       content: `
-        <div style="padding:10px 12px;min-width:190px;font-size:13px;line-height:1.55;">
+        <div style="padding:10px 12px;min-width:200px;font-size:13px;line-height:1.55;">
           <strong style="display:block;font-size:14px;margin-bottom:4px;">${place.title}</strong>
-          <span>${place.address}</span>
+          <span>${place.address || place.query}</span>
         </div>
       `
     });
@@ -802,45 +493,146 @@ function createSelectedPlaceMarkers(places) {
       setTimeout(() => infoWindow.close(), 2200);
     });
 
-    mapState.selectedPlaceMarkers.push({ marker, infoWindow, place });
+    mapState.selectedPlaceMarkers.push({ place, marker, infoWindow });
   });
 }
 
 function createSelectedPlaceMarkerImage() {
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" viewBox="0 0 58 58">
-      <circle cx="29" cy="29" r="23" fill="#17322f" />
-      <circle cx="29" cy="29" r="19" fill="#ffffff" opacity="0.12" />
-      <path d="M29 16c-5.8 0-10.5 4.5-10.5 10 0 7.8 10.5 17.2 10.5 17.2S39.5 33.8 39.5 26c0-5.5-4.7-10-10.5-10Z" fill="#ff8f54"/>
-      <circle cx="29" cy="26" r="4.3" fill="#ffffff"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="58" viewBox="0 0 50 58">
+      <path d="M25 6c-9.4 0-17 7.4-17 16.5 0 12.6 17 27.5 17 27.5S42 35.1 42 22.5C42 13.4 34.4 6 25 6Z" fill="#17322f"/>
+      <circle cx="25" cy="22.5" r="8.2" fill="#ff8f54"/>
+      <circle cx="25" cy="22.5" r="3.5" fill="#ffffff"/>
     </svg>
   `;
 
   return new kakao.maps.MarkerImage(
     `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    new kakao.maps.Size(58, 58),
-    { offset: new kakao.maps.Point(29, 48) }
+    new kakao.maps.Size(50, 58),
+    { offset: new kakao.maps.Point(25, 52) }
   );
 }
 
-function updateMapTypeButtons() {
-  elements.mapTypeButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.mapType === state.currentMapType);
+function selectRoute(routeId, options = {}) {
+  state.selectedRouteId = routeId;
+
+  if (!mapState.map) {
+    return;
+  }
+
+  routePlaces.forEach((route) => {
+    const polyline = mapState.routePolylines.get(route.id);
+    const selected = route.id === routeId;
+    polyline.setOptions({
+      strokeWeight: selected ? 7 : 5,
+      strokeOpacity: selected ? 0.95 : 0.34
+    });
   });
+
+  if (options.fitBounds) {
+    fitRouteBounds(routeId);
+  }
+
+  const route = routePlaces.find((item) => item.id === routeId);
+  if (route) {
+    updateMapStatus(`${route.title} · ${route.city} 코스를 보고 있습니다.`);
+  }
+}
+
+function fitRouteBounds(routeId) {
+  const route = routePlaces.find((item) => item.id === routeId);
+  if (!route || !mapState.map) {
+    return;
+  }
+
+  const bounds = new kakao.maps.LatLngBounds();
+  route.points.forEach(([lat, lng]) => bounds.extend(new kakao.maps.LatLng(lat, lng)));
+  mapState.map.setBounds(bounds);
+}
+
+function focusPlace(placeId) {
+  if (!mapState.map) {
+    return;
+  }
+
+  const selected = mapState.selectedPlaceMarkers.find((item) => item.place.id === placeId);
+  if (!selected) {
+    return;
+  }
+
+  mapState.map.setLevel(5);
+  mapState.map.panTo(new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]));
+  selected.infoWindow.open(mapState.map, selected.marker);
+  updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`);
+  setTimeout(() => selected.infoWindow.close(), 2200);
+}
+
+function fitAllRoutes() {
+  if (!mapState.map) {
+    return;
+  }
+
+  const bounds = new kakao.maps.LatLngBounds();
+  routePlaces.forEach((route) => {
+    route.points.forEach(([lat, lng]) => bounds.extend(new kakao.maps.LatLng(lat, lng)));
+  });
+  mapState.selectedPlaceMarkers.forEach(({ place }) => {
+    bounds.extend(new kakao.maps.LatLng(place.coords[0], place.coords[1]));
+  });
+  mapState.map.setBounds(bounds);
+  updateMapStatus("코스와 주요 장소를 한 번에 보고 있습니다.");
+}
+
+function setBaseMapType(mapTypeId) {
+  state.currentMapType = mapTypeId;
+
+  if (mapState.map) {
+    try {
+      mapState.map.setMapTypeId(getKakaoMapTypeId(mapTypeId));
+    } catch (error) {
+      updateMapStatus("지도 타입 전환 중 오류가 발생했습니다.");
+      return;
+    }
+  }
+
+  updateMapTypeButtons();
+  updateMapStatus(`${getMapTypeLabel(mapTypeId)}로 지도를 전환했습니다.`);
+
+  if (state.openTopMenuId === "operation") {
+    renderTopPanel("operation");
+  }
+}
+
+function getKakaoMapTypeId(mapTypeId) {
+  if (mapTypeId === "SKYVIEW") {
+    return kakao.maps.MapTypeId.SKYVIEW;
+  }
+  return kakao.maps.MapTypeId.ROADMAP;
+}
+
+function getMapTypeLabel(mapTypeId) {
+  return mapTypeId === "SKYVIEW" ? "위성 지도" : "일반 지도";
+}
+
+function updateMapStatus(message) {
+  elements.mapStatus.textContent = `${message} · 현재 지도: ${getMapTypeLabel(state.currentMapType)}`;
 }
 
 function bindMenuButtons() {
   elements.topButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const menuId = button.dataset.topMenu;
+      closeSidePanel();
+
       if (state.openTopMenuId === menuId && !elements.topPanel.root.hidden) {
-        elements.topPanel.root.hidden = true;
         state.openTopMenuId = null;
+        elements.topPanel.root.hidden = true;
       } else {
         state.openTopMenuId = menuId;
         elements.topPanel.root.hidden = false;
         renderTopPanel(menuId);
       }
+
       updateActiveButtons();
     });
   });
@@ -848,29 +640,30 @@ function bindMenuButtons() {
   elements.sideButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const menuId = button.dataset.sideMenu;
-      if (state.openSideMenuId === menuId && !elements.sidePanel.root.hidden) {
-        elements.sidePanel.root.hidden = true;
-        state.openSideMenuId = null;
+
+      if (state.openSideMenuId === menuId && elements.sidePanel.root.classList.contains("is-open")) {
+        closeSidePanel();
       } else {
         state.openSideMenuId = menuId;
-        elements.sidePanel.root.hidden = false;
         renderSidePanel(menuId);
+        openSidePanel();
       }
+
       updateActiveButtons();
     });
   });
 
   elements.closeButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      const panel = button.dataset.closePanel;
-      if (panel === "top") {
+      if (button.dataset.closePanel === "top") {
         state.openTopMenuId = null;
         elements.topPanel.root.hidden = true;
       }
-      if (panel === "side") {
-        state.openSideMenuId = null;
-        elements.sidePanel.root.hidden = true;
+
+      if (button.dataset.closePanel === "side") {
+        closeSidePanel();
       }
+
       updateActiveButtons();
     });
   });
@@ -886,20 +679,36 @@ function bindMapTypeButtons() {
   });
 }
 
+function openSidePanel() {
+  elements.sidePanel.root.classList.add("is-open");
+}
+
+function closeSidePanel() {
+  state.openSideMenuId = null;
+  elements.sidePanel.root.classList.remove("is-open");
+}
+
+function updateMapTypeButtons() {
+  elements.mapTypeButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.mapType === state.currentMapType);
+  });
+}
+
 function updateActiveButtons() {
   elements.topButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.topMenu === state.openTopMenuId);
   });
+
   elements.sideButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.sideMenu === state.openSideMenuId);
+    button.classList.toggle(
+      "is-active",
+      button.dataset.sideMenu === state.openSideMenuId &&
+        elements.sidePanel.root.classList.contains("is-open")
+    );
   });
 }
 
 function renderTopPanel(menuId) {
-  if (!menuId) {
-    return;
-  }
-
   const menu = topMenus[menuId];
   if (!menu) {
     return;
@@ -907,57 +716,34 @@ function renderTopPanel(menuId) {
 
   const items = getMenuItems(menu);
   elements.topPanel.title.textContent = menu.title;
-  renderPanelItems({
-    panel: elements.topPanel,
-    menu: { title: menu.title, items },
-    defaultItemId:
-      menuId === "operation"
-        ? `map-type-${state.currentMapType.toLowerCase()}`
-        : items[0]?.id
-  });
+  renderPanelItems(
+    elements.topPanel,
+    items,
+    menuId === "operation" ? `map-type-${state.currentMapType.toLowerCase()}` : items[0]?.id
+  );
 }
 
 function renderSidePanel(menuId) {
-  if (!menuId) {
-    elements.sidePanel.root.hidden = true;
-    return;
-  }
-
   const menu = sideMenus[menuId];
   if (!menu) {
     return;
   }
 
-  elements.sidePanel.root.hidden = false;
   const items = getMenuItems(menu);
   elements.sidePanel.title.textContent = menu.title;
-  renderPanelItems({
-    panel: elements.sidePanel,
-    menu: { title: menu.title, items },
-    defaultItemId:
-      menuId === "course"
-        ? state.selectedRouteId
-        : menuId === "checkpoint"
-          ? routes.find((route) => route.id === state.selectedRouteId)?.checkpoints[0]?.id
-          : items[0]?.id
-  });
+  renderPanelItems(elements.sidePanel, items, items[0]?.id);
 }
 
-function renderPanelItems({ panel, menu, defaultItemId }) {
+function renderPanelItems(panel, items, defaultItemId) {
   panel.list.innerHTML = "";
 
-  const activeItem =
-    menu.items.find((item) => item.id === defaultItemId) ||
-    menu.items[0];
+  const activeItem = items.find((item) => item.id === defaultItemId) || items[0];
 
-  menu.items.forEach((item) => {
+  items.forEach((item) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "submenu-item";
-    if (activeItem && activeItem.id === item.id) {
-      button.classList.add("is-active");
-    }
-
+    button.classList.toggle("is-active", activeItem?.id === item.id);
     button.innerHTML = `
       <div class="submenu-item-text">
         <strong>${item.label}</strong>
@@ -1006,8 +792,8 @@ function handleMenuAction(action) {
     selectRoute(action.routeId, { fitBounds: true });
   }
 
-  if (action.type === "focus-checkpoint") {
-    focusCheckpoint(action.routeId, action.checkpointId);
+  if (action.type === "focus-place") {
+    focusPlace(action.placeId);
   }
 
   if (action.type === "fit-all") {
@@ -1020,8 +806,5 @@ function handleMenuAction(action) {
 }
 
 function getMenuItems(menu) {
-  if (typeof menu.getItems === "function") {
-    return menu.getItems();
-  }
-  return menu.items || [];
+  return typeof menu.getItems === "function" ? menu.getItems() : menu.items || [];
 }

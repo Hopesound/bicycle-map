@@ -271,23 +271,13 @@ const topMenus = {
       },
       {
         id: "map-type-skyview",
-        label: "항공사진",
-        summary: "스카이뷰만 보기",
-        tag: state.currentMapType === "SKYVIEW" ? "현재" : "항공",
+        label: "위성지도",
+        summary: "스카이뷰 보기",
+        tag: state.currentMapType === "SKYVIEW" ? "현재" : "위성",
         action: { type: "set-map-type", mapTypeId: "SKYVIEW" },
-        detailTitle: "항공사진 모드",
+        detailTitle: "위성지도 모드",
         detailBody:
-          "카카오 스카이뷰를 사용해 항공사진 중심으로 지형을 확인합니다. 레이블 없이 실제 지형이나 주변 환경을 보는 데 적합합니다."
-      },
-      {
-        id: "map-type-hybrid",
-        label: "하이브리드",
-        summary: "항공사진 + 레이블",
-        tag: state.currentMapType === "HYBRID" ? "현재" : "추천",
-        action: { type: "set-map-type", mapTypeId: "HYBRID" },
-        detailTitle: "하이브리드 지도 모드",
-        detailBody:
-          "항공사진 위에 지명과 도로 레이블을 함께 표시합니다. 현장감과 식별성을 동시에 확보하고 싶을 때 가장 적합한 모드입니다."
+          "카카오 스카이뷰를 사용해 위성 사진 기반 배경으로 전환합니다. 실제 지형과 주변 환경을 보는 데 적합합니다."
       },
       {
         id: "op-all",
@@ -489,9 +479,7 @@ const elements = {
 
 const mapState = {
   map: null,
-  markers: new Map(),
   polylines: new Map(),
-  infoWindows: new Map(),
   checkpointMarkers: new Map(),
   selectedPlaceMarkers: []
 };
@@ -547,15 +535,17 @@ function loadKakaoMapsSdk(appKey) {
 }
 
 function initMap() {
+  const initialMapType = getKakaoMapTypeId(state.currentMapType);
   const kakaoMap = new kakao.maps.Map(elements.map, {
     center: new kakao.maps.LatLng(36.2683, 127.6358),
     level: 13,
-    mapTypeId: kakao.maps.MapTypeId[state.currentMapType]
+    mapTypeId: initialMapType
   });
 
   mapState.map = kakaoMap;
   kakaoMap.setMaxLevel(14);
   kakaoMap.setMinLevel(1);
+  elements.keyNotice.hidden = true;
 
   routes.forEach((route) => {
     const path = route.path.map(([lat, lng]) => new kakao.maps.LatLng(lat, lng));
@@ -569,31 +559,6 @@ function initMap() {
     });
     polyline.setMap(kakaoMap);
     mapState.polylines.set(route.id, polyline);
-
-    const marker = new kakao.maps.Marker({
-      map: kakaoMap,
-      position: new kakao.maps.LatLng(route.center[0], route.center[1]),
-      title: route.name,
-      image: createMarkerImage(route, route.id === state.selectedRouteId)
-    });
-
-    const infoWindow = new kakao.maps.InfoWindow({
-      content: `
-        <div style="padding:10px 12px;min-width:180px;font-size:13px;line-height:1.5;">
-          <strong style="display:block;font-size:14px;margin-bottom:4px;">${route.name}</strong>
-          <span>${route.city} · ${route.distance}</span>
-        </div>
-      `
-    });
-
-    kakao.maps.event.addListener(marker, "click", () => {
-      selectRoute(route.id);
-      infoWindow.open(kakaoMap, marker);
-      setTimeout(() => infoWindow.close(), 1800);
-    });
-
-    mapState.markers.set(route.id, marker);
-    mapState.infoWindows.set(route.id, infoWindow);
 
     const checkpointMarkers = route.checkpoints.map((spot) => {
       const checkpointMarker = new kakao.maps.Marker({
@@ -631,23 +596,6 @@ function initMap() {
   updateMapStatus("카카오맵에서 시즌2 코스를 탐색할 수 있습니다.");
 }
 
-function createMarkerImage(route, isSelected) {
-  const background = isSelected ? "#ff8f54" : route.color;
-  const size = isSelected ? 58 : 50;
-  const radius = isSelected ? 22 : 20;
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-      <rect x="4" y="4" width="${size - 8}" height="${size - 8}" rx="${radius}" fill="${background}" transform="rotate(10 ${size / 2} ${size / 2})"/>
-      <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" font-family="Space Grotesk, sans-serif" font-weight="700" fill="#ffffff">${route.order}</text>
-    </svg>
-  `;
-  return new kakao.maps.MarkerImage(
-    `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    new kakao.maps.Size(size, size),
-    { offset: new kakao.maps.Point(size / 2, size - 6) }
-  );
-}
-
 function createCheckpointImage(color) {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
@@ -670,19 +618,17 @@ function selectRoute(routeId, options = {}) {
   }
 
   routes.forEach((route) => {
-    const marker = mapState.markers.get(route.id);
     const polyline = mapState.polylines.get(route.id);
     const checkpointMarkers = mapState.checkpointMarkers.get(route.id) || [];
     const isSelected = route.id === routeId;
 
-    marker.setImage(createMarkerImage(route, isSelected));
     polyline.setOptions({
       strokeWeight: isSelected ? 7 : 5,
       strokeOpacity: isSelected ? 0.95 : 0.34
     });
 
     checkpointMarkers.forEach(({ marker: checkpointMarker }) => {
-      checkpointMarker.setMap(isSelected ? mapState.map : null);
+      checkpointMarker.setMap(null);
     });
   });
 
@@ -721,6 +667,11 @@ function focusCheckpoint(routeId, checkpointId) {
     return;
   }
 
+  const checkpointMarkers = mapState.checkpointMarkers.get(routeId) || [];
+  checkpointMarkers.forEach(({ id, marker }) => {
+    marker.setMap(id === checkpointId ? mapState.map : null);
+  });
+
   mapState.map.setLevel(6);
   mapState.map.panTo(new kakao.maps.LatLng(checkpoint.coords[0], checkpoint.coords[1]));
   updateMapStatus(`${checkpoint.name} 인증 스팟으로 이동했습니다.`);
@@ -743,12 +694,14 @@ function setBaseMapType(mapTypeId) {
   state.currentMapType = mapTypeId;
 
   if (mapState.map) {
-    try {
-      mapState.map.setMapTypeId(kakao.maps.MapTypeId[mapTypeId]);
-    } catch (error) {
-      elements.keyNotice.hidden = false;
-      updateMapStatus("지도 타입 전환 중 오류가 발생했습니다.");
-      return;
+    const kakaoMapType = getKakaoMapTypeId(mapTypeId);
+    if (kakaoMapType !== null) {
+      try {
+        mapState.map.setMapTypeId(kakaoMapType);
+      } catch (error) {
+        updateMapStatus("지도 타입 전환 중 오류가 발생했습니다.");
+        return;
+      }
     }
   }
 
@@ -763,12 +716,21 @@ function setBaseMapType(mapTypeId) {
 
 function getMapTypeLabel(mapTypeId) {
   if (mapTypeId === "SKYVIEW") {
-    return "항공사진";
-  }
-  if (mapTypeId === "HYBRID") {
-    return "하이브리드 지도";
+    return "위성 지도";
   }
   return "일반 지도";
+}
+
+function getKakaoMapTypeId(mapTypeId) {
+  if (!window.kakao?.maps?.MapTypeId) {
+    return null;
+  }
+
+  if (mapTypeId === "SKYVIEW") {
+    return kakao.maps.MapTypeId.SKYVIEW;
+  }
+
+  return kakao.maps.MapTypeId.ROADMAP;
 }
 
 function updateMapStatus(message) {

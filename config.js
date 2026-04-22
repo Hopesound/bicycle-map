@@ -1,2 +1,2 @@
-window.KAKAO_MAP_APPKEY = "13eca9e7bcd70daffbc728ddce4553dc";
+window.KAKAO_MAP_APPKEY = "f5fb64f4ee714a0b3f589d05b3f30d76";
 window.DEFAULT_ROUTE_ID = "jeonju-hanok";

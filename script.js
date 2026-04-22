@@ -172,6 +172,25 @@ const routes = [
   }
 ];
 
+const selectedPlaces = [
+  {
+    id: "goui-reservoir",
+    title: "구이저수지",
+    address: "전북특별자치도 완주군 구이면 구이로 1488-31",
+    description:
+      "선정 장소로 지정된 구이저수지입니다. 구이저수지 둘레길 주소를 기준으로 지도에 표시합니다.",
+    fallback: [35.7398, 127.1032]
+  },
+  {
+    id: "gosan-miso-market",
+    title: "완주군 미소시장",
+    address: "전북특별자치도 완주군 고산면 남봉로 134",
+    description:
+      "선정 장소로 지정된 완주군 미소시장입니다. 고산미소시장 주소를 기준으로 지도에 표시합니다.",
+    fallback: [35.9751, 127.2027]
+  }
+];
+
 const topMenus = {
   intro: {
     title: "챌린지 소개",
@@ -473,7 +492,8 @@ const mapState = {
   markers: new Map(),
   polylines: new Map(),
   infoWindows: new Map(),
-  checkpointMarkers: new Map()
+  checkpointMarkers: new Map(),
+  selectedPlaceMarkers: []
 };
 
 bootstrap();
@@ -519,7 +539,7 @@ function loadKakaoMapsSdk(appKey) {
 
     const script = document.createElement("script");
     script.async = true;
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${appKey}`;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${appKey}&libraries=services`;
     script.onload = () => window.kakao.maps.load(resolve);
     script.onerror = reject;
     document.head.appendChild(script);
@@ -534,6 +554,8 @@ function initMap() {
   });
 
   mapState.map = kakaoMap;
+  kakaoMap.setMaxLevel(14);
+  kakaoMap.setMinLevel(1);
 
   routes.forEach((route) => {
     const path = route.path.map(([lat, lng]) => new kakao.maps.LatLng(lat, lng));
@@ -604,6 +626,7 @@ function initMap() {
     mapState.checkpointMarkers.set(route.id, checkpointMarkers);
   });
 
+  renderSelectedPlaces();
   selectRoute(state.selectedRouteId, { fitBounds: true });
   updateMapStatus("카카오맵에서 시즌2 코스를 탐색할 수 있습니다.");
 }
@@ -720,7 +743,13 @@ function setBaseMapType(mapTypeId) {
   state.currentMapType = mapTypeId;
 
   if (mapState.map) {
-    mapState.map.setMapTypeId(kakao.maps.MapTypeId[mapTypeId]);
+    try {
+      mapState.map.setMapTypeId(kakao.maps.MapTypeId[mapTypeId]);
+    } catch (error) {
+      elements.keyNotice.hidden = false;
+      updateMapStatus("지도 타입 전환 중 오류가 발생했습니다.");
+      return;
+    }
   }
 
   updateMapTypeButtons();
@@ -745,6 +774,91 @@ function getMapTypeLabel(mapTypeId) {
 function updateMapStatus(message) {
   const mode = getMapTypeLabel(state.currentMapType);
   elements.mapStatus.textContent = `${message} · 현재 지도: ${mode}`;
+}
+
+function renderSelectedPlaces() {
+  if (!mapState.map || !window.kakao?.maps?.services) {
+    createSelectedPlaceMarkers(selectedPlaces);
+    return;
+  }
+
+  const geocoder = new kakao.maps.services.Geocoder();
+
+  Promise.all(
+    selectedPlaces.map(
+      (place) =>
+        new Promise((resolve) => {
+          geocoder.addressSearch(place.address, (result, status) => {
+            if (status === kakao.maps.services.Status.OK && result?.[0]) {
+              resolve({
+                ...place,
+                coords: [Number(result[0].y), Number(result[0].x)]
+              });
+              return;
+            }
+
+            resolve({
+              ...place,
+              coords: place.fallback
+            });
+          });
+        })
+    )
+  ).then((resolvedPlaces) => {
+    createSelectedPlaceMarkers(resolvedPlaces);
+  });
+}
+
+function createSelectedPlaceMarkers(places) {
+  if (!mapState.map) {
+    return;
+  }
+
+  mapState.selectedPlaceMarkers.forEach(({ marker }) => marker.setMap(null));
+  mapState.selectedPlaceMarkers = [];
+
+  places.forEach((place) => {
+    const marker = new kakao.maps.Marker({
+      map: mapState.map,
+      position: new kakao.maps.LatLng(place.coords[0], place.coords[1]),
+      title: place.title,
+      image: createSelectedPlaceMarkerImage()
+    });
+
+    const infoWindow = new kakao.maps.InfoWindow({
+      content: `
+        <div style="padding:10px 12px;min-width:190px;font-size:13px;line-height:1.55;">
+          <strong style="display:block;font-size:14px;margin-bottom:4px;">${place.title}</strong>
+          <span>${place.address}</span>
+        </div>
+      `
+    });
+
+    kakao.maps.event.addListener(marker, "click", () => {
+      infoWindow.open(mapState.map, marker);
+      updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`);
+      setTimeout(() => infoWindow.close(), 2200);
+    });
+
+    mapState.selectedPlaceMarkers.push({ marker, infoWindow, place });
+  });
+}
+
+function createSelectedPlaceMarkerImage() {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="58" height="58" viewBox="0 0 58 58">
+      <circle cx="29" cy="29" r="23" fill="#17322f" />
+      <circle cx="29" cy="29" r="19" fill="#ffffff" opacity="0.12" />
+      <path d="M29 16c-5.8 0-10.5 4.5-10.5 10 0 7.8 10.5 17.2 10.5 17.2S39.5 33.8 39.5 26c0-5.5-4.7-10-10.5-10Z" fill="#ff8f54"/>
+      <circle cx="29" cy="26" r="4.3" fill="#ffffff"/>
+    </svg>
+  `;
+
+  return new kakao.maps.MarkerImage(
+    `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    new kakao.maps.Size(58, 58),
+    { offset: new kakao.maps.Point(29, 48) }
+  );
 }
 
 function updateMapTypeButtons() {

@@ -443,7 +443,7 @@ const state = {
   selectedRouteId: (window.DEFAULT_ROUTE_ID || "jeonju-hanok"),
   currentMapType: "ROADMAP",
   openTopMenuId: "intro",
-  openSideMenuId: "course"
+  openSideMenuId: null
 };
 
 const elements = {
@@ -462,6 +462,7 @@ const elements = {
     list: document.getElementById("sidePanelList"),
     detail: document.getElementById("sidePanelDetail")
   },
+  mapTypeButtons: document.querySelectorAll("[data-map-type]"),
   topButtons: document.querySelectorAll("[data-top-menu]"),
   sideButtons: document.querySelectorAll("[data-side-menu]"),
   closeButtons: document.querySelectorAll("[data-close-panel]")
@@ -479,13 +480,14 @@ bootstrap();
 
 async function bootstrap() {
   bindMenuButtons();
+  bindMapTypeButtons();
   renderTopPanel(state.openTopMenuId);
-  renderSidePanel(state.openSideMenuId);
+  updateMapTypeButtons();
 
   const appKey = window.KAKAO_MAP_APPKEY;
   if (!appKey || appKey === "YOUR_KAKAO_JAVASCRIPT_KEY") {
     elements.keyNotice.hidden = false;
-    elements.mapStatus.textContent = "카카오맵 키를 설정하면 지도가 표시됩니다.";
+    elements.mapStatus.textContent = "카카오맵 키를 설정하면 지도가 표시됩니다. · 현재 지도: 일반 지도";
     renderMapFallback();
     return;
   }
@@ -495,7 +497,7 @@ async function bootstrap() {
     initMap();
   } catch (error) {
     elements.keyNotice.hidden = false;
-    elements.mapStatus.textContent = "카카오맵 로딩에 실패했습니다.";
+    elements.mapStatus.textContent = "카카오맵 로딩에 실패했습니다. · 현재 지도: 일반 지도";
     renderMapFallback();
   }
 }
@@ -503,7 +505,7 @@ async function bootstrap() {
 function renderMapFallback() {
   elements.map.innerHTML = `
     <div style="display:grid;place-items:center;height:100%;padding:24px;color:#17322f;background:linear-gradient(180deg,#e7efe9 0%,#dde8e0 100%);font-weight:700;text-align:center;">
-      카카오맵 JavaScript 키를 연결하면 이 위치에 시즌2 지도가 표시됩니다.
+      카카오맵 JavaScript 키와 도메인 등록이 정상일 때 이 위치에 시즌2 지도가 표시됩니다.
     </div>
   `;
 }
@@ -721,6 +723,7 @@ function setBaseMapType(mapTypeId) {
     mapState.map.setMapTypeId(kakao.maps.MapTypeId[mapTypeId]);
   }
 
+  updateMapTypeButtons();
   const modeName = getMapTypeLabel(mapTypeId);
   updateMapStatus(`${modeName}로 지도를 전환했습니다.`);
 
@@ -742,6 +745,12 @@ function getMapTypeLabel(mapTypeId) {
 function updateMapStatus(message) {
   const mode = getMapTypeLabel(state.currentMapType);
   elements.mapStatus.textContent = `${message} · 현재 지도: ${mode}`;
+}
+
+function updateMapTypeButtons() {
+  elements.mapTypeButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.mapType === state.currentMapType);
+  });
 }
 
 function bindMenuButtons() {
@@ -793,6 +802,14 @@ function bindMenuButtons() {
   updateActiveButtons();
 }
 
+function bindMapTypeButtons() {
+  elements.mapTypeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setBaseMapType(button.dataset.mapType);
+    });
+  });
+}
+
 function updateActiveButtons() {
   elements.topButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.topMenu === state.openTopMenuId);
@@ -826,6 +843,7 @@ function renderTopPanel(menuId) {
 
 function renderSidePanel(menuId) {
   if (!menuId) {
+    elements.sidePanel.root.hidden = true;
     return;
   }
 
@@ -834,6 +852,7 @@ function renderSidePanel(menuId) {
     return;
   }
 
+  elements.sidePanel.root.hidden = false;
   const items = getMenuItems(menu);
   elements.sidePanel.title.textContent = menu.title;
   renderPanelItems({

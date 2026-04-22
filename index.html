@@ -100,7 +100,7 @@
           <div class="submenu-detail" id="topPanelDetail"></div>
         </section>
 
-        <section class="submenu-panel side-panel" aria-live="polite">
+        <section class="submenu-panel side-panel" aria-live="polite" hidden>
           <div class="panel-head">
             <p class="panel-kicker">좌측 메뉴</p>
             <h2 id="sidePanelTitle">챌린지 코스</h2>
@@ -116,9 +116,21 @@
           카카오맵 로딩 준비 중
         </div>
 
+        <div class="map-overlay map-type-toggle" aria-label="지도 타입 선택">
+          <button class="map-type-button is-active" type="button" data-map-type="ROADMAP">
+            일반지도
+          </button>
+          <button class="map-type-button" type="button" data-map-type="SKYVIEW">
+            항공사진
+          </button>
+          <button class="map-type-button" type="button" data-map-type="HYBRID">
+            하이브리드
+          </button>
+        </div>
+
         <div class="map-overlay key-notice" id="keyNotice" hidden>
-          <strong>카카오맵 JavaScript 키가 필요합니다.</strong>
-          <span><a href="./config.js">config.js</a>에서 <code>window.KAKAO_MAP_APPKEY</code> 값을 발급받은 키로 바꿔주세요.</span>
+          <strong>카카오맵 또는 항공사진을 불러오지 못했습니다.</strong>
+          <span><a href="./config.js">config.js</a>의 <code>window.KAKAO_MAP_APPKEY</code> 값이 맞는지 확인하고, 카카오 디벨로퍼스 Web 플랫폼에 현재 접속 도메인이 등록되어 있는지도 함께 확인해주세요.</span>
         </div>
       </main>
     </div>

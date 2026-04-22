@@ -380,6 +380,35 @@ a {
   font-weight: 700;
 }
 
+.map-type-toggle {
+  right: 24px;
+  top: calc(var(--header-height) + 22px);
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 22px;
+}
+
+.map-type-button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--muted);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.map-type-button:hover,
+.map-type-button:focus-visible,
+.map-type-button.is-active {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-deep) 100%);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
 .key-notice {
   top: calc(var(--header-height) + 20px);
   right: 24px;
@@ -474,6 +503,11 @@ a {
     left: calc(var(--rail-width) + 16px);
   }
 
+  .map-type-toggle {
+    top: 126px;
+    right: 16px;
+  }
+
   .side-panel {
     top: 126px;
     left: calc(var(--rail-width) + 16px);
@@ -537,6 +571,21 @@ a {
     top: 142px;
   }
 
+  .map-type-toggle {
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 160px;
+    width: auto;
+    justify-content: stretch;
+  }
+
+  .map-type-button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 10px;
+  }
+
   .side-panel {
     top: auto;
     bottom: 106px;
@@ -556,6 +605,6 @@ a {
 
   .key-notice {
     top: auto;
-    bottom: 160px;
+    bottom: 222px;
   }
 }

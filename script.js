@@ -239,12 +239,42 @@ const topMenus = {
   },
   operation: {
     title: "운영 메뉴",
-    items: [
+    getItems: () => [
+      {
+        id: "map-type-roadmap",
+        label: "일반 지도",
+        summary: "기본 카카오맵 보기",
+        tag: state.currentMapType === "ROADMAP" ? "현재" : "지도",
+        action: { type: "set-map-type", mapTypeId: "ROADMAP" },
+        detailTitle: "일반 지도 모드",
+        detailBody:
+          "카카오 기본 도로 지도를 표시합니다. 코스 연결성과 도시 단위 운영 현황을 보기 좋은 기본 모드입니다."
+      },
+      {
+        id: "map-type-skyview",
+        label: "항공사진",
+        summary: "스카이뷰만 보기",
+        tag: state.currentMapType === "SKYVIEW" ? "현재" : "항공",
+        action: { type: "set-map-type", mapTypeId: "SKYVIEW" },
+        detailTitle: "항공사진 모드",
+        detailBody:
+          "카카오 스카이뷰를 사용해 항공사진 중심으로 지형을 확인합니다. 레이블 없이 실제 지형이나 주변 환경을 보는 데 적합합니다."
+      },
+      {
+        id: "map-type-hybrid",
+        label: "하이브리드",
+        summary: "항공사진 + 레이블",
+        tag: state.currentMapType === "HYBRID" ? "현재" : "추천",
+        action: { type: "set-map-type", mapTypeId: "HYBRID" },
+        detailTitle: "하이브리드 지도 모드",
+        detailBody:
+          "항공사진 위에 지명과 도로 레이블을 함께 표시합니다. 현장감과 식별성을 동시에 확보하고 싶을 때 가장 적합한 모드입니다."
+      },
       {
         id: "op-all",
         label: "전체 코스 보기",
         summary: "전국 코스 한 번에 보기",
-        tag: "지도",
+        tag: "코스",
         action: { type: "fit-all" },
         detailTitle: "전국 코스 일괄 보기",
         detailBody:
@@ -259,16 +289,6 @@ const topMenus = {
         detailTitle: "전주 한옥길 코스 바로 이동",
         detailBody:
           "운영 중심 코스인 전주 한옥길 챌린지로 지도를 즉시 이동합니다."
-      },
-      {
-        id: "op-coast",
-        label: "새만금 해안 코스",
-        summary: "해안형 장거리 코스",
-        tag: "확장",
-        action: { type: "focus-route", routeId: "saemangeum-coast" },
-        detailTitle: "새만금 코스트 코스 바로 이동",
-        detailBody:
-          "해안형 시즌 홍보에 활용하기 좋은 새만금 코스트 챌린지로 이동합니다."
       }
     ]
   },
@@ -421,6 +441,7 @@ const sideMenus = {
 
 const state = {
   selectedRouteId: (window.DEFAULT_ROUTE_ID || "jeonju-hanok"),
+  currentMapType: "ROADMAP",
   openTopMenuId: "intro",
   openSideMenuId: "course"
 };
@@ -506,7 +527,8 @@ function loadKakaoMapsSdk(appKey) {
 function initMap() {
   const kakaoMap = new kakao.maps.Map(elements.map, {
     center: new kakao.maps.LatLng(36.2683, 127.6358),
-    level: 13
+    level: 13,
+    mapTypeId: kakao.maps.MapTypeId[state.currentMapType]
   });
 
   mapState.map = kakaoMap;
@@ -581,7 +603,7 @@ function initMap() {
   });
 
   selectRoute(state.selectedRouteId, { fitBounds: true });
-  elements.mapStatus.textContent = "카카오맵에서 시즌2 코스를 탐색할 수 있습니다.";
+  updateMapStatus("카카오맵에서 시즌2 코스를 탐색할 수 있습니다.");
 }
 
 function createMarkerImage(route, isSelected) {
@@ -645,7 +667,7 @@ function selectRoute(routeId, options = {}) {
 
   const route = routes.find((item) => item.id === routeId);
   if (route) {
-    elements.mapStatus.textContent = `${route.name} · ${route.city} 코스를 보고 있습니다.`;
+    updateMapStatus(`${route.name} · ${route.city} 코스를 보고 있습니다.`);
   }
 
   renderSidePanel(state.openSideMenuId);
@@ -676,7 +698,7 @@ function focusCheckpoint(routeId, checkpointId) {
 
   mapState.map.setLevel(6);
   mapState.map.panTo(new kakao.maps.LatLng(checkpoint.coords[0], checkpoint.coords[1]));
-  elements.mapStatus.textContent = `${checkpoint.name} 인증 스팟으로 이동했습니다.`;
+  updateMapStatus(`${checkpoint.name} 인증 스팟으로 이동했습니다.`);
 }
 
 function fitAllRoutes() {
@@ -689,7 +711,37 @@ function fitAllRoutes() {
     route.path.forEach(([lat, lng]) => bounds.extend(new kakao.maps.LatLng(lat, lng)));
   });
   mapState.map.setBounds(bounds);
-  elements.mapStatus.textContent = "시즌2 전체 코스를 한 번에 보고 있습니다.";
+  updateMapStatus("시즌2 전체 코스를 한 번에 보고 있습니다.");
+}
+
+function setBaseMapType(mapTypeId) {
+  state.currentMapType = mapTypeId;
+
+  if (mapState.map) {
+    mapState.map.setMapTypeId(kakao.maps.MapTypeId[mapTypeId]);
+  }
+
+  const modeName = getMapTypeLabel(mapTypeId);
+  updateMapStatus(`${modeName}로 지도를 전환했습니다.`);
+
+  if (state.openTopMenuId === "operation") {
+    renderTopPanel("operation");
+  }
+}
+
+function getMapTypeLabel(mapTypeId) {
+  if (mapTypeId === "SKYVIEW") {
+    return "항공사진";
+  }
+  if (mapTypeId === "HYBRID") {
+    return "하이브리드 지도";
+  }
+  return "일반 지도";
+}
+
+function updateMapStatus(message) {
+  const mode = getMapTypeLabel(state.currentMapType);
+  elements.mapStatus.textContent = `${message} · 현재 지도: ${mode}`;
 }
 
 function bindMenuButtons() {
@@ -760,11 +812,15 @@ function renderTopPanel(menuId) {
     return;
   }
 
+  const items = getMenuItems(menu);
   elements.topPanel.title.textContent = menu.title;
   renderPanelItems({
     panel: elements.topPanel,
-    menu,
-    defaultItemId: menu.items[0]?.id
+    menu: { title: menu.title, items },
+    defaultItemId:
+      menuId === "operation"
+        ? `map-type-${state.currentMapType.toLowerCase()}`
+        : items[0]?.id
   });
 }
 
@@ -778,7 +834,7 @@ function renderSidePanel(menuId) {
     return;
   }
 
-  const items = menu.getItems();
+  const items = getMenuItems(menu);
   elements.sidePanel.title.textContent = menu.title;
   renderPanelItems({
     panel: elements.sidePanel,
@@ -862,4 +918,15 @@ function handleMenuAction(action) {
   if (action.type === "fit-all") {
     fitAllRoutes();
   }
+
+  if (action.type === "set-map-type") {
+    setBaseMapType(action.mapTypeId);
+  }
+}
+
+function getMenuItems(menu) {
+  if (typeof menu.getItems === "function") {
+    return menu.getItems();
+  }
+  return menu.items || [];
 }

@@ -74,6 +74,7 @@ const TREASURE_PLACES_PER_WEEK = 4;
 const TREASURE_PLAN_STORAGE_KEY = "bicycle-challenge-weekly-treasures";
 const CERTIFICATION_STORAGE_KEY = "bicycle-challenge-certifications";
 const CARBON_KG_PER_KM = 0.21;
+const BAND_CERTIFICATION_URL = "https://www.band.us/band/94500191/post";
 let weeklyTreasurePlanCache = null;
 
 const topMenus = {
@@ -246,6 +247,7 @@ const elements = {
   homeIntro: document.getElementById("homeIntro"),
   map: document.getElementById("map"),
   mapStatus: document.getElementById("mapStatus"),
+  placeCard: document.getElementById("placeCard"),
   keyNotice: document.getElementById("keyNotice"),
   topPanel: {
     root: document.querySelector(".top-panel"),
@@ -446,8 +448,9 @@ function createSelectedPlaceMarkers(places) {
 
     kakao.maps.event.addListener(marker, "click", () => {
       infoWindow.open(mapState.map, marker);
+      showPlaceCard(place);
       updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`, { highlightWord: place.title });
-      setTimeout(() => infoWindow.close(), 2200);
+      setTimeout(() => infoWindow.close(), 1600);
     });
 
     mapState.selectedPlaceMarkers.push({ place, marker, infoWindow });
@@ -524,8 +527,9 @@ function focusPlace(placeId) {
   mapState.map.setLevel(4);
   mapState.map.panTo(new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]));
   selected.infoWindow.open(mapState.map, selected.marker);
+  showPlaceCard(selected.place);
   updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, { highlightWord: selected.place.title });
-  setTimeout(() => selected.infoWindow.close(), 2200);
+  setTimeout(() => selected.infoWindow.close(), 1600);
 }
 
 function fitAllRoutes() {
@@ -594,6 +598,41 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function showPlaceCard(place) {
+  if (!elements.placeCard) {
+    return;
+  }
+
+  const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
+  elements.placeCard.hidden = false;
+  elements.placeCard.innerHTML = `
+    <button class="place-card-close" type="button" data-close-place-card aria-label="장소 정보 닫기">×</button>
+    <p class="place-card-kicker">보물찾기 장소</p>
+    <h3>${escapeHtml(place.title)}</h3>
+    <p class="place-card-address">${escapeHtml(place.address || place.query)}</p>
+    <p class="place-card-intro">${escapeHtml(place.intro || "자전거 챌린지 인증 장소입니다.")}</p>
+    ${
+      weekLabels.length
+        ? `<div class="place-card-weeks">${weekLabels.map((label) => `<span>${escapeHtml(label)}</span>`).join("")}</div>`
+        : ""
+    }
+    <div class="place-card-actions">
+      <button type="button" class="place-card-action" data-band-certify>네이버 밴드 인증하기</button>
+      <button type="button" class="place-card-action is-light" data-close-place-card>닫기</button>
+    </div>
+  `;
+
+  elements.placeCard.querySelectorAll("[data-close-place-card]").forEach((button) => {
+    button.addEventListener("click", () => {
+      elements.placeCard.hidden = true;
+    });
+  });
+
+  elements.placeCard.querySelector("[data-band-certify]")?.addEventListener("click", () => {
+    openBandCertificationPage();
+  });
 }
 
 function bindHomeIntro() {
@@ -891,7 +930,7 @@ function renderWeeklyCertificationDetail(container, item) {
                   댓글
                   <textarea name="comment" placeholder="방문 인증 소감이나 현장 메모를 남겨주세요." required></textarea>
                 </label>
-                <button class="detail-action" type="submit">인증 등록하기</button>
+                <button class="detail-action" type="submit">네이버 밴드로 인증 등록하기</button>
               </form>
               ${
                 latestRecord
@@ -907,7 +946,7 @@ function renderWeeklyCertificationDetail(container, item) {
         })
         .join("")}
     </div>
-    <div class="cert-note">인증 기록은 현재 브라우저에 저장됩니다. 실제 서버 업로드가 필요하면 별도 저장소 연결이 필요합니다.</div>
+    <div class="cert-note">입력값은 탄소절감 계산용으로 현재 브라우저에 저장되고, 제출 후 네이버 밴드 인증 게시글 화면이 열립니다.</div>
   `;
 
   container.querySelectorAll("[data-certification-form]").forEach((form) => {
@@ -917,13 +956,18 @@ function renderWeeklyCertificationDetail(container, item) {
 
 function renderWeeklyCarbonDetail(container, item) {
   const stats = getWeeklyCarbonStats(item.week);
+  const overallStats = getOverallCarbonStats();
 
   container.innerHTML = `
     <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
     <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <div class="carbon-meter is-total">
+      <strong>${escapeHtml(formatCarbon(overallStats.totalCarbonKg))}</strong>
+      <span>전체 탄소절감량 · 전체 주행거리 ${escapeHtml(formatKm(overallStats.totalDistanceKm))}</span>
+    </div>
     <div class="carbon-meter">
       <strong>${escapeHtml(formatCarbon(stats.totalCarbonKg))}</strong>
-      <span>총 주행거리 ${escapeHtml(formatKm(stats.totalDistanceKm))} 기준</span>
+      <span>${item.week}주차 주행거리 ${escapeHtml(formatKm(stats.totalDistanceKm))} 기준</span>
     </div>
     <div class="week-summary">계산 기준: 주행거리 1km당 ${CARBON_KG_PER_KM}kg CO2 절감</div>
     <div class="weekly-place-list">
@@ -970,12 +1014,20 @@ function handleCertificationSubmit(event, item, container) {
   renderWeeklyCertificationDetail(container, item);
   focusPlace(place.id);
   updateMapStatus(`${place.title} 인증이 등록되었습니다.`, { highlightWord: place.title });
+  openBandCertificationPage();
 }
 
 function bindFocusPlaceButtons(container) {
   container.querySelectorAll("[data-focus-place]").forEach((button) => {
     button.addEventListener("click", () => focusPlace(button.dataset.focusPlace));
   });
+}
+
+function openBandCertificationPage() {
+  const bandWindow = window.open(BAND_CERTIFICATION_URL, "_blank", "noopener,noreferrer");
+  if (!bandWindow) {
+    window.location.href = BAND_CERTIFICATION_URL;
+  }
 }
 
 function getWeeklyTreasurePlan() {
@@ -1065,6 +1117,12 @@ function getPlaceById(placeId) {
   return selectedPlaces.find((place) => place.id === placeId);
 }
 
+function getWeeksForPlace(placeId) {
+  return getWeeklyTreasurePlan()
+    .filter((week) => week.placeIds.includes(placeId))
+    .map((week) => week.week);
+}
+
 function getWeeklyCarbonStats(week) {
   const places = getWeeklyPlaces(week);
   const placeIds = new Set(places.map((place) => place.id));
@@ -1085,6 +1143,15 @@ function getWeeklyCarbonStats(week) {
 
   return {
     places: placesWithStats,
+    totalDistanceKm,
+    totalCarbonKg: totalDistanceKm * CARBON_KG_PER_KM
+  };
+}
+
+function getOverallCarbonStats() {
+  const records = getCertificationRecords();
+  const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
+  return {
     totalDistanceKm,
     totalCarbonKg: totalDistanceKm * CARBON_KG_PER_KM
   };

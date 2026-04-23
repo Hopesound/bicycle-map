@@ -200,8 +200,11 @@ a {
 
 .submenu-panel {
   width: min(360px, calc(100vw - 48px));
+  max-height: calc(100vh - var(--header-height) - 40px);
   padding: 20px;
   border-radius: 28px;
+  display: flex;
+  flex-direction: column;
 }
 
 .top-panel {
@@ -266,6 +269,31 @@ a {
 .submenu-list {
   display: grid;
   gap: 10px;
+  min-height: 0;
+  overflow: visible;
+}
+
+.side-panel .submenu-list {
+  max-height: min(42vh, 430px);
+  overflow-y: auto;
+  padding-right: 6px;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(10, 141, 120, 0.45) rgba(23, 50, 47, 0.08);
+  scrollbar-width: thin;
+}
+
+.side-panel .submenu-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.side-panel .submenu-list::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(23, 50, 47, 0.08);
+}
+
+.side-panel .submenu-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(10, 141, 120, 0.45);
 }
 
 .submenu-item {
@@ -330,6 +358,7 @@ a {
   border-radius: 22px;
   background: linear-gradient(160deg, rgba(11, 97, 87, 0.96), rgba(8, 68, 60, 0.98));
   color: rgba(255, 255, 255, 0.94);
+  flex: 0 0 auto;
 }
 
 .submenu-detail h3 {
@@ -375,6 +404,15 @@ a {
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+}
+
+.spot-intro {
+  margin-top: 12px;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.65;
 }
 
 .status-chip {

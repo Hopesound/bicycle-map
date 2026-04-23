@@ -4,6 +4,7 @@ const selectedPlaces = [
     title: "구이저수지",
     query: "구이저수지 완주",
     address: "전북특별자치도 완주군 구이면 구이로 1488-31",
+    intro: "완주 구이면에 있는 대표 저수지로, 수변 경관과 휴식 동선을 함께 활용하기 좋은 자전거 챌린지 거점입니다.",
     fallback: [35.7398, 127.1032]
   },
   {
@@ -11,37 +12,38 @@ const selectedPlaces = [
     title: "완주군 미소시장",
     query: "고산미소시장 완주",
     address: "전북특별자치도 완주군 고산면 남봉로 134",
+    intro: "완주 고산면의 지역 시장 거점으로, 로컬 상권과 챌린지 방문 인증을 연결하기 좋은 장소입니다.",
     fallback: [35.9751, 127.2027]
   },
-  { id: "jbnu-museum", title: "전북대 자연사박물관", query: "전북대 자연사박물관", fallback: [35.8473, 127.1293] },
-  { id: "jeonbuk-env", title: "전북환경운동연합", query: "전북환경운동연합 전주", fallback: [35.8185, 127.1537] },
-  { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", fallback: [35.9114, 127.1732] },
-  { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", fallback: [35.9415, 127.1254] },
-  { id: "gijije", title: "기지제", query: "기지제 전주", fallback: [35.8077, 127.1018] },
-  { id: "kkotsingi", title: "전주시 공영자전거 꽃싱이 송천대여소", query: "꽃싱이 송천대여소 전주", fallback: [35.8784, 127.1182] },
-  { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", fallback: [35.8371, 127.0406] },
-  { id: "saechangi-bridge", title: "새창이다리", query: "새창이다리 전주", fallback: [35.8134, 127.1202] },
-  { id: "omokdae", title: "오목대", query: "오목대 전주", fallback: [35.8113, 127.1538] },
-  { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", fallback: [35.7621, 127.1859] },
-  { id: "march-first", title: "전주3.1운동발상지", query: "전주 3.1운동 발상지", fallback: [35.8199, 127.1442] },
-  { id: "bibijeong", title: "비비정", query: "비비정 완주", fallback: [35.8687, 127.0744] },
-  { id: "woosuk-hospital", title: "우석대학교 부속 전주한방볍원", query: "우석대학교 부속 전주한방병원", fallback: [35.8137, 127.0892] },
-  { id: "sebyeongho", title: "세병호", query: "세병호 전주", fallback: [35.8816, 127.1461] },
-  { id: "yeoyu-cafe", title: "무인카페여유(구이로 1575)", query: "무인카페여유 구이로 1575", fallback: [35.7449, 127.1048] },
-  { id: "jeonju-archive", title: "전주시민기록관", query: "전주시민기록관", fallback: [35.8207, 127.1459] },
-  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", fallback: [35.9445, 126.9546] },
-  { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", fallback: [35.8271, 127.1519] },
-  { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", fallback: [35.8328, 127.1768] },
-  { id: "jeonju-fm", title: "전주공동체라디오 전주FM", query: "전주공동체라디오 전주FM", fallback: [35.8148, 127.1211] },
-  { id: "daedeok-elementary", title: "대덕초등학교", query: "대덕초등학교 완주", fallback: [35.9139, 127.2386] },
-  { id: "chucheondae", title: "추천대", query: "추천대 완주", fallback: [35.9589, 127.2656] },
-  { id: "deokjin-park", title: "덕진공원", query: "덕진공원", fallback: [35.8482, 127.1201] },
-  { id: "volunteer-center", title: "전주시 자원봉사센터", query: "전주시 자원봉사센터", fallback: [35.8247, 127.1487] },
-  { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", fallback: [35.8176, 127.1104] },
-  { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", fallback: [35.9302, 127.2269] },
-  { id: "hari-bridge", title: "하리교", query: "하리교 전주", fallback: [35.7861, 127.1143] },
-  { id: "bike-box", title: "바이크박스", query: "바이크박스 전주", fallback: [35.8201, 127.1501] },
-  { id: "palbok-art", title: "팔복예술공장", query: "팔복예술공장", fallback: [35.8464, 127.1029] }
+  { id: "jbnu-museum", title: "전북대 자연사박물관", query: "전북대 자연사박물관", intro: "대학 캠퍼스 안에서 자연사 자료를 만날 수 있는 교육형 방문 거점입니다.", fallback: [35.8473, 127.1293] },
+  { id: "jeonbuk-env", title: "전북환경운동연합", query: "전북환경운동연합 전주", intro: "지역 환경 활동과 탄소 감축 메시지를 연결하기 좋은 시민사회 거점입니다.", fallback: [35.8185, 127.1537] },
+  { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", intro: "완주 소양면의 역사 사찰로, 숲길과 문화유산을 함께 경험할 수 있는 코스 거점입니다.", fallback: [35.9114, 127.1732] },
+  { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", intro: "봉동 생활권에서 쉬어가기 좋은 근린공원형 인증 장소입니다.", fallback: [35.9415, 127.1254] },
+  { id: "gijije", title: "기지제", query: "기지제 전주", intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.8077, 127.1018] },
+  { id: "kkotsingi", title: "전주시 공영자전거 꽃싱이 송천대여소", query: "꽃싱이 송천대여소 전주", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8784, 127.1182] },
+  { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", intro: "다양한 식물과 산책로가 있는 녹지형 장소로 친환경 챌린지 메시지와 잘 어울립니다.", fallback: [35.8371, 127.0406] },
+  { id: "saechangi-bridge", title: "새창이다리", query: "새창이다리 전주", intro: "전주 도심 하천 동선과 연결되는 교량형 위치 표시 지점입니다.", fallback: [35.8134, 127.1202] },
+  { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
+  { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", intro: "편백숲 치유 관광과 자전거 방문 인증을 연결하기 좋은 숲길 거점입니다.", fallback: [35.7621, 127.1859] },
+  { id: "march-first", title: "전주3.1운동발상지", query: "전주 3.1운동 발상지", intro: "지역 독립운동의 의미를 담은 역사형 인증 장소입니다.", fallback: [35.8199, 127.1442] },
+  { id: "bibijeong", title: "비비정", query: "비비정 완주", intro: "만경강 풍경과 함께 쉬어갈 수 있는 완주 대표 전망 거점입니다.", fallback: [35.8687, 127.0744] },
+  { id: "woosuk-hospital", title: "우석대학교 부속 전주한방볍원", query: "우석대학교 부속 전주한방병원", intro: "지역 의료·건강 테마와 연결할 수 있는 도심 거점입니다.", fallback: [35.8137, 127.0892] },
+  { id: "sebyeongho", title: "세병호", query: "세병호 전주", intro: "전주 북부권의 수변 경관을 즐길 수 있는 호수형 방문 장소입니다.", fallback: [35.8816, 127.1461] },
+  { id: "yeoyu-cafe", title: "무인카페여유(구이로 1575)", query: "무인카페여유 구이로 1575", intro: "구이로 라이딩 중 쉬어가기 좋은 무인카페형 휴식 거점입니다.", fallback: [35.7449, 127.1048] },
+  { id: "jeonju-archive", title: "전주시민기록관", query: "전주시민기록관", intro: "전주 시민의 생활 기록을 만날 수 있는 문화·기록 거점입니다.", fallback: [35.8207, 127.1459] },
+  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", fallback: [35.9445, 126.9546] },
+  { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", intro: "가볍게 이동하며 쉬어갈 수 있는 산책·라이딩 친화형 길입니다.", fallback: [35.8271, 127.1519] },
+  { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", intro: "아중호수와 독서 문화가 만나는 생활문화형 인증 장소입니다.", fallback: [35.8328, 127.1768] },
+  { id: "jeonju-fm", title: "전주공동체라디오 전주FM", query: "전주공동체라디오 전주FM", intro: "지역 미디어와 시민 참여 메시지를 연결할 수 있는 커뮤니티 거점입니다.", fallback: [35.8148, 127.1211] },
+  { id: "daedeok-elementary", title: "대덕초등학교", query: "대덕초등학교 완주", intro: "지역 생활권을 연결하는 교육 시설 주변 위치 표시 지점입니다.", fallback: [35.9139, 127.2386] },
+  { id: "chucheondae", title: "추천대", query: "추천대 완주", intro: "완주권 역사·경관 동선과 연결할 수 있는 방문 거점입니다.", fallback: [35.9589, 127.2656] },
+  { id: "deokjin-park", title: "덕진공원", query: "덕진공원", intro: "전주 대표 공원으로 수변 경관과 휴식 동선이 좋은 시민 친화형 장소입니다.", fallback: [35.8482, 127.1201] },
+  { id: "volunteer-center", title: "전주시 자원봉사센터", query: "전주시 자원봉사센터", intro: "시민 참여와 봉사 활동을 챌린지 캠페인과 연결하기 좋은 거점입니다.", fallback: [35.8247, 127.1487] },
+  { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
+  { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", intro: "완주 하천 동선에서 위치를 확인하기 좋은 교량형 인증 지점입니다.", fallback: [35.9302, 127.2269] },
+  { id: "hari-bridge", title: "하리교", query: "하리교 전주", intro: "전주 남부권 이동 동선과 연결되는 교량형 위치 표시 장소입니다.", fallback: [35.7861, 127.1143] },
+  { id: "bike-box", title: "바이크박스", query: "바이크박스 전주", intro: "자전거 이용자에게 친숙한 정비·라이딩 관련 거점으로 활용할 수 있습니다.", fallback: [35.8201, 127.1501] },
+  { id: "palbok-art", title: "팔복예술공장", query: "팔복예술공장", intro: "산업공간을 문화예술 거점으로 재생한 전주 대표 복합문화 장소입니다.", fallback: [35.8464, 127.1029] }
 ];
 
 const routePlaces = [
@@ -225,7 +227,8 @@ const sideMenus = {
         tag: "장소",
         action: { type: "focus-place", placeId: place.id },
         detailTitle: place.title,
-        detailBody: `${place.title} 위치로 지도를 이동합니다.`,
+        detailBody: place.intro || `${place.title} 위치로 지도를 이동합니다.`,
+        intro: place.intro,
         detailMeta: ["전북 권역", "고정 마커"]
       }))
   },
@@ -560,7 +563,11 @@ function focusPlace(placeId) {
     return;
   }
 
-  mapState.map.setLevel(5);
+  if (state.currentMapType !== "SKYVIEW") {
+    setBaseMapType("SKYVIEW", { silent: true });
+  }
+
+  mapState.map.setLevel(4);
   mapState.map.panTo(new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]));
   selected.infoWindow.open(mapState.map, selected.marker);
   updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`);
@@ -583,7 +590,7 @@ function fitAllRoutes() {
   updateMapStatus("코스와 주요 장소를 한 번에 보고 있습니다.");
 }
 
-function setBaseMapType(mapTypeId) {
+function setBaseMapType(mapTypeId, options = {}) {
   state.currentMapType = mapTypeId;
 
   if (mapState.map) {
@@ -596,9 +603,11 @@ function setBaseMapType(mapTypeId) {
   }
 
   updateMapTypeButtons();
-  updateMapStatus(`${getMapTypeLabel(mapTypeId)}로 지도를 전환했습니다.`);
+  if (!options.silent) {
+    updateMapStatus(`${getMapTypeLabel(mapTypeId)}로 지도를 전환했습니다.`);
+  }
 
-  if (state.openTopMenuId === "operation") {
+  if (!options.silent && state.openTopMenuId === "operation") {
     renderTopPanel("operation");
   }
 }
@@ -773,6 +782,7 @@ function renderPanelDetail(container, item) {
   container.innerHTML = `
     <h3>${item.detailTitle || item.label}</h3>
     <p>${item.detailBody || item.summary}</p>
+    ${item.intro ? `<div class="spot-intro">${item.intro}</div>` : ""}
     ${meta.length ? `<div class="detail-meta">${meta.map((value) => `<span class="detail-pill">${value}</span>`).join("")}</div>` : ""}
     ${item.action ? `<button class="detail-action" type="button">지도에서 바로 보기</button>` : ""}
   `;

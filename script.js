@@ -281,6 +281,8 @@ async function bootstrap() {
   bindMapTypeButtons();
   renderTopPanel(state.openTopMenuId);
   updateMapTypeButtons();
+  bindViewportState();
+  applyMobileInitialState();
   elements.keyNotice.hidden = true;
 
   const appKey = window.KAKAO_MAP_APPKEY;
@@ -299,6 +301,35 @@ async function bootstrap() {
     updateMapStatus("카카오맵 로딩에 실패했습니다.");
     renderMapFallback();
   }
+}
+
+function bindViewportState() {
+  const mobileViewport = window.matchMedia("(max-width: 680px)");
+  const handleViewport = (event) => {
+    if (event.matches) {
+      applyMobileInitialState();
+    }
+  };
+
+  if (typeof mobileViewport.addEventListener === "function") {
+    mobileViewport.addEventListener("change", handleViewport);
+    return;
+  }
+
+  if (typeof mobileViewport.addListener === "function") {
+    mobileViewport.addListener(handleViewport);
+  }
+}
+
+function applyMobileInitialState() {
+  if (!window.matchMedia("(max-width: 680px)").matches) {
+    return;
+  }
+
+  state.openTopMenuId = null;
+  elements.topPanel.root.hidden = true;
+  closeSidePanel();
+  updateActiveButtons();
 }
 
 function renderMapFallback() {

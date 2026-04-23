@@ -33,6 +33,42 @@ body {
   font-family: var(--font-body);
 }
 
+.home-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  padding: 28px;
+  border: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(10, 141, 120, 0.22), transparent 26%),
+    rgba(12, 31, 29, 0.72);
+  cursor: pointer;
+}
+
+.home-intro[hidden] {
+  display: none !important;
+}
+
+.home-intro img {
+  display: block;
+  width: min(1040px, 92vw);
+  max-height: min(78vh, 760px);
+  object-fit: contain;
+  border-radius: 28px;
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.34);
+}
+
+.home-intro span {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--brand-deep);
+  font-weight: 800;
+}
+
 button {
   font: inherit;
 }
@@ -222,6 +258,10 @@ a {
 }
 
 .submenu-panel[hidden] {
+  display: none !important;
+}
+
+.side-panel[data-panel-mode="checkpoint"] .submenu-detail {
   display: none !important;
 }
 
@@ -425,6 +465,57 @@ a {
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+}
+
+.cert-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cert-form label {
+  display: grid;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.cert-form input,
+.cert-form textarea {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 13px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+  font: inherit;
+}
+
+.cert-form textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.cert-note,
+.cert-record {
+  margin-top: 13px;
+  padding: 12px 13px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.cert-record strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.cert-record span {
+  display: block;
 }
 
 .spot-intro {

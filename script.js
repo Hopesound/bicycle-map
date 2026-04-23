@@ -64,27 +64,12 @@ const routePlaces = [
       [35.795, 127.197]
     ],
     color: "#ff9158"
-  },
-  {
-    id: "saemangeum-coast",
-    title: "새만금 코스트 챌린지",
-    city: "군산·부안",
-    region: "전라권",
-    description:
-      "새만금 해안 풍경 중심의 시즌2 확장 루트입니다. 장거리 탄소 감축 캠페인에 연결할 수 있습니다.",
-    points: [
-      [35.98, 126.703],
-      [35.941, 126.703],
-      [35.89, 126.706],
-      [35.847, 126.705],
-      [35.8, 126.699],
-      [35.74, 126.674]
-    ],
-    color: "#0ea5e9"
   }
 ];
 
 const JEONBUK_RECT = "126.45,35.35,127.85,36.20";
+const challengeRoutes = routePlaces.filter((route) => route.id === "jeonju-hanok");
+const CERTIFICATION_STORAGE_KEY = "bicycle-challenge-certifications";
 
 const topMenus = {
   intro: {
@@ -206,7 +191,7 @@ const sideMenus = {
   course: {
     title: "챌린지 코스",
     getItems: () =>
-      routePlaces.map((route) => ({
+      challengeRoutes.map((route) => ({
         id: route.id,
         label: route.title,
         summary: `${route.city} · ${route.region}`,
@@ -233,29 +218,19 @@ const sideMenus = {
       }))
   },
   ranking: {
-    title: "랭킹 보드",
-    getItems: () => [
-      {
-        id: "ranking-main",
-        label: "대표 코스 보기",
-        summary: "전주 한옥길 중심",
-        tag: "TOP",
-        action: { type: "focus-route", routeId: "jeonju-hanok" },
-        detailTitle: "대표 코스 보기",
-        detailBody:
-          "현재 메인 코스는 전주 한옥길 챌린지입니다. 전북 중심의 화면 흐름에 맞게 우선 노출됩니다."
-      },
-      {
-        id: "ranking-route",
-        label: "새만금 확장 코스",
-        summary: "해안형 코스 이동",
-        tag: "확장",
-        action: { type: "focus-route", routeId: "saemangeum-coast" },
-        detailTitle: "새만금 확장 코스",
-        detailBody:
-          "새만금 코스트 챌린지는 시즌2 확장형 해안 코스로 운영 메뉴와 연결됩니다."
-      }
-    ]
+    title: "인증하기",
+    getItems: () =>
+      selectedPlaces.map((place) => ({
+        id: `cert-${place.id}`,
+        label: place.title,
+        summary: "인증사진, 주행거리, 댓글 등록",
+        tag: "인증",
+        action: { type: "focus-place", placeId: place.id },
+        detailType: "certification",
+        certificationPlaceId: place.id,
+        detailTitle: `${place.title} 인증하기`,
+        detailBody: "방문 인증사진, 주행거리, 댓글을 입력해 인증 기록을 남길 수 있습니다."
+      }))
   },
   carbon: {
     title: "탄소 절감",
@@ -292,6 +267,7 @@ const state = {
 };
 
 const elements = {
+  homeIntro: document.getElementById("homeIntro"),
   map: document.getElementById("map"),
   mapStatus: document.getElementById("mapStatus"),
   keyNotice: document.getElementById("keyNotice"),
@@ -322,6 +298,7 @@ const mapState = {
 bootstrap();
 
 async function bootstrap() {
+  bindHomeIntro();
   bindMenuButtons();
   bindMapTypeButtons();
   renderTopPanel(state.openTopMenuId);
@@ -380,7 +357,7 @@ function initMap() {
   mapState.map = map;
   elements.keyNotice.hidden = true;
 
-  routePlaces.forEach((route) => {
+  challengeRoutes.forEach((route) => {
     const polyline = new kakao.maps.Polyline({
       path: route.points.map(([lat, lng]) => new kakao.maps.LatLng(lat, lng)),
       strokeWeight: route.id === state.selectedRouteId ? 7 : 5,
@@ -493,7 +470,7 @@ function createSelectedPlaceMarkers(places) {
 
     kakao.maps.event.addListener(marker, "click", () => {
       infoWindow.open(mapState.map, marker);
-      updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`);
+      updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`, { highlightWord: place.title });
       setTimeout(() => infoWindow.close(), 2200);
     });
 
@@ -524,7 +501,7 @@ function selectRoute(routeId, options = {}) {
     return;
   }
 
-  routePlaces.forEach((route) => {
+  challengeRoutes.forEach((route) => {
     const polyline = mapState.routePolylines.get(route.id);
     const selected = route.id === routeId;
     polyline.setOptions({
@@ -537,14 +514,14 @@ function selectRoute(routeId, options = {}) {
     fitRouteBounds(routeId);
   }
 
-  const route = routePlaces.find((item) => item.id === routeId);
+  const route = challengeRoutes.find((item) => item.id === routeId);
   if (route) {
     updateMapStatus(`${route.title} · ${route.city} 코스를 보고 있습니다.`);
   }
 }
 
 function fitRouteBounds(routeId) {
-  const route = routePlaces.find((item) => item.id === routeId);
+  const route = challengeRoutes.find((item) => item.id === routeId);
   if (!route || !mapState.map) {
     return;
   }
@@ -571,7 +548,7 @@ function focusPlace(placeId) {
   mapState.map.setLevel(4);
   mapState.map.panTo(new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]));
   selected.infoWindow.open(mapState.map, selected.marker);
-  updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, { highlightWord: "위치" });
+  updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, { highlightWord: selected.place.title });
   setTimeout(() => selected.infoWindow.close(), 2200);
 }
 
@@ -581,7 +558,7 @@ function fitAllRoutes() {
   }
 
   const bounds = new kakao.maps.LatLngBounds();
-  routePlaces.forEach((route) => {
+  challengeRoutes.forEach((route) => {
     route.points.forEach(([lat, lng]) => bounds.extend(new kakao.maps.LatLng(lat, lng)));
   });
   mapState.selectedPlaceMarkers.forEach(({ place }) => {
@@ -616,7 +593,7 @@ function setBaseMapType(mapTypeId, options = {}) {
 
 function getKakaoMapTypeId(mapTypeId) {
   if (mapTypeId === "SKYVIEW") {
-    return kakao.maps.MapTypeId.SKYVIEW;
+    return kakao.maps.MapTypeId.HYBRID || kakao.maps.MapTypeId.SKYVIEW;
   }
   return kakao.maps.MapTypeId.ROADMAP;
 }
@@ -634,9 +611,7 @@ function updateMapStatus(message, options = {}) {
       )
     : escapedMessage;
 
-  elements.mapStatus.innerHTML = `${highlightedMessage} · 현재 지도: ${escapeHtml(
-    getMapTypeLabel(state.currentMapType)
-  )}`;
+  elements.mapStatus.innerHTML = highlightedMessage;
 }
 
 function escapeHtml(value) {
@@ -646,6 +621,16 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function bindHomeIntro() {
+  if (!elements.homeIntro) {
+    return;
+  }
+
+  elements.homeIntro.addEventListener("click", () => {
+    elements.homeIntro.hidden = true;
+  });
 }
 
 function bindMenuButtons() {
@@ -761,6 +746,8 @@ function renderSidePanel(menuId) {
 
   const items = getMenuItems(menu);
   elements.sidePanel.title.textContent = menu.title;
+  elements.sidePanel.root.dataset.panelMode = menuId;
+  elements.sidePanel.detail.hidden = menuId === "checkpoint";
   renderPanelItems(elements.sidePanel, items, items[0]?.id);
 }
 
@@ -810,6 +797,11 @@ function renderPanelItems(panel, items, defaultItemId) {
 }
 
 function renderPanelDetail(container, item) {
+  if (item.detailType === "certification") {
+    renderCertificationDetail(container, item);
+    return;
+  }
+
   const meta = item.detailMeta || [];
   container.innerHTML = `
     <h3>${item.detailTitle || item.label}</h3>
@@ -822,6 +814,85 @@ function renderPanelDetail(container, item) {
   const actionButton = container.querySelector(".detail-action");
   if (actionButton) {
     actionButton.addEventListener("click", () => handleMenuAction(item.action));
+  }
+}
+
+function renderCertificationDetail(container, item) {
+  const records = getCertificationRecords().filter(
+    (record) => record.placeId === item.certificationPlaceId
+  );
+  const latestRecord = records[0];
+
+  container.innerHTML = `
+    <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
+    <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <form class="cert-form" data-certification-form>
+      <label>
+        인증사진
+        <input name="photo" type="file" accept="image/*" required />
+      </label>
+      <label>
+        주행거리(km)
+        <input name="distance" type="number" min="0" step="0.1" placeholder="예: 12.5" required />
+      </label>
+      <label>
+        댓글
+        <textarea name="comment" placeholder="오늘의 인증 소감이나 현장 메모를 남겨주세요." required></textarea>
+      </label>
+      <button class="detail-action" type="submit">인증 등록하기</button>
+    </form>
+    <div class="cert-note">등록 내용은 현재 브라우저에 임시 저장됩니다. 실제 서버 업로드가 필요한 경우 별도 저장소 연결이 필요합니다.</div>
+    ${
+      latestRecord
+        ? `<div class="cert-record">
+            <strong>최근 인증</strong>
+            <span>${escapeHtml(latestRecord.createdAt)} · ${escapeHtml(latestRecord.distance)}km · ${escapeHtml(latestRecord.photoName)}</span>
+            <span>${escapeHtml(latestRecord.comment)}</span>
+          </div>`
+        : ""
+    }
+  `;
+
+  const form = container.querySelector("[data-certification-form]");
+  form?.addEventListener("submit", (event) => handleCertificationSubmit(event, item, container));
+}
+
+function handleCertificationSubmit(event, item, container) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const formData = new FormData(form);
+  const photo = form.querySelector('input[name="photo"]')?.files?.[0];
+  const record = {
+    placeId: item.certificationPlaceId,
+    placeTitle: item.label,
+    photoName: photo?.name || "인증사진",
+    distance: formData.get("distance"),
+    comment: formData.get("comment"),
+    createdAt: new Date().toLocaleString("ko-KR")
+  };
+
+  const records = getCertificationRecords();
+  records.unshift(record);
+  saveCertificationRecords(records);
+  renderCertificationDetail(container, item);
+  handleMenuAction(item.action);
+  updateMapStatus(`${item.label} 인증이 등록되었습니다.`, { highlightWord: item.label });
+}
+
+function getCertificationRecords() {
+  try {
+    return JSON.parse(localStorage.getItem(CERTIFICATION_STORAGE_KEY) || "[]");
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveCertificationRecords(records) {
+  try {
+    localStorage.setItem(CERTIFICATION_STORAGE_KEY, JSON.stringify(records.slice(0, 80)));
+  } catch (error) {
+    updateMapStatus("인증 기록을 저장하지 못했습니다.");
   }
 }
 

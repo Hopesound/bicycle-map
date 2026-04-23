@@ -64,9 +64,22 @@ a {
 
 .brand {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   min-width: 0;
+}
+
+.brand::before {
+  content: "";
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34' fill='none'%3E%3Ccircle cx='10' cy='23' r='5.5' stroke='%230b6157' stroke-width='2.5'/%3E%3Ccircle cx='25' cy='23' r='5.5' stroke='%230b6157' stroke-width='2.5'/%3E%3Cpath d='M13 23h5.5l3.5-8h-6l-3 8Zm5.5 0 6.5-.1M14.4 12.5h4.2M21.7 14.2l2.9 8.8' stroke='%230b6157' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9 13.8c3-4.2 8.3-6.5 14.3-4.4' stroke='%23ff8f54' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E")
+      center / 34px 34px no-repeat,
+    linear-gradient(135deg, rgba(10, 141, 120, 0.16), rgba(255, 143, 84, 0.2));
+  box-shadow: 0 14px 28px rgba(11, 97, 87, 0.16);
 }
 
 .brand-title {
@@ -74,6 +87,7 @@ a {
   font-size: clamp(1.2rem, 0.98rem + 0.85vw, 2rem);
   font-weight: 700;
   letter-spacing: -0.05em;
+  color: var(--brand-deep);
   white-space: nowrap;
 }
 
@@ -205,6 +219,10 @@ a {
   border-radius: 28px;
   display: flex;
   flex-direction: column;
+}
+
+.submenu-panel[hidden] {
+  display: none !important;
 }
 
 .top-panel {
@@ -447,6 +465,11 @@ a {
   align-items: center;
   color: var(--brand-deep);
   font-weight: 700;
+}
+
+.status-highlight {
+  color: #d9362b;
+  font-weight: 900;
 }
 
 .map-type-toggle {

@@ -571,7 +571,7 @@ function focusPlace(placeId) {
   mapState.map.setLevel(4);
   mapState.map.panTo(new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]));
   selected.infoWindow.open(mapState.map, selected.marker);
-  updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`);
+  updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, { highlightWord: "위치" });
   setTimeout(() => selected.infoWindow.close(), 2200);
 }
 
@@ -625,8 +625,27 @@ function getMapTypeLabel(mapTypeId) {
   return mapTypeId === "SKYVIEW" ? "위성 지도" : "일반 지도";
 }
 
-function updateMapStatus(message) {
-  elements.mapStatus.textContent = `${message} · 현재 지도: ${getMapTypeLabel(state.currentMapType)}`;
+function updateMapStatus(message, options = {}) {
+  const escapedMessage = escapeHtml(message);
+  const highlightedMessage = options.highlightWord
+    ? escapedMessage.replace(
+        escapeHtml(options.highlightWord),
+        `<span class="status-highlight">${escapeHtml(options.highlightWord)}</span>`
+      )
+    : escapedMessage;
+
+  elements.mapStatus.innerHTML = `${highlightedMessage} · 현재 지도: ${escapeHtml(
+    getMapTypeLabel(state.currentMapType)
+  )}`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function bindMenuButtons() {

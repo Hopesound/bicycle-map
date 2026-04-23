@@ -69,193 +69,169 @@ const routePlaces = [
 
 const JEONBUK_RECT = "126.45,35.35,127.85,36.20";
 const challengeRoutes = routePlaces.filter((route) => route.id === "jeonju-hanok");
+const WEEK_COUNT = 4;
+const TREASURE_PLACES_PER_WEEK = 4;
+const TREASURE_PLAN_STORAGE_KEY = "bicycle-challenge-weekly-treasures";
 const CERTIFICATION_STORAGE_KEY = "bicycle-challenge-certifications";
+const CARBON_KG_PER_KM = 0.21;
+let weeklyTreasurePlanCache = null;
 
 const topMenus = {
   intro: {
     title: "챌린지 소개",
     items: [
       {
-        id: "season-overview",
-        label: "Season2 개요",
-        summary: "시즌 전체 방향",
-        tag: "안내",
+        id: "intro-main-image",
+        label: "메인 이미지",
+        summary: "시즌2 대표 화면",
+        tag: "소개",
+        detailType: "main-image",
         detailTitle: "탄소를 감축하는 자전거 챌린지 season2",
         detailBody:
-          "전국 자전거 코스를 연결해 이동 거리만큼 탄소 절감 효과를 체감하도록 설계한 시즌형 캠페인입니다. 메인 화면은 지도와 메뉴 탐색을 중심으로 구성했습니다."
-      },
-      {
-        id: "season-target",
-        label: "탄소 감축 목표",
-        summary: "시즌 목표 지표",
-        tag: "목표",
-        detailTitle: "탄소 감축 목표",
-        detailBody:
-          "시즌2는 전북 권역 코스를 중심으로 이동 거리와 지역 참여도를 함께 보여주는 구조입니다. 장소 마커를 통해 캠페인 거점도 한 번에 확인할 수 있습니다."
-      },
-      {
-        id: "season-area",
-        label: "전북 주요 거점",
-        summary: "표출 장소 안내",
-        tag: "거점",
-        detailTitle: "전북 주요 거점 지도 표출",
-        detailBody:
-          "구이저수지, 완주군 미소시장, 덕진공원, 팔복예술공장 등 요청하신 거점들이 지도 위에 고정 마커로 표출됩니다."
+          "첫 화면에 표시되는 메인 이미지를 챌린지 소개에서도 다시 확인할 수 있습니다."
       }
     ]
   },
-  guide: {
-    title: "참여 가이드",
+  method: {
+    title: "참여방법",
     items: [
       {
-        id: "guide-join",
-        label: "참가 신청",
-        summary: "시즌2 참가 흐름",
-        tag: "참가",
-        detailTitle: "참가 신청 흐름",
+        id: "method-treasure",
+        label: "1. 보물찾기 확인",
+        summary: "주차별 공개 장소 확인",
+        tag: "STEP",
+        detailTitle: "보물찾기 장소 확인",
         detailBody:
-          "원하는 코스를 선택한 뒤 참가 페이지와 연결하고, 지도 위 주요 거점과 인증 포인트를 따라 이동하는 흐름으로 확장할 수 있습니다."
+          "좌측 보물찾기 메뉴에서 1주차부터 4주차까지 랜덤으로 공개된 장소를 확인합니다. 장소를 누르면 지도에서 위치를 바로 볼 수 있습니다."
       },
       {
-        id: "guide-map",
-        label: "지도 탐색",
-        summary: "일반/위성지도 전환",
-        tag: "지도",
-        detailTitle: "지도 탐색 방식",
+        id: "method-certify",
+        label: "2. 인증하기 등록",
+        summary: "사진, 거리, 댓글 입력",
+        tag: "STEP",
+        detailTitle: "인증 등록",
         detailBody:
-          "지도 우측 상단 토글에서 일반지도와 위성지도를 바꿔 볼 수 있습니다. 상단 메뉴를 누르면 좌측 하위 메뉴는 자동으로 닫힙니다."
+          "공개된 장소를 방문한 뒤 인증하기 메뉴에서 인증사진, 주행거리, 댓글을 입력해 기록합니다."
+      },
+      {
+        id: "method-carbon",
+        label: "3. 탄소절감 확인",
+        summary: "등록 기록 기반 계산",
+        tag: "STEP",
+        detailTitle: "탄소절감량 확인",
+        detailBody:
+          "등록된 주행거리를 기준으로 주차별 예상 탄소절감량을 확인합니다. 계산 기준은 1km당 0.21kg CO2 절감입니다."
       }
     ]
   },
-  operation: {
-    title: "운영 메뉴",
-    getItems: () => [
-      {
-        id: "map-type-roadmap",
-        label: "일반 지도",
-        summary: "기본 카카오맵 보기",
-        tag: state.currentMapType === "ROADMAP" ? "현재" : "지도",
-        action: { type: "set-map-type", mapTypeId: "ROADMAP" },
-        detailTitle: "일반 지도 모드",
-        detailBody:
-          "도로와 행정 경계가 잘 보이는 일반 지도를 표시합니다."
-      },
-      {
-        id: "map-type-skyview",
-        label: "위성 지도",
-        summary: "스카이뷰 보기",
-        tag: state.currentMapType === "SKYVIEW" ? "현재" : "위성",
-        action: { type: "set-map-type", mapTypeId: "SKYVIEW" },
-        detailTitle: "위성 지도 모드",
-        detailBody:
-          "실제 지형과 건물 배경을 확인할 수 있는 스카이뷰 모드입니다."
-      },
-      {
-        id: "fit-all",
-        label: "전체 범위 보기",
-        summary: "코스와 주요 장소 함께 보기",
-        tag: "전체",
-        action: { type: "fit-all" },
-        detailTitle: "전체 범위 보기",
-        detailBody:
-          "주요 코스와 지도에 표시된 장소가 모두 보이도록 범위를 재설정합니다."
-      }
-    ]
-  },
-  support: {
-    title: "지원 센터",
+  event: {
+    title: "이벤트",
     items: [
       {
-        id: "support-source",
-        label: "데이터 출처",
-        summary: "Kakao Maps 기반",
-        tag: "출처",
-        detailTitle: "데이터 출처",
+        id: "event-weekly",
+        label: "주차별 미션 이벤트",
+        summary: "매주 공개 장소 인증",
+        tag: "미션",
+        detailTitle: "주차별 미션 이벤트",
         detailBody:
-          "지도는 Kakao 지도 Web API 기반이며, 장소 마커는 주소 검색과 키워드 검색을 조합해 표출합니다."
+          "각 주차에 공개된 보물찾기 장소를 인증하면 해당 주차 이벤트 참여 기록으로 활용할 수 있습니다."
       },
       {
-        id: "support-domain",
-        label: "도메인 등록",
-        summary: "지도 로딩 오류 대응",
-        tag: "점검",
-        detailTitle: "카카오 도메인 등록 확인",
+        id: "event-carbon",
+        label: "탄소절감 챌린지",
+        summary: "주행거리 기반 참여",
+        tag: "탄소",
+        detailTitle: "탄소절감 챌린지",
         detailBody:
-          "지도가 뜨지 않으면 JavaScript 키뿐 아니라 카카오 디벨로퍼스 Web 플랫폼에 현재 접속 도메인이 등록되어 있는지 확인해야 합니다."
+          "인증하기에서 등록한 주행거리를 모아 탄소절감량을 비교하고, 친환경 이동 성과를 확인합니다."
+      }
+    ]
+  },
+  community: {
+    title: "커뮤니티",
+    items: [
+      {
+        id: "community-board",
+        label: "참여 소식",
+        summary: "댓글과 인증 기록 공유",
+        tag: "소식",
+        detailTitle: "참여 소식",
+        detailBody:
+          "참가자가 남긴 댓글과 인증 기록을 커뮤니티 콘텐츠로 확장할 수 있는 공간입니다."
+      },
+      {
+        id: "community-guide",
+        label: "운영자 안내",
+        summary: "장소 공개와 인증 관리",
+        tag: "안내",
+        detailTitle: "운영자 안내",
+        detailBody:
+          "현재 페이지는 정적 홈페이지이므로 인증 내용은 접속한 브라우저에 저장됩니다. 서버 연동을 추가하면 실제 커뮤니티 게시판으로 확장할 수 있습니다."
+      }
+    ]
+  },
+  login: {
+    title: "로그인",
+    items: [
+      {
+        id: "login-panel",
+        label: "참가자 로그인",
+        summary: "아이디와 비밀번호 입력",
+        tag: "LOGIN",
+        detailType: "login",
+        detailTitle: "참가자 로그인",
+        detailBody:
+          "현재는 화면 구성용 로그인 폼입니다. 실제 회원 기능은 별도 서버 또는 인증 서비스 연결이 필요합니다."
       }
     ]
   }
 };
 
 const sideMenus = {
-  course: {
-    title: "챌린지 코스",
+  treasure: {
+    title: "보물찾기",
     getItems: () =>
-      challengeRoutes.map((route) => ({
-        id: route.id,
-        label: route.title,
-        summary: `${route.city} · ${route.region}`,
-        tag: "코스",
-        action: { type: "focus-route", routeId: route.id },
-        detailTitle: route.title,
-        detailBody: route.description,
-        detailMeta: [route.city, route.region]
+      getWeeklyTreasurePlan().map((week) => ({
+        id: `treasure-week-${week.week}`,
+        label: `${week.week}주차`,
+        summary: `${week.places.length}개 랜덤 공개 장소`,
+        tag: "공개",
+        action: { type: "focus-week", week: week.week },
+        detailType: "weekly-treasure",
+        week: week.week,
+        detailTitle: `${week.week}주차 보물찾기`,
+        detailBody: "이번 주차에 공개된 장소를 확인하고 지도에서 위치를 찾아보세요."
       }))
   },
-  checkpoint: {
-    title: "인증 스팟",
-    getItems: () =>
-      selectedPlaces.map((place) => ({
-        id: place.id,
-        label: place.title,
-        summary: place.address || place.query,
-        tag: "장소",
-        action: { type: "focus-place", placeId: place.id },
-        detailTitle: place.title,
-        detailBody: place.intro || `${place.title} 위치로 지도를 이동합니다.`,
-        intro: place.intro,
-        detailMeta: ["전북 권역", "고정 마커"]
-      }))
-  },
-  ranking: {
+  certify: {
     title: "인증하기",
     getItems: () =>
-      selectedPlaces.map((place) => ({
-        id: `cert-${place.id}`,
-        label: place.title,
+      getWeeklyTreasurePlan().map((week) => ({
+        id: `cert-week-${week.week}`,
+        label: `${week.week}주차`,
         summary: "인증사진, 주행거리, 댓글 등록",
         tag: "인증",
-        action: { type: "focus-place", placeId: place.id },
-        detailType: "certification",
-        certificationPlaceId: place.id,
-        detailTitle: `${place.title} 인증하기`,
-        detailBody: "방문 인증사진, 주행거리, 댓글을 입력해 인증 기록을 남길 수 있습니다."
+        action: { type: "focus-week", week: week.week },
+        detailType: "weekly-certification",
+        week: week.week,
+        detailTitle: `${week.week}주차 인증하기`,
+        detailBody: "공개된 장소별로 인증사진, 주행거리, 댓글을 등록합니다."
       }))
   },
   carbon: {
-    title: "탄소 절감",
-    getItems: () => [
-      {
-        id: "carbon-place",
-        label: "거점 중심 탐색",
-        summary: "선정 장소 확인",
-        tag: "거점",
-        action: { type: "focus-place", placeId: "goui-reservoir" },
-        detailTitle: "거점 중심 탐색",
-        detailBody:
-          "선정 장소를 기준으로 캠페인 확산 거점을 보여줍니다. 구이저수지와 완주군 미소시장도 포함됩니다."
-      },
-      {
-        id: "carbon-view",
-        label: "지도로 보기",
-        summary: "전체 범위 재설정",
-        tag: "지도",
-        action: { type: "fit-all" },
-        detailTitle: "지도로 전체 보기",
-        detailBody:
-          "코스와 고정 마커를 함께 보며 시즌2 전북 거점을 한 번에 살펴볼 수 있습니다."
-      }
-    ]
+    title: "탄소절감",
+    getItems: () =>
+      getWeeklyTreasurePlan().map((week) => ({
+        id: `carbon-week-${week.week}`,
+        label: `${week.week}주차`,
+        summary: "인증 기록 기반 절감량",
+        tag: "CO2",
+        action: { type: "focus-week", week: week.week },
+        detailType: "weekly-carbon",
+        week: week.week,
+        detailTitle: `${week.week}주차 탄소절감`,
+        detailBody: "인증하기에 등록된 주행거리로 예상 탄소절감량을 계산합니다."
+      }))
   }
 };
 
@@ -586,9 +562,6 @@ function setBaseMapType(mapTypeId, options = {}) {
     updateMapStatus(`${getMapTypeLabel(mapTypeId)}로 지도를 전환했습니다.`);
   }
 
-  if (!options.silent && state.openTopMenuId === "operation") {
-    renderTopPanel("operation");
-  }
 }
 
 function getKakaoMapTypeId(mapTypeId) {
@@ -731,11 +704,7 @@ function renderTopPanel(menuId) {
 
   const items = getMenuItems(menu);
   elements.topPanel.title.textContent = menu.title;
-  renderPanelItems(
-    elements.topPanel,
-    items,
-    menuId === "operation" ? `map-type-${state.currentMapType.toLowerCase()}` : items[0]?.id
-  );
+  renderPanelItems(elements.topPanel, items, items[0]?.id);
 }
 
 function renderSidePanel(menuId) {
@@ -747,7 +716,7 @@ function renderSidePanel(menuId) {
   const items = getMenuItems(menu);
   elements.sidePanel.title.textContent = menu.title;
   elements.sidePanel.root.dataset.panelMode = menuId;
-  elements.sidePanel.detail.hidden = menuId === "checkpoint";
+  elements.sidePanel.detail.hidden = false;
   renderPanelItems(elements.sidePanel, items, items[0]?.id);
 }
 
@@ -797,8 +766,28 @@ function renderPanelItems(panel, items, defaultItemId) {
 }
 
 function renderPanelDetail(container, item) {
-  if (item.detailType === "certification") {
-    renderCertificationDetail(container, item);
+  if (item.detailType === "main-image") {
+    renderMainImageDetail(container, item);
+    return;
+  }
+
+  if (item.detailType === "login") {
+    renderLoginDetail(container, item);
+    return;
+  }
+
+  if (item.detailType === "weekly-treasure") {
+    renderWeeklyTreasureDetail(container, item);
+    return;
+  }
+
+  if (item.detailType === "weekly-certification") {
+    renderWeeklyCertificationDetail(container, item);
+    return;
+  }
+
+  if (item.detailType === "weekly-carbon") {
+    renderWeeklyCarbonDetail(container, item);
     return;
   }
 
@@ -817,67 +806,318 @@ function renderPanelDetail(container, item) {
   }
 }
 
-function renderCertificationDetail(container, item) {
-  const records = getCertificationRecords().filter(
-    (record) => record.placeId === item.certificationPlaceId
-  );
-  const latestRecord = records[0];
+function renderMainImageDetail(container, item) {
+  container.innerHTML = `
+    <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
+    <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <div class="panel-main-image">
+      <img src="./img/main.png" alt="탄소를 감축하는 자전거 챌린지 season2 메인 이미지" />
+    </div>
+  `;
+}
+
+function renderLoginDetail(container, item) {
+  container.innerHTML = `
+    <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
+    <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <form class="login-form">
+      <label>
+        아이디
+        <input type="text" placeholder="참가자 아이디" autocomplete="username" />
+      </label>
+      <label>
+        비밀번호
+        <input type="password" placeholder="비밀번호" autocomplete="current-password" />
+      </label>
+      <button class="detail-action" type="button">로그인 준비 중</button>
+    </form>
+  `;
+}
+
+function renderWeeklyTreasureDetail(container, item) {
+  const places = getWeeklyPlaces(item.week);
 
   container.innerHTML = `
     <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
     <p>${escapeHtml(item.detailBody || item.summary)}</p>
-    <form class="cert-form" data-certification-form>
-      <label>
-        인증사진
-        <input name="photo" type="file" accept="image/*" required />
-      </label>
-      <label>
-        주행거리(km)
-        <input name="distance" type="number" min="0" step="0.1" placeholder="예: 12.5" required />
-      </label>
-      <label>
-        댓글
-        <textarea name="comment" placeholder="오늘의 인증 소감이나 현장 메모를 남겨주세요." required></textarea>
-      </label>
-      <button class="detail-action" type="submit">인증 등록하기</button>
-    </form>
-    <div class="cert-note">등록 내용은 현재 브라우저에 임시 저장됩니다. 실제 서버 업로드가 필요한 경우 별도 저장소 연결이 필요합니다.</div>
-    ${
-      latestRecord
-        ? `<div class="cert-record">
-            <strong>최근 인증</strong>
-            <span>${escapeHtml(latestRecord.createdAt)} · ${escapeHtml(latestRecord.distance)}km · ${escapeHtml(latestRecord.photoName)}</span>
-            <span>${escapeHtml(latestRecord.comment)}</span>
-          </div>`
-        : ""
-    }
+    <div class="week-summary">${item.week}주차 공개 장소 ${places.length}곳이 랜덤으로 배정되었습니다.</div>
+    <div class="weekly-place-list">
+      ${places
+        .map(
+          (place, index) => `
+            <article class="weekly-place-card">
+              <strong>${index + 1}. ${escapeHtml(place.title)}</strong>
+              <span>${escapeHtml(place.address || place.query)}</span>
+              <button class="mini-action" type="button" data-focus-place="${escapeHtml(place.id)}">지도에서 보기</button>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
   `;
 
-  const form = container.querySelector("[data-certification-form]");
-  form?.addEventListener("submit", (event) => handleCertificationSubmit(event, item, container));
+  bindFocusPlaceButtons(container);
+}
+
+function renderWeeklyCertificationDetail(container, item) {
+  const places = getWeeklyPlaces(item.week);
+  const records = getCertificationRecords();
+
+  container.innerHTML = `
+    <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
+    <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <div class="week-summary">${item.week}주차 공개 장소별 인증을 등록합니다.</div>
+    <div class="weekly-place-list">
+      ${places
+        .map((place) => {
+          const latestRecord = records.find(
+            (record) => Number(record.week) === item.week && record.placeId === place.id
+          );
+
+          return `
+            <article class="weekly-place-card cert-place-card">
+              <strong>${escapeHtml(place.title)}</strong>
+              <span>${escapeHtml(place.address || place.query)}</span>
+              <form class="cert-form" data-certification-form data-week="${item.week}" data-place-id="${escapeHtml(place.id)}">
+                <label>
+                  인증사진
+                  <input name="photo" type="file" accept="image/*" required />
+                </label>
+                <label>
+                  주행거리(km)
+                  <input name="distance" type="number" min="0" step="0.1" placeholder="예: 12.5" required />
+                </label>
+                <label>
+                  댓글
+                  <textarea name="comment" placeholder="방문 인증 소감이나 현장 메모를 남겨주세요." required></textarea>
+                </label>
+                <button class="detail-action" type="submit">인증 등록하기</button>
+              </form>
+              ${
+                latestRecord
+                  ? `<div class="cert-record">
+                      <strong>최근 인증</strong>
+                      <span>${escapeHtml(latestRecord.createdAt)} · ${escapeHtml(formatKm(latestRecord.distance))} · ${escapeHtml(latestRecord.photoName)}</span>
+                      <span>${escapeHtml(latestRecord.comment)}</span>
+                    </div>`
+                  : ""
+              }
+            </article>
+          `;
+        })
+        .join("")}
+    </div>
+    <div class="cert-note">인증 기록은 현재 브라우저에 저장됩니다. 실제 서버 업로드가 필요하면 별도 저장소 연결이 필요합니다.</div>
+  `;
+
+  container.querySelectorAll("[data-certification-form]").forEach((form) => {
+    form.addEventListener("submit", (event) => handleCertificationSubmit(event, item, container));
+  });
+}
+
+function renderWeeklyCarbonDetail(container, item) {
+  const stats = getWeeklyCarbonStats(item.week);
+
+  container.innerHTML = `
+    <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
+    <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <div class="carbon-meter">
+      <strong>${escapeHtml(formatCarbon(stats.totalCarbonKg))}</strong>
+      <span>총 주행거리 ${escapeHtml(formatKm(stats.totalDistanceKm))} 기준</span>
+    </div>
+    <div class="week-summary">계산 기준: 주행거리 1km당 ${CARBON_KG_PER_KM}kg CO2 절감</div>
+    <div class="weekly-place-list">
+      ${stats.places
+        .map(
+          (place) => `
+            <article class="carbon-place-row">
+              <strong>${escapeHtml(place.title)}</strong>
+              <span>${place.recordCount}건 인증 · ${escapeHtml(formatKm(place.distanceKm))} · ${escapeHtml(formatCarbon(place.carbonKg))}</span>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+  `;
 }
 
 function handleCertificationSubmit(event, item, container) {
   event.preventDefault();
 
   const form = event.currentTarget;
+  const place = getPlaceById(form.dataset.placeId);
+  if (!place) {
+    updateMapStatus("인증 장소를 찾지 못했습니다.");
+    return;
+  }
+
   const formData = new FormData(form);
   const photo = form.querySelector('input[name="photo"]')?.files?.[0];
+  const distance = Number(formData.get("distance") || 0);
   const record = {
-    placeId: item.certificationPlaceId,
-    placeTitle: item.label,
+    week: Number(form.dataset.week),
+    placeId: place.id,
+    placeTitle: place.title,
     photoName: photo?.name || "인증사진",
-    distance: formData.get("distance"),
-    comment: formData.get("comment"),
+    distance,
+    comment: String(formData.get("comment") || ""),
     createdAt: new Date().toLocaleString("ko-KR")
   };
 
   const records = getCertificationRecords();
   records.unshift(record);
   saveCertificationRecords(records);
-  renderCertificationDetail(container, item);
-  handleMenuAction(item.action);
-  updateMapStatus(`${item.label} 인증이 등록되었습니다.`, { highlightWord: item.label });
+  renderWeeklyCertificationDetail(container, item);
+  focusPlace(place.id);
+  updateMapStatus(`${place.title} 인증이 등록되었습니다.`, { highlightWord: place.title });
+}
+
+function bindFocusPlaceButtons(container) {
+  container.querySelectorAll("[data-focus-place]").forEach((button) => {
+    button.addEventListener("click", () => focusPlace(button.dataset.focusPlace));
+  });
+}
+
+function getWeeklyTreasurePlan() {
+  if (weeklyTreasurePlanCache) {
+    return weeklyTreasurePlanCache;
+  }
+
+  const savedPlan = readWeeklyTreasurePlan();
+  if (savedPlan) {
+    weeklyTreasurePlanCache = hydrateWeeklyTreasurePlan(savedPlan);
+    return weeklyTreasurePlanCache;
+  }
+
+  const createdPlan = createWeeklyTreasurePlan();
+  saveWeeklyTreasurePlan(createdPlan);
+  weeklyTreasurePlanCache = hydrateWeeklyTreasurePlan(createdPlan);
+  return weeklyTreasurePlanCache;
+}
+
+function readWeeklyTreasurePlan() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(TREASURE_PLAN_STORAGE_KEY) || "null");
+    if (isValidTreasurePlan(parsed)) {
+      return parsed;
+    }
+  } catch (error) {
+    return null;
+  }
+  return null;
+}
+
+function createWeeklyTreasurePlan() {
+  const shuffledPlaces = shufflePlaces(selectedPlaces);
+  return Array.from({ length: WEEK_COUNT }, (_, index) => {
+    const start = index * TREASURE_PLACES_PER_WEEK;
+    return {
+      week: index + 1,
+      placeIds: shuffledPlaces.slice(start, start + TREASURE_PLACES_PER_WEEK).map((place) => place.id)
+    };
+  });
+}
+
+function hydrateWeeklyTreasurePlan(plan) {
+  return plan.map((week) => ({
+    week: Number(week.week),
+    placeIds: week.placeIds,
+    places: week.placeIds.map((placeId) => getPlaceById(placeId)).filter(Boolean)
+  }));
+}
+
+function isValidTreasurePlan(plan) {
+  return (
+    Array.isArray(plan) &&
+    plan.length === WEEK_COUNT &&
+    plan.every(
+      (week, index) =>
+        Number(week.week) === index + 1 &&
+        Array.isArray(week.placeIds) &&
+        week.placeIds.length > 0 &&
+        week.placeIds.every((placeId) => Boolean(getPlaceById(placeId)))
+    )
+  );
+}
+
+function saveWeeklyTreasurePlan(plan) {
+  try {
+    localStorage.setItem(TREASURE_PLAN_STORAGE_KEY, JSON.stringify(plan));
+  } catch (error) {
+    // Random weekly places still work for the current session if storage is unavailable.
+  }
+}
+
+function shufflePlaces(places) {
+  const result = [...places];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+  }
+  return result;
+}
+
+function getWeeklyPlaces(week) {
+  return getWeeklyTreasurePlan().find((item) => item.week === Number(week))?.places || [];
+}
+
+function getPlaceById(placeId) {
+  return selectedPlaces.find((place) => place.id === placeId);
+}
+
+function getWeeklyCarbonStats(week) {
+  const places = getWeeklyPlaces(week);
+  const placeIds = new Set(places.map((place) => place.id));
+  const records = getCertificationRecords().filter(
+    (record) => Number(record.week) === Number(week) && placeIds.has(record.placeId)
+  );
+  const placesWithStats = places.map((place) => {
+    const placeRecords = records.filter((record) => record.placeId === place.id);
+    const distanceKm = placeRecords.reduce((sum, record) => sum + Number(record.distance || 0), 0);
+    return {
+      ...place,
+      recordCount: placeRecords.length,
+      distanceKm,
+      carbonKg: distanceKm * CARBON_KG_PER_KM
+    };
+  });
+  const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
+
+  return {
+    places: placesWithStats,
+    totalDistanceKm,
+    totalCarbonKg: totalDistanceKm * CARBON_KG_PER_KM
+  };
+}
+
+function formatKm(value) {
+  return `${Number(value || 0).toFixed(1)}km`;
+}
+
+function formatCarbon(value) {
+  return `${Number(value || 0).toFixed(2)}kg CO2`;
+}
+
+function focusWeeklyPlaces(week) {
+  if (!mapState.map) {
+    return;
+  }
+
+  const weeklyPlaces = getWeeklyPlaces(week);
+  const weeklyMarkers = mapState.selectedPlaceMarkers.filter(({ place }) =>
+    weeklyPlaces.some((weeklyPlace) => weeklyPlace.id === place.id)
+  );
+
+  if (!weeklyMarkers.length) {
+    return;
+  }
+
+  const bounds = new kakao.maps.LatLngBounds();
+  weeklyMarkers.forEach(({ place }) => {
+    bounds.extend(new kakao.maps.LatLng(place.coords[0], place.coords[1]));
+  });
+  mapState.map.setBounds(bounds);
+  updateMapStatus(`${week}주차 보물찾기 장소를 표시했습니다.`);
 }
 
 function getCertificationRecords() {
@@ -890,7 +1130,7 @@ function getCertificationRecords() {
 
 function saveCertificationRecords(records) {
   try {
-    localStorage.setItem(CERTIFICATION_STORAGE_KEY, JSON.stringify(records.slice(0, 80)));
+    localStorage.setItem(CERTIFICATION_STORAGE_KEY, JSON.stringify(records.slice(0, 120)));
   } catch (error) {
     updateMapStatus("인증 기록을 저장하지 못했습니다.");
   }
@@ -907,6 +1147,10 @@ function handleMenuAction(action) {
 
   if (action.type === "focus-place") {
     focusPlace(action.placeId);
+  }
+
+  if (action.type === "focus-week") {
+    focusWeeklyPlaces(action.week);
   }
 
   if (action.type === "fit-all") {

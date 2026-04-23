@@ -261,8 +261,19 @@ a {
   display: none !important;
 }
 
-.side-panel[data-panel-mode="checkpoint"] .submenu-detail {
-  display: none !important;
+.side-panel[data-panel-mode="treasure"] .submenu-list,
+.side-panel[data-panel-mode="certify"] .submenu-list,
+.side-panel[data-panel-mode="carbon"] .submenu-list {
+  flex: 0 0 auto;
+  max-height: 210px;
+}
+
+.side-panel[data-panel-mode="treasure"] .submenu-detail,
+.side-panel[data-panel-mode="certify"] .submenu-detail,
+.side-panel[data-panel-mode="carbon"] .submenu-detail {
+  min-height: 0;
+  overflow-y: auto;
+  flex: 1 1 auto;
 }
 
 .top-panel {
@@ -465,6 +476,115 @@ a {
   color: #fff;
   font-weight: 700;
   cursor: pointer;
+}
+
+.panel-main-image {
+  margin-top: 16px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.panel-main-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.login-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.login-form input {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 13px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+  font: inherit;
+}
+
+.week-summary {
+  margin-top: 13px;
+  padding: 12px 13px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.weekly-place-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.weekly-place-card,
+.carbon-place-row {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.weekly-place-card strong,
+.carbon-place-row strong {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.weekly-place-card span,
+.carbon-place-row span {
+  line-height: 1.5;
+}
+
+.mini-action {
+  justify-self: start;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--brand-deep);
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.carbon-meter {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 143, 84, 0.24), rgba(255, 255, 255, 0.12));
+}
+
+.carbon-meter strong {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: -0.04em;
+}
+
+.carbon-meter span {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 700;
 }
 
 .cert-form {
@@ -720,7 +840,7 @@ a {
     width: auto;
     height: 88px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     padding-top: 0;
     border-right: 0;
     border-top: 1px solid rgba(23, 50, 47, 0.08);

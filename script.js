@@ -326,10 +326,11 @@ async function bootstrap() {
   bindMapTypeButtons();
   renderTopPanel(state.openTopMenuId);
   updateMapTypeButtons();
+  elements.keyNotice.hidden = true;
 
   const appKey = window.KAKAO_MAP_APPKEY;
   if (!appKey || appKey === "YOUR_KAKAO_JAVASCRIPT_KEY") {
-    elements.keyNotice.hidden = false;
+    elements.keyNotice.hidden = true;
     updateMapStatus("카카오맵 키를 설정하면 지도가 표시됩니다.");
     renderMapFallback();
     return;
@@ -339,7 +340,7 @@ async function bootstrap() {
     await loadKakaoMapsSdk(appKey);
     initMap();
   } catch (error) {
-    elements.keyNotice.hidden = false;
+    elements.keyNotice.hidden = true;
     updateMapStatus("카카오맵 로딩에 실패했습니다.");
     renderMapFallback();
   }
@@ -591,6 +592,7 @@ function fitAllRoutes() {
 }
 
 function setBaseMapType(mapTypeId, options = {}) {
+  elements.keyNotice.hidden = true;
   state.currentMapType = mapTypeId;
 
   if (mapState.map) {
@@ -749,14 +751,18 @@ function renderPanelItems(panel, items, defaultItemId) {
   const activeItem = items.find((item) => item.id === defaultItemId) || items[0];
 
   items.forEach((item) => {
+    const isActive = activeItem?.id === item.id;
+    const inlineIntro =
+      isActive && item.intro ? `<div class="inline-spot-intro">${item.intro}</div>` : "";
     const button = document.createElement("button");
     button.type = "button";
     button.className = "submenu-item";
-    button.classList.toggle("is-active", activeItem?.id === item.id);
+    button.classList.toggle("is-active", isActive);
     button.innerHTML = `
       <div class="submenu-item-text">
         <strong>${item.label}</strong>
         <span>${item.summary}</span>
+        ${inlineIntro}
       </div>
       <span class="submenu-item-tag">${item.tag || "메뉴"}</span>
     `;
@@ -765,6 +771,13 @@ function renderPanelItems(panel, items, defaultItemId) {
       panel.list.querySelectorAll(".submenu-item").forEach((node) => {
         node.classList.toggle("is-active", node === button);
       });
+      panel.list.querySelectorAll(".inline-spot-intro").forEach((node) => node.remove());
+      if (item.intro) {
+        const intro = document.createElement("div");
+        intro.className = "inline-spot-intro";
+        intro.textContent = item.intro;
+        button.querySelector(".submenu-item-text")?.appendChild(intro);
+      }
       renderPanelDetail(panel.detail, item);
       handleMenuAction(item.action);
     });

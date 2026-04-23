@@ -215,6 +215,8 @@ a {
 .side-panel {
   top: calc(var(--header-height) + 18px);
   left: calc(var(--rail-width) + 8px);
+  height: min(760px, calc(100vh - var(--header-height) - 36px));
+  overflow: hidden;
   transform: translateX(-26px);
   opacity: 0;
   pointer-events: none;
@@ -274,7 +276,8 @@ a {
 }
 
 .side-panel .submenu-list {
-  max-height: min(42vh, 430px);
+  flex: 1 1 auto;
+  max-height: none;
   overflow-y: auto;
   padding-right: 6px;
   overscroll-behavior: contain;
@@ -415,6 +418,25 @@ a {
   line-height: 1.65;
 }
 
+.inline-spot-intro {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(10, 141, 120, 0.08);
+  color: var(--brand-deep);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+#keyNotice[hidden] {
+  display: none !important;
+}
+
+.map-type-toggle {
+  z-index: 1450;
+}
+
 .status-chip {
   right: 24px;
   bottom: 24px;
@@ -462,7 +484,7 @@ a {
   width: min(420px, calc(100vw - 48px));
   padding: 18px 20px;
   border-radius: 22px;
-  display: grid;
+  display: none !important;
   gap: 8px;
 }
 

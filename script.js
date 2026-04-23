@@ -240,7 +240,9 @@ const state = {
   selectedRouteId: window.DEFAULT_ROUTE_ID || "jeonju-hanok",
   currentMapType: "ROADMAP",
   openTopMenuId: "intro",
-  openSideMenuId: null
+  openSideMenuId: null,
+  routeSearchDestination: null,
+  routeSearchUrl: ""
 };
 
 const elements = {
@@ -248,6 +250,13 @@ const elements = {
   map: document.getElementById("map"),
   mapStatus: document.getElementById("mapStatus"),
   placeCard: document.getElementById("placeCard"),
+  routeFinder: document.getElementById("routeFinder"),
+  routeSearchForm: document.getElementById("routeSearchForm"),
+  routeSearchInput: document.getElementById("routeSearchInput"),
+  routeSearchMeta: document.getElementById("routeSearchMeta"),
+  routeSearchActions: document.getElementById("routeSearchActions"),
+  routeOpenButton: document.getElementById("routeOpenButton"),
+  routeLocateButton: document.getElementById("routeLocateButton"),
   keyNotice: document.getElementById("keyNotice"),
   topPanel: {
     root: document.querySelector(".top-panel"),
@@ -270,7 +279,11 @@ const elements = {
 const mapState = {
   map: null,
   routePolylines: new Map(),
-  selectedPlaceMarkers: []
+  selectedPlaceMarkers: [],
+  currentLocation: null,
+  currentLocationMarker: null,
+  routeDestinationMarker: null,
+  routePreviewLine: null
 };
 
 bootstrap();
@@ -279,6 +292,7 @@ async function bootstrap() {
   bindHomeIntro();
   bindMenuButtons();
   bindMapTypeButtons();
+  bindRouteFinder();
   renderTopPanel(state.openTopMenuId);
   updateMapTypeButtons();
   bindViewportState();
@@ -365,6 +379,7 @@ function initMap() {
 
   mapState.map = map;
   elements.keyNotice.hidden = true;
+  requestCurrentLocation({ panTo: false, silent: true });
 
   challengeRoutes.forEach((route) => {
     const polyline = new kakao.maps.Polyline({
@@ -664,6 +679,257 @@ function showPlaceCard(place) {
   elements.placeCard.querySelector("[data-band-certify]")?.addEventListener("click", () => {
     openBandCertificationPage();
   });
+}
+
+function bindRouteFinder() {
+  elements.routeSearchForm?.addEventListener("submit", handleRouteSearchSubmit);
+
+  elements.routeLocateButton?.addEventListener("click", async () => {
+    const currentLocation = await requestCurrentLocation({ panTo: true });
+    if (currentLocation) {
+      elements.routeSearchMeta.textContent = "현재 위치를 확인했습니다. 도착 장소를 입력해 자전거 길찾기를 시작하세요.";
+      updateMapStatus("현재 위치를 확인했습니다.");
+    }
+  });
+
+  elements.routeOpenButton?.addEventListener("click", () => {
+    if (state.routeSearchUrl) {
+      openExternalRoute(state.routeSearchUrl);
+    }
+  });
+}
+
+async function handleRouteSearchSubmit(event) {
+  event.preventDefault();
+
+  const keyword = elements.routeSearchInput?.value.trim();
+  if (!keyword) {
+    elements.routeSearchMeta.textContent = "도착 장소 이름을 입력해주세요.";
+    elements.routeSearchActions.hidden = true;
+    return;
+  }
+
+  const currentLocation = mapState.currentLocation || (await requestCurrentLocation({ panTo: false }));
+  if (!currentLocation) {
+    elements.routeSearchMeta.textContent = "현재 위치를 확인해야 자전거 코스를 찾을 수 있습니다.";
+    elements.routeSearchActions.hidden = true;
+    return;
+  }
+
+  const destination = await resolveRouteDestination(keyword, currentLocation);
+  if (!destination) {
+    elements.routeSearchMeta.textContent = "검색 결과가 없습니다. 장소명이나 주소를 다시 입력해주세요.";
+    elements.routeSearchActions.hidden = true;
+    return;
+  }
+
+  state.routeSearchDestination = destination;
+  state.routeSearchUrl = buildKakaoBikeRouteUrl(currentLocation, destination.coords);
+  updateRoutePreview(currentLocation, destination);
+
+  const distanceText = formatRouteDistance(
+    calculateDistanceKm(currentLocation, {
+      lat: destination.coords[0],
+      lng: destination.coords[1]
+    })
+  );
+  elements.routeSearchMeta.innerHTML = `${escapeHtml(destination.title)} · 현재 위치에서 약 ${escapeHtml(distanceText)} 떨어져 있습니다.`;
+  elements.routeOpenButton.textContent = `${destination.title} 자전거 길찾기`;
+  elements.routeSearchActions.hidden = false;
+  updateMapStatus(`${destination.title} 자전거 코스를 준비했습니다.`, {
+    highlightWord: destination.title
+  });
+}
+
+function requestCurrentLocation(options = {}) {
+  const { panTo = true, silent = false } = options;
+
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      if (!silent) {
+        elements.routeSearchMeta.textContent = "브라우저에서 위치 정보를 지원하지 않습니다.";
+      }
+      resolve(null);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const currentLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+
+        mapState.currentLocation = currentLocation;
+        updateCurrentLocationMarker(currentLocation, { panTo });
+        resolve(currentLocation);
+      },
+      () => {
+        if (!silent) {
+          elements.routeSearchMeta.textContent = "현재 위치 권한을 허용하면 자전거 길찾기를 사용할 수 있습니다.";
+        }
+        resolve(null);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  });
+}
+
+function updateCurrentLocationMarker(currentLocation, options = {}) {
+  if (!mapState.map) {
+    return;
+  }
+
+  const { panTo = true } = options;
+  const position = new kakao.maps.LatLng(currentLocation.lat, currentLocation.lng);
+
+  if (!mapState.currentLocationMarker) {
+    mapState.currentLocationMarker = new kakao.maps.Marker({
+      map: mapState.map,
+      position,
+      image: createCurrentLocationMarkerImage(),
+      title: "현재 위치"
+    });
+  } else {
+    mapState.currentLocationMarker.setPosition(position);
+  }
+
+  if (panTo) {
+    mapState.map.panTo(position);
+  }
+}
+
+function createCurrentLocationMarkerImage() {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 42 42">
+      <circle cx="21" cy="21" r="14" fill="rgba(47,126,255,0.22)"/>
+      <circle cx="21" cy="21" r="8.5" fill="#2f7eff" stroke="#ffffff" stroke-width="3"/>
+    </svg>
+  `;
+
+  return new kakao.maps.MarkerImage(
+    `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    new kakao.maps.Size(42, 42),
+    { offset: new kakao.maps.Point(21, 21) }
+  );
+}
+
+function resolveRouteDestination(keyword, currentLocation) {
+  return new Promise((resolve) => {
+    if (!window.kakao?.maps?.services) {
+      resolve(null);
+      return;
+    }
+
+    const placesService = new kakao.maps.services.Places();
+    placesService.keywordSearch(
+      keyword,
+      (result, status) => {
+        if (status !== kakao.maps.services.Status.OK || !result?.[0]) {
+          resolve(null);
+          return;
+        }
+
+        const destination = result[0];
+        resolve({
+          id: destination.id || `route-${Date.now()}`,
+          title: destination.place_name,
+          address: destination.road_address_name || destination.address_name || keyword,
+          query: keyword,
+          intro: "코스찾기로 선택한 도착 장소입니다.",
+          coords: [Number(destination.y), Number(destination.x)]
+        });
+      },
+      {
+        x: currentLocation.lng,
+        y: currentLocation.lat,
+        radius: 20000,
+        size: 10,
+        sort: kakao.maps.services.SortBy.DISTANCE
+      }
+    );
+  });
+}
+
+function updateRoutePreview(currentLocation, destination) {
+  if (!mapState.map) {
+    return;
+  }
+
+  const originLatLng = new kakao.maps.LatLng(currentLocation.lat, currentLocation.lng);
+  const destinationLatLng = new kakao.maps.LatLng(destination.coords[0], destination.coords[1]);
+
+  if (!mapState.routeDestinationMarker) {
+    mapState.routeDestinationMarker = new kakao.maps.Marker({
+      map: mapState.map,
+      position: destinationLatLng,
+      title: destination.title
+    });
+  } else {
+    mapState.routeDestinationMarker.setPosition(destinationLatLng);
+  }
+
+  if (!mapState.routePreviewLine) {
+    mapState.routePreviewLine = new kakao.maps.Polyline({
+      map: mapState.map,
+      path: [originLatLng, destinationLatLng],
+      strokeWeight: 5,
+      strokeColor: "#2f7eff",
+      strokeOpacity: 0.9,
+      strokeStyle: "dash"
+    });
+  } else {
+    mapState.routePreviewLine.setPath([originLatLng, destinationLatLng]);
+    mapState.routePreviewLine.setMap(mapState.map);
+  }
+
+  const bounds = new kakao.maps.LatLngBounds();
+  bounds.extend(originLatLng);
+  bounds.extend(destinationLatLng);
+  mapState.map.setBounds(bounds);
+}
+
+function buildKakaoBikeRouteUrl(origin, destinationCoords) {
+  const sp = `${origin.lat.toFixed(5)},${origin.lng.toFixed(5)}`;
+  const ep = `${destinationCoords[0].toFixed(5)},${destinationCoords[1].toFixed(5)}`;
+  return `https://m.map.kakao.com/scheme/route?sp=${sp}&ep=${ep}&by=bicycle`;
+}
+
+function openExternalRoute(url) {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    window.location.href = url;
+    return;
+  }
+
+  const routeWindow = window.open(url, "_blank", "noopener,noreferrer");
+  if (!routeWindow) {
+    window.location.href = url;
+  }
+}
+
+function calculateDistanceKm(origin, destination) {
+  const toRadians = (value) => (value * Math.PI) / 180;
+  const earthRadiusKm = 6371;
+  const deltaLat = toRadians(destination.lat - origin.lat);
+  const deltaLng = toRadians(destination.lng - origin.lng);
+  const lat1 = toRadians(origin.lat);
+  const lat2 = toRadians(destination.lat);
+  const a =
+    Math.sin(deltaLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function formatRouteDistance(distanceKm) {
+  if (distanceKm < 1) {
+    return `${Math.round(distanceKm * 1000)}m`;
+  }
+  return `${distanceKm.toFixed(1)}km`;
 }
 
 function bindHomeIntro() {

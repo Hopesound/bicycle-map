@@ -85,6 +85,38 @@
       <main class="map-stage">
         <div id="map" aria-label="카카오맵 자전거 챌린지 지도"></div>
 
+        <section class="map-overlay route-finder" id="routeFinder" aria-label="코스찾기">
+          <div class="route-finder-head">
+            <p class="route-finder-title">코스찾기</p>
+            <button class="route-chip" type="button" id="routeLocateButton">현재위치</button>
+          </div>
+          <form class="route-search-form" id="routeSearchForm">
+            <label class="route-search-input">
+              <span class="route-search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="6.5"></circle>
+                  <path d="m16 16 4 4"></path>
+                </svg>
+              </span>
+              <input
+                id="routeSearchInput"
+                type="text"
+                placeholder="도착 장소 이름을 입력하세요"
+                autocomplete="off"
+              />
+            </label>
+            <button class="route-search-submit" type="submit">검색</button>
+          </form>
+          <div class="route-search-meta" id="routeSearchMeta">
+            현재 위치에서 찾고 싶은 장소를 입력하면 자전거 길찾기를 열 수 있습니다.
+          </div>
+          <div class="route-search-actions" id="routeSearchActions" hidden>
+            <button class="route-open-button" id="routeOpenButton" type="button">
+              자전거 길찾기 열기
+            </button>
+          </div>
+        </section>
+
         <section class="submenu-panel top-panel" aria-live="polite">
           <div class="panel-head">
             <p class="panel-kicker">상단 메뉴</p>

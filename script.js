@@ -25,10 +25,11 @@ const selectedPlaces = [
   {
     id: "saechangi-bridge",
     title: "새창이다리",
-    query: "새창이다리 군산 대야면 복교리",
-    address: "전북특별자치도 군산시 대야면 복교리 1328-29",
-    intro: "군산시 대야면 복교리와 김제시 청하면 일대를 잇는 근대 교량 거점으로, 새창이다리 북측 진입부 기준으로 위치를 표시합니다.",
-    fallback: [35.9276, 126.8332]
+    query: "새창이다리 만경대교",
+    address: "만경대교 옆 새창이다리, 군산시 대야면 복교리-김제시 청하면 동지산리 일원",
+    preferKeyword: true,
+    intro: "만경대교 바로 옆에 놓인 근대 교량 거점으로, 복교리 주소지점이 아닌 새창이다리 실교량 위치 기준으로 표시합니다.",
+    fallback: [35.9108, 126.8383]
   },
   { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
   { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", intro: "편백숲 치유 관광과 자전거 방문 인증을 연결하기 좋은 숲길 거점입니다.", fallback: [35.7621, 127.1859] },
@@ -470,7 +471,7 @@ function resolvePlaceCoords(place, geocoder, placesService) {
       );
     };
 
-    if (place.address) {
+    if (place.address && !place.preferKeyword) {
       geocoder.addressSearch(place.address, (result, status) => {
         if (status === kakao.maps.services.Status.OK && result?.[0]) {
           resolve([Number(result[0].y), Number(result[0].x)]);
@@ -484,6 +485,10 @@ function resolvePlaceCoords(place, geocoder, placesService) {
 
     tryKeyword();
   });
+}
+
+function getPlaceAddressText(place) {
+  return place.address || place.query;
 }
 
 function createSelectedPlaceMarkers(places) {
@@ -506,7 +511,7 @@ function createSelectedPlaceMarkers(places) {
       content: `
         <div style="padding:10px 12px;min-width:200px;font-size:13px;line-height:1.55;">
           <strong style="display:block;font-size:14px;margin-bottom:4px;">${place.title}</strong>
-          <span>${place.address || place.query}</span>
+          <span>${getPlaceAddressText(place)}</span>
         </div>
       `
     });
@@ -677,7 +682,7 @@ function showPlaceCard(place) {
     <button class="place-card-close" type="button" data-close-place-card aria-label="장소 정보 닫기">×</button>
     <p class="place-card-kicker">보물찾기 장소</p>
     <h3>${escapeHtml(place.title)}</h3>
-    <p class="place-card-address">${escapeHtml(place.address || place.query)}</p>
+    <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
     <p class="place-card-intro">${escapeHtml(place.intro || "자전거 챌린지 인증 장소입니다.")}</p>
     ${
       weekLabels.length
@@ -1218,6 +1223,7 @@ function renderTopPanel(menuId) {
 
   const items = getMenuItems(menu);
   elements.topPanel.title.textContent = menu.title;
+  elements.topPanel.root.dataset.panelMode = menuId;
   renderPanelItems(elements.topPanel, items, items[0]?.id);
 }
 
@@ -1550,7 +1556,7 @@ function renderWeeklyTreasureDetail(container, item) {
           (place, index) => `
             <article class="weekly-place-card">
               <strong>${index + 1}. ${escapeHtml(place.title)}</strong>
-              <span>${escapeHtml(place.address || place.query)}</span>
+              <span>${escapeHtml(getPlaceAddressText(place))}</span>
               <button class="mini-action" type="button" data-focus-place="${escapeHtml(place.id)}">지도에서 보기</button>
             </article>
           `
@@ -1580,7 +1586,7 @@ function renderWeeklyCertificationDetail(container, item) {
           return `
             <article class="weekly-place-card cert-place-card">
               <strong>${escapeHtml(place.title)}</strong>
-              <span>${escapeHtml(place.address || place.query)}</span>
+              <span>${escapeHtml(getPlaceAddressText(place))}</span>
               <form class="cert-form" data-certification-form data-week="${item.week}" data-place-id="${escapeHtml(place.id)}">
                 <label>
                   인증사진

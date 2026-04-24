@@ -129,22 +129,28 @@ const topMenus = {
     title: "이벤트",
     items: [
       {
-        id: "event-weekly",
-        label: "주차별 미션 이벤트",
-        summary: "매주 공개 장소 인증",
-        tag: "미션",
-        detailTitle: "주차별 미션 이벤트",
+        id: "event-bongdong-coffee",
+        label: "봉동 상장기공원 커피 이벤트",
+        summary: "인증 후 인근 커피숍 무료 커피 30잔",
+        tag: "EVENT",
+        detailType: "event-promo",
+        action: { type: "focus-place", placeId: "sangjang-park" },
+        detailTitle: "봉동 상장기공원 인증하고 무료 커피 받기",
         detailBody:
-          "각 주차에 공개된 보물찾기 장소를 인증하면 해당 주차 이벤트 참여 기록으로 활용할 수 있습니다."
+          "2026년 5월 4일부터 2026년 5월 31일까지 3회차로 운영되는 시즌2 현장 이벤트입니다.",
+        eventPlaceId: "sangjang-park"
       },
       {
-        id: "event-carbon",
-        label: "탄소절감 챌린지",
-        summary: "주행거리 기반 참여",
-        tag: "탄소",
-        detailTitle: "탄소절감 챌린지",
+        id: "event-bongdong-guide",
+        label: "참여 및 인증 안내",
+        summary: "밴드 인증 후 현장 확인 방식",
+        tag: "GUIDE",
+        detailType: "event-guide",
+        action: { type: "focus-place", placeId: "sangjang-park" },
+        detailTitle: "이벤트 참여 및 인증 방법",
         detailBody:
-          "인증하기에서 등록한 주행거리를 모아 탄소절감량을 비교하고, 친환경 이동 성과를 확인합니다."
+          "봉동 상장기공원 현장 인증과 네이버 밴드 인증 화면을 기준으로 무료 커피 제공 여부를 확인합니다.",
+        eventPlaceId: "sangjang-park"
       }
     ]
   },
@@ -394,8 +400,7 @@ function initMap() {
   });
 
   renderSelectedPlaces();
-  selectRoute(state.selectedRouteId, { fitBounds: true });
-  updateMapStatus("카카오맵에서 시즌2 코스를 탐색할 수 있습니다.");
+  selectRoute(state.selectedRouteId, { fitBounds: true, silentStatus: true });
 }
 
 function renderSelectedPlaces() {
@@ -540,7 +545,7 @@ function selectRoute(routeId, options = {}) {
   }
 
   const route = challengeRoutes.find((item) => item.id === routeId);
-  if (route) {
+  if (route && !options.silentStatus) {
     updateMapStatus(`${route.title} · ${route.city} 코스를 보고 있습니다.`);
   }
 }
@@ -626,6 +631,7 @@ function getMapTypeLabel(mapTypeId) {
 }
 
 function updateMapStatus(message, options = {}) {
+  elements.mapStatus.hidden = false;
   const escapedMessage = escapeHtml(message);
   const highlightedMessage = options.highlightWord
     ? escapedMessage.replace(
@@ -1107,6 +1113,16 @@ function renderPanelDetail(container, item) {
     return;
   }
 
+  if (item.detailType === "event-promo") {
+    renderEventPromoDetail(container, item);
+    return;
+  }
+
+  if (item.detailType === "event-guide") {
+    renderEventGuideDetail(container, item);
+    return;
+  }
+
   if (item.detailType === "login") {
     renderLoginDetail(container, item);
     return;
@@ -1150,6 +1166,118 @@ function renderMainImageDetail(container, item) {
       <img src="./img/main.png" alt="탄소를 감축하는 자전거 챌린지 season2 메인 이미지" />
     </div>
   `;
+}
+
+function renderEventPromoDetail(container, item) {
+  const rounds = [
+    {
+      label: "1차 이벤트",
+      date: "2026.05.04 - 2026.05.10",
+      theme: "오픈 주간",
+      reward: "선착순 무료 커피 30잔"
+    },
+    {
+      label: "2차 이벤트",
+      date: "2026.05.11 - 2026.05.18",
+      theme: "재방문 유도 주간",
+      reward: "선착순 무료 커피 30잔"
+    },
+    {
+      label: "3차 이벤트",
+      date: "2026.05.19 - 2026.05.31",
+      theme: "마감 스페셜 주간",
+      reward: "선착순 무료 커피 30잔"
+    }
+  ];
+
+  container.innerHTML = `
+    <div class="event-hero">
+      <span class="event-badge">시즌2 오프라인 이벤트</span>
+      <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
+      <p>${escapeHtml(item.detailBody || item.summary)}</p>
+      <div class="detail-meta">
+        <span class="detail-pill">장소: 봉동 상장기공원</span>
+        <span class="detail-pill">혜택: 무료 커피 30잔</span>
+        <span class="detail-pill">기간: 2026.05.04 - 2026.05.31</span>
+      </div>
+    </div>
+    <div class="event-round-list">
+      ${rounds
+        .map(
+          (round) => `
+            <article class="event-round-card">
+              <strong>${escapeHtml(round.label)}</strong>
+              <span>${escapeHtml(round.date)}</span>
+              <span>${escapeHtml(round.theme)}</span>
+              <span>${escapeHtml(round.reward)}</span>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+    <div class="event-steps">
+      <article class="event-step">
+        <strong>1. 봉동 상장기공원 방문</strong>
+        <span>지도에서 위치를 확인하고 봉동 상장기공원에 도착합니다.</span>
+      </article>
+      <article class="event-step">
+        <strong>2. 인증하기 또는 밴드 인증</strong>
+        <span>인증사진, 주행거리, 댓글을 등록하고 네이버 밴드 인증 화면을 준비합니다.</span>
+      </article>
+      <article class="event-step">
+        <strong>3. 인근 커피숍에서 확인</strong>
+        <span>현장 인증 또는 밴드 인증 화면을 제시하면 회차별 선착순 30잔 무료 커피 혜택을 받을 수 있습니다.</span>
+      </article>
+    </div>
+    <div class="event-note">
+      회차별 운영 수량은 선착순 30잔 기준으로 안내했습니다. 운영처 사정에 따라 조기 마감 또는 안내 문구 조정이 필요하면 이벤트 문구만 바로 바꿀 수 있습니다.
+    </div>
+    <div class="event-actions">
+      <button class="detail-action" type="button" data-focus-event-place="${escapeHtml(item.eventPlaceId)}">봉동 상장기공원 위치 보기</button>
+      <button class="detail-action event-action-alt" type="button" data-open-event-band>네이버 밴드 인증 열기</button>
+    </div>
+  `;
+
+  bindEventDetailActions(container, item);
+}
+
+function renderEventGuideDetail(container, item) {
+  container.innerHTML = `
+    <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
+    <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <div class="event-guide-list">
+      <article class="weekly-place-card">
+        <strong>운영 방식</strong>
+        <span>봉동 상장기공원 방문 인증 후 인근 커피숍에서 인증 내역을 보여주면 무료 커피 제공 대상 여부를 확인합니다.</span>
+      </article>
+      <article class="weekly-place-card">
+        <strong>인증 기준</strong>
+        <span>인증사진 1장, 주행거리, 댓글이 포함된 인증 등록 또는 네이버 밴드 인증 화면을 기준으로 운영합니다.</span>
+      </article>
+      <article class="weekly-place-card">
+        <strong>운영 일정</strong>
+        <span>2026년 5월 4일, 5월 11일, 5월 19일 시작의 3회차 이벤트로 2026년 5월 31일까지 운영합니다.</span>
+      </article>
+    </div>
+    <div class="event-actions">
+      <button class="detail-action" type="button" data-focus-event-place="${escapeHtml(item.eventPlaceId)}">봉동 상장기공원 위치 보기</button>
+      <button class="detail-action event-action-alt" type="button" data-open-event-band>밴드 인증 화면 열기</button>
+    </div>
+  `;
+
+  bindEventDetailActions(container, item);
+}
+
+function bindEventDetailActions(container, item) {
+  container.querySelector("[data-focus-event-place]")?.addEventListener("click", () => {
+    if (item.eventPlaceId) {
+      focusPlace(item.eventPlaceId);
+    }
+  });
+
+  container.querySelector("[data-open-event-band]")?.addEventListener("click", () => {
+    openBandCertificationPage();
+  });
 }
 
 function renderLoginDetail(container, item) {

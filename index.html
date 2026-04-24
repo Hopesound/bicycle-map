@@ -85,38 +85,6 @@
       <main class="map-stage">
         <div id="map" aria-label="카카오맵 자전거 챌린지 지도"></div>
 
-        <section class="map-overlay route-finder" id="routeFinder" aria-label="코스찾기">
-          <div class="route-finder-head">
-            <p class="route-finder-title">코스찾기</p>
-            <button class="route-chip" type="button" id="routeLocateButton">현재위치</button>
-          </div>
-          <form class="route-search-form" id="routeSearchForm">
-            <label class="route-search-input">
-              <span class="route-search-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="6.5"></circle>
-                  <path d="m16 16 4 4"></path>
-                </svg>
-              </span>
-              <input
-                id="routeSearchInput"
-                type="text"
-                placeholder="도착 장소 이름을 입력하세요"
-                autocomplete="off"
-              />
-            </label>
-            <button class="route-search-submit" type="submit">검색</button>
-          </form>
-          <div class="route-search-meta" id="routeSearchMeta">
-            현재 위치에서 찾고 싶은 장소를 입력하면 자전거 길찾기를 열 수 있습니다.
-          </div>
-          <div class="route-search-actions" id="routeSearchActions" hidden>
-            <button class="route-open-button" id="routeOpenButton" type="button">
-              자전거 길찾기 열기
-            </button>
-          </div>
-        </section>
-
         <section class="submenu-panel top-panel" aria-live="polite">
           <div class="panel-head">
             <p class="panel-kicker">상단 메뉴</p>
@@ -137,22 +105,65 @@
               ×
             </button>
           </div>
+          <section class="route-finder route-finder--panel" id="routeFinder" aria-label="코스찾기">
+            <div class="route-finder-head">
+              <p class="route-finder-title">코스찾기</p>
+              <button class="route-chip" type="button" id="routeLocateButton">현재위치</button>
+            </div>
+            <form class="route-search-form" id="routeSearchForm">
+              <label class="route-search-input">
+                <span class="route-search-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4 4"></path>
+                  </svg>
+                </span>
+                <input
+                  id="routeSearchInput"
+                  type="text"
+                  placeholder="도착 장소 이름을 입력하세요"
+                  autocomplete="off"
+                />
+              </label>
+              <button class="route-search-submit" type="submit">검색</button>
+            </form>
+            <div class="route-search-meta" id="routeSearchMeta">
+              현재 위치에서 찾고 싶은 장소를 입력하면 자전거 길찾기를 열 수 있습니다.
+            </div>
+            <div class="route-search-actions" id="routeSearchActions" hidden>
+              <button class="route-open-button" id="routeOpenButton" type="button">
+                자전거 길찾기 열기
+              </button>
+            </div>
+          </section>
           <div class="submenu-list" id="sidePanelList"></div>
           <div class="submenu-detail" id="sidePanelDetail"></div>
         </section>
 
-        <div class="map-overlay status-chip" id="mapStatus">
-          카카오맵 로딩 준비 중
-        </div>
+        <div class="map-overlay status-chip" id="mapStatus" hidden aria-live="polite"></div>
 
         <div class="map-overlay place-card" id="placeCard" hidden aria-live="polite"></div>
 
         <div class="map-overlay map-type-toggle" aria-label="지도 타입 선택">
           <button class="map-type-button is-active" type="button" data-map-type="ROADMAP">
-            일반지도
+            <span class="map-type-button-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 6.5 9.4 4l5.2 2.2L20 3.8v13.7l-5.4 2.5-5.2-2.2L4 20.2Z"></path>
+                <path d="M9.4 4v13.8"></path>
+                <path d="M14.6 6.2V20"></path>
+              </svg>
+            </span>
+            <span class="map-type-button-label">지도</span>
           </button>
           <button class="map-type-button" type="button" data-map-type="SKYVIEW">
-            위성지도
+            <span class="map-type-button-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="4" y="4.5" width="16" height="11" rx="3"></rect>
+                <path d="M7 15.5 10.5 11l3 2.7 2.2-1.8L20 15.5"></path>
+                <circle cx="9" cy="8.5" r="1.2"></circle>
+              </svg>
+            </span>
+            <span class="map-type-button-label">위성</span>
           </button>
         </div>
 

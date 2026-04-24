@@ -121,14 +121,14 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-24",
     revealLabel: "4월 24일",
     placeIds: [
-      "jbnu-museum",
       "jeonbuk-env",
       "songgwangsa",
       "sangjang-park",
       "gijije",
       "kkotsingi",
       "jeonju-arboretum",
-      "saechangi-bridge"
+      "saechangi-bridge",
+      "palbok-art"
     ]
   },
   {
@@ -136,14 +136,14 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-25",
     revealLabel: "4월 25일",
     placeIds: [
-      "goui-reservoir",
       "gosan-miso-market",
       "omokdae",
       "sanggwan-forest",
       "march-first",
       "bibijeong",
       "woosuk-hospital",
-      "sebyeongho"
+      "sebyeongho",
+      "yeoyu-cafe"
     ]
   },
   {
@@ -151,14 +151,14 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-26",
     revealLabel: "4월 26일",
     placeIds: [
-      "yeoyu-cafe",
       "jeonju-archive",
       "iksan-samil",
       "wind-road",
       "ajung-library",
       "jeonju-fm",
       "daedeok-elementary",
-      "chucheondae"
+      "chucheondae",
+      "deokjin-park"
     ]
   },
   {
@@ -166,13 +166,13 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-27",
     revealLabel: "4월 27일",
     placeIds: [
-      "deokjin-park",
       "volunteer-center",
       "medical-coop",
       "eoeun-bridge",
       "hari-bridge",
       "bike-box",
-      "palbok-art"
+      "jbnu-museum",
+      "goui-reservoir"
     ]
   }
 ];
@@ -1594,6 +1594,9 @@ function renderSidePanel(menuId) {
   }
 
   const items = getMenuItems(menu);
+  if (elements.routeFinder) {
+    elements.routeFinder.hidden = menuId !== "treasure";
+  }
   elements.sidePanel.title.textContent = menuId === "carbon" ? "탄소감축" : menu.title;
   elements.sidePanel.root.dataset.panelMode = menuId;
   elements.sidePanel.detail.hidden = false;
@@ -1700,7 +1703,7 @@ function getPanelItemSummary(panel, item) {
 
 function shouldUseInlineDetail(panel) {
   if (panel === elements.sidePanel) {
-    return panel.root.dataset.panelMode === "treasure";
+    return ["treasure", "certify", "carbon"].includes(panel.root.dataset.panelMode);
   }
 
   if (panel === elements.topPanel) {
@@ -2345,4 +2348,75 @@ function handleMenuAction(action) {
 
 function getMenuItems(menu) {
   return typeof menu.getItems === "function" ? menu.getItems() : menu.items || [];
+}
+
+function renderWeeklyCertificationDetail(container, item) {
+  const places = getWeeklyPlaces(item.week);
+  const weekPlan = getWeekPlan(item.week);
+
+  if (!weekPlan?.isRevealed) {
+    container.innerHTML = `
+      <h3>${escapeHtml(`${item.week}주차 인증하기`)}</h3>
+      <p>${escapeHtml(`${getWeekRevealLabel(item.week)} 공개 후 인증할 수 있습니다.`)}</p>
+      <div class="week-summary">비공개 주차입니다. 아직 인증 장소가 열리지 않았습니다.</div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <h3>${escapeHtml(`${item.week}주차 인증하기`)}</h3>
+    <p>장소명을 누르면 지도에 위치가 표시되고, 팝업에서 인증하기를 열 수 있습니다.</p>
+    <div class="week-summary">${item.week}주차 공개 장소 ${places.length}곳</div>
+    <div class="weekly-place-list">
+      ${places
+        .map(
+          (place, index) => `
+            <article class="weekly-place-card cert-place-card">
+              <button class="text-place-link" type="button" data-focus-place="${escapeHtml(place.id)}">
+                ${index + 1}. ${escapeHtml(place.title)}
+              </button>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+    <div class="cert-note">장소 팝업의 인증하기 버튼을 누르면 네이버 밴드 게시판이 새 창으로 열립니다.</div>
+  `;
+
+  bindFocusPlaceButtons(container);
+}
+
+function renderWeeklyCarbonDetail(container, item) {
+  const weekPlan = getWeekPlan(item.week);
+  if (!weekPlan?.isRevealed) {
+    container.innerHTML = `
+      <h3>${escapeHtml(`${item.week}주차 탄소감축`)}</h3>
+      <p>${escapeHtml(`${getWeekRevealLabel(item.week)} 공개 후 탄소감축량이 표시됩니다.`)}</p>
+      <div class="week-summary">비공개 주차입니다. 공개 이후 입력된 거리 기준으로 감축량을 계산합니다.</div>
+    `;
+    return;
+  }
+
+  const stats = getWeeklyCarbonStats(item.week);
+  container.innerHTML = `
+    <h3>${escapeHtml(`${item.week}주차 탄소감축`)}</h3>
+    <p>참가자가 입력한 거리 기준으로 계산된 감축량입니다.</p>
+    <div class="carbon-meter">
+      <strong>${escapeHtml(formatCarbon(stats.totalCarbonKg))}</strong>
+      <span>${item.week}주차 입력 거리 ${escapeHtml(formatKm(stats.totalDistanceKm))}</span>
+    </div>
+    <div class="week-summary">계산 기준: 주행거리 1km당 ${CARBON_KG_PER_KM}kg CO2 감축</div>
+    <div class="weekly-place-list">
+      ${stats.places
+        .map(
+          (place) => `
+            <article class="carbon-place-row">
+              <strong>${escapeHtml(place.title)}</strong>
+              <span>${escapeHtml(formatCarbon(place.carbonKg))} · ${escapeHtml(formatKm(place.distanceKm))}</span>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+  `;
 }

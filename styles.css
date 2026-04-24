@@ -915,6 +915,23 @@ a {
   color: var(--brand-deep);
 }
 
+.text-place-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--brand-deep);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.text-place-link:hover,
+.text-place-link:focus-visible {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
 .place-popup {
   position: relative;
   min-width: 320px;
@@ -1209,6 +1226,10 @@ a {
 
 .route-finder--panel {
   width: 100%;
+}
+
+.route-finder--panel[hidden] {
+  display: none !important;
 }
 
 .route-finder-title {

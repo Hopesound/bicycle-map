@@ -297,6 +297,7 @@ bootstrap();
 async function bootstrap() {
   bindHomeIntro();
   bindMenuButtons();
+  bindOverlayDismiss();
   bindMapTypeButtons();
   bindRouteFinder();
   renderTopPanel(state.openTopMenuId);
@@ -1003,6 +1004,63 @@ function bindMenuButtons() {
   });
 
   updateActiveButtons();
+}
+
+function bindOverlayDismiss() {
+  [elements.topPanel.root, elements.sidePanel.root].forEach((panelRoot) => {
+    panelRoot?.addEventListener("click", (event) => {
+      const clickedCloseButton = event.target.closest("[data-close-panel]");
+      if (clickedCloseButton) {
+        return;
+      }
+
+      const clickedInteractive = event.target.closest(
+        "button, a, input, textarea, select, option, label, form"
+      );
+      const clickedPanelHead = event.target.closest(".panel-head");
+      const clickedPanelShell = event.target === panelRoot;
+
+      if (!clickedPanelHead && !clickedPanelShell) {
+        return;
+      }
+
+      if (clickedInteractive && !clickedPanelHead) {
+        return;
+      }
+
+      if (panelRoot === elements.topPanel.root) {
+        state.openTopMenuId = null;
+        elements.topPanel.root.hidden = true;
+      }
+
+      if (panelRoot === elements.sidePanel.root) {
+        closeSidePanel();
+      }
+
+      updateActiveButtons();
+    });
+  });
+
+  elements.placeCard?.addEventListener("click", (event) => {
+    if (elements.placeCard.hidden) {
+      return;
+    }
+
+    if (event.target.closest("button, a, input, textarea, select, option, label, form")) {
+      return;
+    }
+
+    const clickedCardShell = event.target === elements.placeCard;
+    const clickedCardText = event.target.closest(
+      ".place-card-kicker, h3, .place-card-address, .place-card-intro, .place-card-weeks"
+    );
+
+    if (!clickedCardShell && !clickedCardText) {
+      return;
+    }
+
+    elements.placeCard.hidden = true;
+  });
 }
 
 function bindMapTypeButtons() {

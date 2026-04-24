@@ -344,6 +344,7 @@ async function bootstrap() {
   bindDraggablePanels();
   bindMapTypeButtons();
   bindRouteFinder();
+  syncStaticMenuLabels();
   renderTopPanel(state.openTopMenuId);
   updateMapTypeButtons();
   bindViewportState();
@@ -365,6 +366,13 @@ async function bootstrap() {
     elements.keyNotice.hidden = true;
     updateMapStatus("카카오맵 로딩에 실패했습니다.");
     renderMapFallback();
+  }
+}
+
+function syncStaticMenuLabels() {
+  const carbonButtonLabel = document.querySelector('.rail-button[data-side-menu="carbon"] > span:last-child');
+  if (carbonButtonLabel) {
+    carbonButtonLabel.textContent = "탄소감축";
   }
 }
 
@@ -633,6 +641,31 @@ function getPlaceAddressText(place) {
   return place.address || place.query;
 }
 
+function getCompactPlaceIntro(place) {
+  const intro = String(place.intro || "자전거 챌린지 인증 장소입니다.").trim();
+  const compact = intro.replace(/\s+/g, " ");
+
+  if (compact.length <= 42) {
+    return compact;
+  }
+
+  return `${compact.slice(0, 42).trim()}...`;
+}
+
+function getPlaceTravelCarbonText(place) {
+  if (!mapState.currentLocation || !Array.isArray(place.coords)) {
+    return "현재 위치 기준 탄소감축량 확인 중";
+  }
+
+  const distanceKm = calculateDistanceKm(mapState.currentLocation, {
+    lat: place.coords[0],
+    lng: place.coords[1]
+  });
+  const carbonKg = distanceKm * CARBON_KG_PER_KM;
+
+  return `예상 탄소감축 ${formatCarbon(carbonKg)} · 약 ${formatKm(distanceKm)}`;
+}
+
 function closePlacePopup() {
   if (mapState.placePopupOverlay) {
     mapState.placePopupOverlay.setMap(null);
@@ -663,7 +696,8 @@ function createPlacePopupContent(place) {
   const container = document.createElement("div");
   container.className = "place-popup";
   const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
-  const introText = place.intro || "자전거 챌린지 인증 장소입니다.";
+  const introText = getCompactPlaceIntro(place);
+  const carbonText = getPlaceTravelCarbonText(place);
 
   container.innerHTML = `
     <button class="place-popup-close" type="button" aria-label="장소 팝업 닫기">×</button>
@@ -674,8 +708,8 @@ function createPlacePopupContent(place) {
           <span class="place-popup-pin" aria-hidden="true">●</span>
         </div>
         <span class="place-popup-kicker">보물찾기 인증 장소</span>
-        <p class="place-popup-address">${escapeHtml(getPlaceAddressText(place))}</p>
         <p class="place-popup-intro">${escapeHtml(introText)}</p>
+        <p class="place-popup-carbon">${escapeHtml(carbonText)}</p>
         ${
           weekLabels.length
             ? `<div class="place-popup-weeks">${weekLabels
@@ -746,7 +780,10 @@ function createSelectedPlaceMarkers(places) {
 
     kakao.maps.event.addListener(marker, "click", () => {
       openPlacePopup(place, marker.getPosition());
-      updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`, { highlightWord: place.title });
+      updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`, {
+        highlightWord: place.title,
+        suppressOnMobile: true
+      });
     });
 
     mapState.selectedPlaceMarkers.push({ place, marker });
@@ -827,7 +864,10 @@ function focusPlace(placeId) {
   const markerPosition = new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]);
   mapState.map.panTo(markerPosition);
   openPlacePopup(selected.place, markerPosition);
-  updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, { highlightWord: selected.place.title });
+  updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, {
+    highlightWord: selected.place.title,
+    suppressOnMobile: true
+  });
 }
 
 function fitAllRoutes() {
@@ -878,6 +918,11 @@ function getMapTypeLabel(mapTypeId) {
 }
 
 function updateMapStatus(message, options = {}) {
+  if (options.suppressOnMobile && window.matchMedia("(max-width: 680px)").matches) {
+    elements.mapStatus.hidden = true;
+    return;
+  }
+
   elements.mapStatus.hidden = false;
   const escapedMessage = escapeHtml(message);
   const highlightedMessage = options.highlightWord
@@ -1476,7 +1521,7 @@ function renderSidePanel(menuId) {
   }
 
   const items = getMenuItems(menu);
-  elements.sidePanel.title.textContent = menu.title;
+  elements.sidePanel.title.textContent = menuId === "carbon" ? "탄소감축" : menu.title;
   elements.sidePanel.root.dataset.panelMode = menuId;
   elements.sidePanel.detail.hidden = false;
   renderPanelItems(elements.sidePanel, items, items[0]?.id);
@@ -1492,6 +1537,7 @@ function renderPanelItems(panel, items, defaultItemId) {
     const isActive = activeItem?.id === item.id;
     const inlineIntro =
       isActive && item.intro ? `<div class="inline-spot-intro">${item.intro}</div>` : "";
+    const itemSummary = getPanelItemSummary(panel, item);
     const button = document.createElement("button");
     button.type = "button";
     button.className = "submenu-item";
@@ -1500,7 +1546,7 @@ function renderPanelItems(panel, items, defaultItemId) {
     button.innerHTML = `
       <div class="submenu-item-text">
         <strong>${item.label}</strong>
-        <span>${item.summary}</span>
+        <span>${itemSummary}</span>
         ${inlineIntro}
       </div>
       <span class="submenu-item-tag">${item.tag || "메뉴"}</span>
@@ -1569,6 +1615,14 @@ function renderPanelItems(panel, items, defaultItemId) {
       renderPanelDetail(panel.detail, activeItem);
     }
   }
+}
+
+function getPanelItemSummary(panel, item) {
+  if (panel === elements.sidePanel && panel.root.dataset.panelMode === "carbon" && item.week) {
+    return `${formatCarbon(getWeeklyCarbonStats(item.week).totalCarbonKg)} 감축`;
+  }
+
+  return item.summary;
 }
 
 function shouldUseInlineDetail(panel) {
@@ -1871,11 +1925,11 @@ function renderWeeklyCarbonDetail(container, item) {
   const overallStats = getOverallCarbonStats();
 
   container.innerHTML = `
-    <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
-    <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    <h3>${escapeHtml(`${item.week}주차 탄소감축`)}</h3>
+    <p>인증한 주행거리 기준으로 주차별 예상 탄소감축량을 보여줍니다.</p>
     <div class="carbon-meter is-total">
       <strong>${escapeHtml(formatCarbon(overallStats.totalCarbonKg))}</strong>
-      <span>전체 탄소절감량 · 전체 주행거리 ${escapeHtml(formatKm(overallStats.totalDistanceKm))}</span>
+      <span>전체 탄소감축량 · 전체 주행거리 ${escapeHtml(formatKm(overallStats.totalDistanceKm))}</span>
     </div>
     <div class="carbon-meter">
       <strong>${escapeHtml(formatCarbon(stats.totalCarbonKg))}</strong>

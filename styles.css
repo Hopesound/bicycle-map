@@ -902,10 +902,7 @@ a {
 }
 
 .place-popup-main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 88px;
-  gap: 18px;
-  align-items: start;
+  display: block;
 }
 
 .place-popup-copy {
@@ -964,21 +961,6 @@ a {
   color: inherit;
   font: inherit;
   cursor: pointer;
-}
-
-.place-popup-thumb {
-  display: grid;
-  place-items: center;
-  width: 88px;
-  height: 88px;
-  border-radius: 16px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.5), transparent 48%),
-    linear-gradient(160deg, rgba(87, 146, 203, 0.96), rgba(76, 117, 180, 0.96));
-  color: #fff;
-  font-size: 1.15rem;
-  font-weight: 900;
-  letter-spacing: -0.02em;
 }
 
 .place-popup-actions {
@@ -1701,15 +1683,7 @@ a {
   }
 
   .place-popup-main {
-    grid-template-columns: minmax(0, 1fr) 68px;
-    gap: 12px;
-  }
-
-  .place-popup-thumb {
-    width: 68px;
-    height: 68px;
-    border-radius: 14px;
-    font-size: 0.96rem;
+    display: block;
   }
 
   .place-popup-title {

@@ -25,12 +25,12 @@ const selectedPlaces = [
   {
     id: "saechangi-bridge",
     title: "새창이다리",
-    query: "새창이다리 만경대교",
-    address: "만경대교 옆 새창이다리, 군산시 대야면 복교리-김제시 청하면 동지산리 일원",
+    query: "만경강교 옆 새창이다리",
+    address: "만경강교 옆 새창이다리",
     preferKeyword: true,
-    fixedCoords: [35.9108, 126.8383],
-    intro: "만경대교 바로 옆에 놓인 근대 교량 거점으로, 복교리 주소지점이 아닌 새창이다리 실교량 위치 기준으로 표시합니다.",
-    fallback: [35.9108, 126.8383]
+    fixedCoords: [35.9109, 126.8401],
+    intro: "만경강교 바로 옆에 놓인 새창이다리 실교량 위치 기준으로 표시합니다.",
+    fallback: [35.9109, 126.8401]
   },
   { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
   { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", intro: "편백숲 치유 관광과 자전거 방문 인증을 연결하기 좋은 숲길 거점입니다.", fallback: [35.7621, 127.1859] },
@@ -65,10 +65,10 @@ const selectedPlaces = [
     id: "volunteer-center",
     title: "전주시 자원봉사센터",
     query: "전주시 자원봉사센터 전주천동로 455",
-    address: "전북특별자치도 전주시 덕진구 전주천동로 455",
-    fixedCoords: [35.8331, 127.1107],
+    address: "봉사자 작은도서관 아래 자전거연습장",
+    fixedCoords: [35.83235, 127.10892],
     intro: "시민 참여와 봉사 활동을 챌린지 캠페인과 연결하기 좋은 거점입니다.",
-    fallback: [35.8331, 127.1107]
+    fallback: [35.83235, 127.10892]
   },
   { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
   { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", intro: "완주 하천 동선에서 위치를 확인하기 좋은 교량형 인증 지점입니다.", fallback: [35.9302, 127.2269] },
@@ -99,6 +99,14 @@ const routePlaces = [
 ];
 
 const JEONBUK_RECT = "126.45,35.35,127.85,36.20";
+const MUNICIPAL_BOUNDARY_URLS = [
+  "https://cdn.jsdelivr.net/gh/southkorea/southkorea-maps@master/kostat/2018/json/skorea-municipalities-2018-geo.json",
+  "https://raw.githubusercontent.com/southkorea/southkorea-maps/master/kostat/2018/json/skorea-municipalities-2018-geo.json"
+];
+const MUNICIPALITY_STROKE_COLORS = {
+  jeonju: "#16967f",
+  wanju: "#2f7eff"
+};
 const challengeRoutes = routePlaces.filter((route) => route.id === "jeonju-hanok");
 const WEEK_COUNT = 4;
 const TREASURE_PLACES_PER_WEEK = 4;
@@ -317,6 +325,7 @@ const elements = {
 const mapState = {
   map: null,
   routePolylines: new Map(),
+  adminBoundaryPolygons: [],
   selectedPlaceMarkers: [],
   placePopupOverlay: null,
   currentLocation: null,
@@ -429,20 +438,120 @@ function initMap() {
     closePlacePopup();
   });
 
-  challengeRoutes.forEach((route) => {
-    const polyline = new kakao.maps.Polyline({
-      path: route.points.map(([lat, lng]) => new kakao.maps.LatLng(lat, lng)),
-      strokeWeight: route.id === state.selectedRouteId ? 7 : 5,
-      strokeColor: route.color,
-      strokeOpacity: route.id === state.selectedRouteId ? 0.95 : 0.34,
-      strokeStyle: "solid"
-    });
-    polyline.setMap(map);
-    mapState.routePolylines.set(route.id, polyline);
-  });
-
+  renderMunicipalityBoundaries();
   renderSelectedPlaces();
   selectRoute(state.selectedRouteId, { fitBounds: true, silentStatus: true });
+}
+
+async function renderMunicipalityBoundaries() {
+  if (!mapState.map || !window.kakao?.maps?.Polygon || typeof fetch !== "function") {
+    return;
+  }
+
+  clearMunicipalityBoundaries();
+
+  try {
+    const geojson = await fetchMunicipalityGeoJson();
+    const features = Array.isArray(geojson?.features) ? geojson.features : [];
+
+    features.forEach((feature) => {
+      const strokeColor = getMunicipalityStrokeColor(getMunicipalityName(feature));
+      if (!strokeColor) {
+        return;
+      }
+
+      const polygons = geometryToPolygonPaths(feature?.geometry);
+      polygons.forEach((path) => {
+        const polygon = new kakao.maps.Polygon({
+          path,
+          strokeWeight: 3,
+          strokeColor,
+          strokeOpacity: 0.9,
+          strokeStyle: "solid",
+          fillOpacity: 0,
+          zIndex: 2
+        });
+
+        polygon.setMap(mapState.map);
+        mapState.adminBoundaryPolygons.push(polygon);
+      });
+    });
+  } catch (error) {
+    console.warn("Failed to render municipality boundaries.", error);
+  }
+}
+
+async function fetchMunicipalityGeoJson() {
+  for (const url of MUNICIPAL_BOUNDARY_URLS) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        continue;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.warn("Boundary fetch source failed.", url, error);
+    }
+  }
+
+  throw new Error("Unable to load municipality boundary GeoJSON.");
+}
+
+function clearMunicipalityBoundaries() {
+  mapState.adminBoundaryPolygons.forEach((polygon) => polygon.setMap(null));
+  mapState.adminBoundaryPolygons = [];
+}
+
+function getMunicipalityName(feature) {
+  const properties = feature?.properties || {};
+  return (
+    properties.name ||
+    properties.adm_nm ||
+    properties.SIG_KOR_NM ||
+    properties.sig_kor_nm ||
+    ""
+  );
+}
+
+function getMunicipalityStrokeColor(name) {
+  if (!name) {
+    return "";
+  }
+
+  if (name === "완주군") {
+    return MUNICIPALITY_STROKE_COLORS.wanju;
+  }
+
+  if (name === "전주시" || name.startsWith("전주시 ")) {
+    return MUNICIPALITY_STROKE_COLORS.jeonju;
+  }
+
+  return "";
+}
+
+function geometryToPolygonPaths(geometry) {
+  if (!geometry?.type || !Array.isArray(geometry.coordinates)) {
+    return [];
+  }
+
+  if (geometry.type === "Polygon") {
+    return [convertPolygonRings(geometry.coordinates)];
+  }
+
+  if (geometry.type === "MultiPolygon") {
+    return geometry.coordinates.map((polygon) => convertPolygonRings(polygon));
+  }
+
+  return [];
+}
+
+function convertPolygonRings(rings) {
+  const convertedRings = rings.map((ring) =>
+    ring.map(([lng, lat]) => new kakao.maps.LatLng(lat, lng))
+  );
+
+  return convertedRings.length === 1 ? convertedRings[0] : convertedRings;
 }
 
 function renderSelectedPlaces() {
@@ -552,7 +661,6 @@ function openPlacePopup(place, position) {
 function createPlacePopupContent(place) {
   const container = document.createElement("div");
   container.className = "place-popup";
-  const titleBadge = place.title.slice(0, 2);
 
   container.innerHTML = `
     <button class="place-popup-close" type="button" aria-label="장소 팝업 닫기">×</button>
@@ -570,7 +678,6 @@ function createPlacePopupContent(place) {
           <button type="button" class="place-popup-link" data-popup-route>길찾기</button>
         </div>
       </div>
-      <div class="place-popup-thumb" aria-hidden="true">${escapeHtml(titleBadge)}</div>
     </div>
     <div class="place-popup-actions">
       <button type="button" class="place-popup-action" data-popup-detail>상세</button>
@@ -664,6 +771,9 @@ function selectRoute(routeId, options = {}) {
 
   challengeRoutes.forEach((route) => {
     const polyline = mapState.routePolylines.get(route.id);
+    if (!polyline) {
+      return;
+    }
     const selected = route.id === routeId;
     polyline.setOptions({
       strokeWeight: selected ? 7 : 5,
@@ -1037,16 +1147,30 @@ function buildKakaoBikeRouteUrl(origin, destinationCoords) {
 }
 
 function openExternalRoute(url) {
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (isMobile) {
-    window.location.href = url;
-    return;
+  openExternalPage(url, "새 창 열기가 차단되었습니다. 팝업 차단을 해제한 뒤 다시 시도해주세요.");
+}
+
+function openExternalPage(url, blockedMessage) {
+  const externalWindow = window.open(url, "_blank", "noopener,noreferrer");
+  if (externalWindow) {
+    externalWindow.opener = null;
+    return true;
   }
 
-  const routeWindow = window.open(url, "_blank", "noopener,noreferrer");
-  if (!routeWindow) {
-    window.location.href = url;
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.target = "_blank";
+  anchor.rel = "noopener noreferrer";
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+
+  if (!document.hidden && blockedMessage) {
+    updateMapStatus(blockedMessage);
   }
+
+  return false;
 }
 
 function calculateDistanceKm(origin, destination) {
@@ -1806,10 +1930,10 @@ function bindFocusPlaceButtons(container) {
 }
 
 function openBandCertificationPage() {
-  const bandWindow = window.open(BAND_CERTIFICATION_URL, "_blank", "noopener,noreferrer");
-  if (!bandWindow) {
-    window.location.href = BAND_CERTIFICATION_URL;
-  }
+  openExternalPage(
+    BAND_CERTIFICATION_URL,
+    "네이버 밴드 새 창 열기가 차단되었습니다. 팝업 차단을 해제한 뒤 다시 눌러주세요."
+  );
 }
 
 function getWeeklyTreasurePlan() {

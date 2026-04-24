@@ -22,7 +22,14 @@ const selectedPlaces = [
   { id: "gijije", title: "기지제", query: "기지제 전주", intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.8077, 127.1018] },
   { id: "kkotsingi", title: "전주시 공영자전거 꽃싱이 송천대여소", query: "꽃싱이 송천대여소 전주", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8784, 127.1182] },
   { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", intro: "다양한 식물과 산책로가 있는 녹지형 장소로 친환경 챌린지 메시지와 잘 어울립니다.", fallback: [35.8371, 127.0406] },
-  { id: "saechangi-bridge", title: "새창이다리", query: "새창이다리 전주", intro: "전주 도심 하천 동선과 연결되는 교량형 위치 표시 지점입니다.", fallback: [35.8134, 127.1202] },
+  {
+    id: "saechangi-bridge",
+    title: "새창이다리",
+    query: "새창이다리 군산 대야면 복교리",
+    address: "전북특별자치도 군산시 대야면 복교리 1328-29",
+    intro: "군산시 대야면 복교리와 김제시 청하면 일대를 잇는 근대 교량 거점으로, 새창이다리 북측 진입부 기준으로 위치를 표시합니다.",
+    fallback: [35.9276, 126.8332]
+  },
   { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
   { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", intro: "편백숲 치유 관광과 자전거 방문 인증을 연결하기 좋은 숲길 거점입니다.", fallback: [35.7621, 127.1859] },
   { id: "march-first", title: "전주3.1운동발상지", query: "전주 3.1운동 발상지", intro: "지역 독립운동의 의미를 담은 역사형 인증 장소입니다.", fallback: [35.8199, 127.1442] },
@@ -254,6 +261,7 @@ const state = {
 const elements = {
   homeIntro: document.getElementById("homeIntro"),
   map: document.getElementById("map"),
+  mapStage: document.querySelector(".map-stage"),
   mapStatus: document.getElementById("mapStatus"),
   placeCard: document.getElementById("placeCard"),
   routeFinder: document.getElementById("routeFinder"),
@@ -298,6 +306,7 @@ async function bootstrap() {
   bindHomeIntro();
   bindMenuButtons();
   bindOverlayDismiss();
+  bindDraggablePanels();
   bindMapTypeButtons();
   bindRouteFinder();
   renderTopPanel(state.openTopMenuId);
@@ -1009,6 +1018,11 @@ function bindMenuButtons() {
 function bindOverlayDismiss() {
   [elements.topPanel.root, elements.sidePanel.root].forEach((panelRoot) => {
     panelRoot?.addEventListener("click", (event) => {
+      if (panelRoot.dataset.dragMoved === "true") {
+        panelRoot.dataset.dragMoved = "false";
+        return;
+      }
+
       const clickedCloseButton = event.target.closest("[data-close-panel]");
       if (clickedCloseButton) {
         return;
@@ -1046,6 +1060,11 @@ function bindOverlayDismiss() {
       return;
     }
 
+    if (elements.placeCard.dataset.dragMoved === "true") {
+      elements.placeCard.dataset.dragMoved = "false";
+      return;
+    }
+
     if (event.target.closest("button, a, input, textarea, select, option, label, form")) {
       return;
     }
@@ -1061,6 +1080,97 @@ function bindOverlayDismiss() {
 
     elements.placeCard.hidden = true;
   });
+}
+
+function bindDraggablePanels() {
+  makePanelDraggable(elements.topPanel.root, ".panel-head");
+  makePanelDraggable(elements.sidePanel.root, ".panel-head");
+  makePanelDraggable(elements.placeCard, ".place-card-kicker, h3");
+}
+
+function makePanelDraggable(panelRoot, handleSelector) {
+  if (!panelRoot) {
+    return;
+  }
+
+  panelRoot.dataset.dragMoved = "false";
+
+  panelRoot.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    const handle = event.target.closest(handleSelector);
+    if (!handle || !panelRoot.contains(handle)) {
+      return;
+    }
+
+    if (event.target.closest("button, a, input, textarea, select, option, label, form")) {
+      return;
+    }
+
+    const stageRect = elements.mapStage?.getBoundingClientRect();
+    const panelRect = panelRoot.getBoundingClientRect();
+    if (!stageRect || !panelRect.width || !panelRect.height) {
+      return;
+    }
+
+    const pointerStartX = event.clientX;
+    const pointerStartY = event.clientY;
+    const startLeft = panelRect.left - stageRect.left;
+    const startTop = panelRect.top - stageRect.top;
+    let moved = false;
+
+    panelRoot.style.width = `${panelRect.width}px`;
+    panelRoot.style.left = `${startLeft}px`;
+    panelRoot.style.top = `${startTop}px`;
+    panelRoot.style.right = "auto";
+    panelRoot.style.bottom = "auto";
+    panelRoot.style.transform = "none";
+    panelRoot.dataset.dragMoved = "false";
+
+    const onPointerMove = (moveEvent) => {
+      const deltaX = moveEvent.clientX - pointerStartX;
+      const deltaY = moveEvent.clientY - pointerStartY;
+
+      if (!moved && Math.hypot(deltaX, deltaY) > 6) {
+        moved = true;
+        panelRoot.dataset.dragMoved = "true";
+      }
+
+      if (!moved) {
+        return;
+      }
+
+      const maxLeft = Math.max(8, stageRect.width - panelRect.width - 8);
+      const maxTop = Math.max(8, stageRect.height - panelRect.height - 8);
+      const nextLeft = clamp(startLeft + deltaX, 8, maxLeft);
+      const nextTop = clamp(startTop + deltaY, 8, maxTop);
+
+      panelRoot.style.left = `${nextLeft}px`;
+      panelRoot.style.top = `${nextTop}px`;
+    };
+
+    const onPointerUp = () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+      document.body.style.userSelect = "";
+      requestAnimationFrame(() => {
+        panelRoot.dataset.dragMoved = "false";
+      });
+    };
+
+    document.body.style.userSelect = "none";
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+    event.preventDefault();
+  });
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
 }
 
 function bindMapTypeButtons() {
@@ -1128,6 +1238,7 @@ function renderPanelItems(panel, items, defaultItemId) {
   panel.list.innerHTML = "";
 
   const activeItem = items.find((item) => item.id === defaultItemId) || items[0];
+  let activeButton = null;
 
   items.forEach((item) => {
     const isActive = activeItem?.id === item.id;
@@ -1137,6 +1248,7 @@ function renderPanelItems(panel, items, defaultItemId) {
     button.type = "button";
     button.className = "submenu-item";
     button.classList.toggle("is-active", isActive);
+    button.dataset.panelItemId = item.id;
     button.innerHTML = `
       <div class="submenu-item-text">
         <strong>${item.label}</strong>
@@ -1146,18 +1258,30 @@ function renderPanelItems(panel, items, defaultItemId) {
       <span class="submenu-item-tag">${item.tag || "메뉴"}</span>
     `;
 
+    if (isActive) {
+      activeButton = button;
+    }
+
     button.addEventListener("click", () => {
+      const useInlineDetail = shouldUseInlineDetail(panel);
+      const hasInlineDetailOpen =
+        button.nextElementSibling?.classList.contains("inline-panel-detail") || false;
       const shouldToggleDetailOff =
+        !useInlineDetail &&
         panel === elements.sidePanel &&
         isMobileViewport() &&
         button.classList.contains("is-active") &&
         !panel.detail.hidden;
 
-      if (shouldToggleDetailOff) {
+      const shouldToggleInlineOff =
+        useInlineDetail && button.classList.contains("is-active") && hasInlineDetailOpen;
+
+      if (shouldToggleDetailOff || shouldToggleInlineOff) {
         panel.list.querySelectorAll(".submenu-item").forEach((node) => {
           node.classList.remove("is-active");
         });
         panel.list.querySelectorAll(".inline-spot-intro").forEach((node) => node.remove());
+        clearInlinePanelDetails(panel);
         panel.detail.hidden = true;
         return;
       }
@@ -1166,13 +1290,21 @@ function renderPanelItems(panel, items, defaultItemId) {
         node.classList.toggle("is-active", node === button);
       });
       panel.list.querySelectorAll(".inline-spot-intro").forEach((node) => node.remove());
+      clearInlinePanelDetails(panel);
       if (item.intro) {
         const intro = document.createElement("div");
         intro.className = "inline-spot-intro";
         intro.textContent = item.intro;
         button.querySelector(".submenu-item-text")?.appendChild(intro);
       }
-      renderPanelDetail(panel.detail, item);
+
+      if (useInlineDetail) {
+        panel.detail.hidden = true;
+        insertInlinePanelDetail(panel, button, item);
+      } else {
+        panel.detail.hidden = false;
+        renderPanelDetail(panel.detail, item);
+      }
       handleMenuAction(item.action);
     });
 
@@ -1180,9 +1312,38 @@ function renderPanelItems(panel, items, defaultItemId) {
   });
 
   if (activeItem) {
-    panel.detail.hidden = false;
-    renderPanelDetail(panel.detail, activeItem);
+    clearInlinePanelDetails(panel);
+    if (shouldUseInlineDetail(panel) && activeButton) {
+      panel.detail.hidden = true;
+      insertInlinePanelDetail(panel, activeButton, activeItem);
+    } else {
+      panel.detail.hidden = false;
+      renderPanelDetail(panel.detail, activeItem);
+    }
   }
+}
+
+function shouldUseInlineDetail(panel) {
+  if (panel === elements.sidePanel) {
+    return panel.root.dataset.panelMode === "treasure";
+  }
+
+  if (panel === elements.topPanel) {
+    return state.openTopMenuId === "event";
+  }
+
+  return false;
+}
+
+function clearInlinePanelDetails(panel) {
+  panel.list.querySelectorAll(".inline-panel-detail").forEach((node) => node.remove());
+}
+
+function insertInlinePanelDetail(panel, button, item) {
+  const inlineDetail = document.createElement("div");
+  inlineDetail.className = "submenu-detail inline-panel-detail";
+  renderPanelDetail(inlineDetail, item);
+  button.insertAdjacentElement("afterend", inlineDetail);
 }
 
 function renderPanelDetail(container, item) {

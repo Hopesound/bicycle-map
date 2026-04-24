@@ -28,6 +28,7 @@ const selectedPlaces = [
     query: "새창이다리 만경대교",
     address: "만경대교 옆 새창이다리, 군산시 대야면 복교리-김제시 청하면 동지산리 일원",
     preferKeyword: true,
+    fixedCoords: [35.9108, 126.8383],
     intro: "만경대교 바로 옆에 놓인 근대 교량 거점으로, 복교리 주소지점이 아닌 새창이다리 실교량 위치 기준으로 표시합니다.",
     fallback: [35.9108, 126.8383]
   },
@@ -35,10 +36,24 @@ const selectedPlaces = [
   { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", intro: "편백숲 치유 관광과 자전거 방문 인증을 연결하기 좋은 숲길 거점입니다.", fallback: [35.7621, 127.1859] },
   { id: "march-first", title: "전주3.1운동발상지", query: "전주 3.1운동 발상지", intro: "지역 독립운동의 의미를 담은 역사형 인증 장소입니다.", fallback: [35.8199, 127.1442] },
   { id: "bibijeong", title: "비비정", query: "비비정 완주", intro: "만경강 풍경과 함께 쉬어갈 수 있는 완주 대표 전망 거점입니다.", fallback: [35.8687, 127.0744] },
-  { id: "woosuk-hospital", title: "우석대학교 부속 전주한방볍원", query: "우석대학교 부속 전주한방병원", intro: "지역 의료·건강 테마와 연결할 수 있는 도심 거점입니다.", fallback: [35.8137, 127.0892] },
+  { id: "woosuk-hospital", title: "우석대학교 부속 전주한방병원", query: "우석대학교 부속 전주한방병원", intro: "지역 의료·건강 테마와 연결할 수 있는 도심 거점입니다.", fallback: [35.8137, 127.0892] },
   { id: "sebyeongho", title: "세병호", query: "세병호 전주", intro: "전주 북부권의 수변 경관을 즐길 수 있는 호수형 방문 장소입니다.", fallback: [35.8816, 127.1461] },
-  { id: "yeoyu-cafe", title: "무인카페여유(구이로 1575)", query: "무인카페여유 구이로 1575", intro: "구이로 라이딩 중 쉬어가기 좋은 무인카페형 휴식 거점입니다.", fallback: [35.7449, 127.1048] },
-  { id: "jeonju-archive", title: "전주시민기록관", query: "전주시민기록관", intro: "전주 시민의 생활 기록을 만날 수 있는 문화·기록 거점입니다.", fallback: [35.8207, 127.1459] },
+  {
+    id: "yeoyu-cafe",
+    title: "무인카페여유",
+    query: "구이앤금우통신 완주군 구이면 구이로 1575",
+    address: "전북특별자치도 완주군 구이면 구이로 1575 구이앤금우통신",
+    intro: "구이로 라이딩 중 쉬어가기 좋은 무인카페형 휴식 거점입니다.",
+    fallback: [35.7449, 127.1048]
+  },
+  {
+    id: "jeonju-archive",
+    title: "전주시민기록관",
+    query: "우아동성당 전주",
+    address: "전주시민기록관 인근 우아동성당",
+    intro: "전주 시민의 생활 기록과 인근 생활권을 함께 연결해 볼 수 있는 문화·기록 거점입니다.",
+    fallback: [35.8339, 127.1714]
+  },
   { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", fallback: [35.9445, 126.9546] },
   { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", intro: "가볍게 이동하며 쉬어갈 수 있는 산책·라이딩 친화형 길입니다.", fallback: [35.8271, 127.1519] },
   { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", intro: "아중호수와 독서 문화가 만나는 생활문화형 인증 장소입니다.", fallback: [35.8328, 127.1768] },
@@ -46,7 +61,15 @@ const selectedPlaces = [
   { id: "daedeok-elementary", title: "대덕초등학교", query: "대덕초등학교 완주", intro: "지역 생활권을 연결하는 교육 시설 주변 위치 표시 지점입니다.", fallback: [35.9139, 127.2386] },
   { id: "chucheondae", title: "추천대", query: "추천대 완주", intro: "완주권 역사·경관 동선과 연결할 수 있는 방문 거점입니다.", fallback: [35.9589, 127.2656] },
   { id: "deokjin-park", title: "덕진공원", query: "덕진공원", intro: "전주 대표 공원으로 수변 경관과 휴식 동선이 좋은 시민 친화형 장소입니다.", fallback: [35.8482, 127.1201] },
-  { id: "volunteer-center", title: "전주시 자원봉사센터", query: "전주시 자원봉사센터", intro: "시민 참여와 봉사 활동을 챌린지 캠페인과 연결하기 좋은 거점입니다.", fallback: [35.8247, 127.1487] },
+  {
+    id: "volunteer-center",
+    title: "전주시 자원봉사센터",
+    query: "전주시 자원봉사센터 전주천동로 455",
+    address: "전북특별자치도 전주시 덕진구 전주천동로 455",
+    fixedCoords: [35.8331, 127.1107],
+    intro: "시민 참여와 봉사 활동을 챌린지 캠페인과 연결하기 좋은 거점입니다.",
+    fallback: [35.8331, 127.1107]
+  },
   { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
   { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", intro: "완주 하천 동선에서 위치를 확인하기 좋은 교량형 인증 지점입니다.", fallback: [35.9302, 127.2269] },
   { id: "hari-bridge", title: "하리교", query: "하리교 전주", intro: "전주 남부권 이동 동선과 연결되는 교량형 위치 표시 장소입니다.", fallback: [35.7861, 127.1143] },
@@ -295,6 +318,7 @@ const mapState = {
   map: null,
   routePolylines: new Map(),
   selectedPlaceMarkers: [],
+  placePopupOverlay: null,
   currentLocation: null,
   currentLocationMarker: null,
   routeDestinationMarker: null,
@@ -401,6 +425,9 @@ function initMap() {
   mapState.map = map;
   elements.keyNotice.hidden = true;
   requestCurrentLocation({ panTo: false, silent: true });
+  kakao.maps.event.addListener(map, "click", () => {
+    closePlacePopup();
+  });
 
   challengeRoutes.forEach((route) => {
     const polyline = new kakao.maps.Polyline({
@@ -448,6 +475,11 @@ async function resolveSelectedPlaces(places, geocoder, placesService) {
 
 function resolvePlaceCoords(place, geocoder, placesService) {
   return new Promise((resolve) => {
+    if (Array.isArray(place.fixedCoords) && place.fixedCoords.length === 2) {
+      resolve(place.fixedCoords);
+      return;
+    }
+
     const tryKeyword = () => {
       if (!place.query) {
         resolve(place.fallback);
@@ -491,12 +523,102 @@ function getPlaceAddressText(place) {
   return place.address || place.query;
 }
 
+function closePlacePopup() {
+  if (mapState.placePopupOverlay) {
+    mapState.placePopupOverlay.setMap(null);
+    mapState.placePopupOverlay = null;
+  }
+}
+
+function openPlacePopup(place, position) {
+  if (!mapState.map || !window.kakao?.maps) {
+    return;
+  }
+
+  closePlacePopup();
+  const content = createPlacePopupContent(place);
+  const overlay = new kakao.maps.CustomOverlay({
+    position,
+    content,
+    clickable: true,
+    xAnchor: 0.5,
+    yAnchor: 1.18
+  });
+
+  overlay.setMap(mapState.map);
+  mapState.placePopupOverlay = overlay;
+}
+
+function createPlacePopupContent(place) {
+  const container = document.createElement("div");
+  container.className = "place-popup";
+  const titleBadge = place.title.slice(0, 2);
+
+  container.innerHTML = `
+    <button class="place-popup-close" type="button" aria-label="장소 팝업 닫기">×</button>
+    <div class="place-popup-main">
+      <div class="place-popup-copy">
+        <div class="place-popup-title-row">
+          <strong class="place-popup-title">${escapeHtml(place.title)}</strong>
+          <span class="place-popup-pin" aria-hidden="true">➜</span>
+        </div>
+        <span class="place-popup-kicker">시즌2 인증 장소</span>
+        <p class="place-popup-address">${escapeHtml(getPlaceAddressText(place))}</p>
+        <div class="place-popup-links">
+          <button type="button" class="place-popup-link" data-popup-detail>상세보기</button>
+          <span>·</span>
+          <button type="button" class="place-popup-link" data-popup-route>길찾기</button>
+        </div>
+      </div>
+      <div class="place-popup-thumb" aria-hidden="true">${escapeHtml(titleBadge)}</div>
+    </div>
+    <div class="place-popup-actions">
+      <button type="button" class="place-popup-action" data-popup-detail>상세</button>
+      <button type="button" class="place-popup-action" data-popup-certify>인증</button>
+      <button type="button" class="place-popup-action place-popup-action--primary" data-popup-route>길찾기</button>
+    </div>
+    <div class="place-popup-tail" aria-hidden="true"></div>
+  `;
+
+  container.querySelector(".place-popup-close")?.addEventListener("click", () => {
+    closePlacePopup();
+  });
+  container.querySelectorAll("[data-popup-detail]").forEach((button) => {
+    button.addEventListener("click", () => {
+      showPlaceCard(place);
+    });
+  });
+  container.querySelectorAll("[data-popup-certify]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openBandCertificationPage();
+    });
+  });
+  container.querySelectorAll("[data-popup-route]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openBikeRouteToPlace(place);
+    });
+  });
+
+  return container;
+}
+
+async function openBikeRouteToPlace(place) {
+  const currentLocation = mapState.currentLocation || (await requestCurrentLocation({ panTo: false }));
+  if (!currentLocation) {
+    updateMapStatus("현재 위치를 확인하면 길찾기를 열 수 있습니다.");
+    return;
+  }
+
+  openExternalRoute(buildKakaoBikeRouteUrl(currentLocation, place.coords));
+}
+
 function createSelectedPlaceMarkers(places) {
   if (!mapState.map) {
     return;
   }
 
   mapState.selectedPlaceMarkers.forEach(({ marker }) => marker.setMap(null));
+  closePlacePopup();
   mapState.selectedPlaceMarkers = [];
 
   places.forEach((place) => {
@@ -507,23 +629,13 @@ function createSelectedPlaceMarkers(places) {
       image: createSelectedPlaceMarkerImage()
     });
 
-    const infoWindow = new kakao.maps.InfoWindow({
-      content: `
-        <div style="padding:10px 12px;min-width:200px;font-size:13px;line-height:1.55;">
-          <strong style="display:block;font-size:14px;margin-bottom:4px;">${place.title}</strong>
-          <span>${getPlaceAddressText(place)}</span>
-        </div>
-      `
-    });
-
     kakao.maps.event.addListener(marker, "click", () => {
-      infoWindow.open(mapState.map, marker);
+      openPlacePopup(place, marker.getPosition());
       showPlaceCard(place);
       updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`, { highlightWord: place.title });
-      setTimeout(() => infoWindow.close(), 1600);
     });
 
-    mapState.selectedPlaceMarkers.push({ place, marker, infoWindow });
+    mapState.selectedPlaceMarkers.push({ place, marker });
   });
 }
 
@@ -595,11 +707,11 @@ function focusPlace(placeId) {
   }
 
   mapState.map.setLevel(4);
-  mapState.map.panTo(new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]));
-  selected.infoWindow.open(mapState.map, selected.marker);
+  const markerPosition = new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]);
+  mapState.map.panTo(markerPosition);
+  openPlacePopup(selected.place, markerPosition);
   showPlaceCard(selected.place);
   updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, { highlightWord: selected.place.title });
-  setTimeout(() => selected.infoWindow.close(), 1600);
 }
 
 function fitAllRoutes() {

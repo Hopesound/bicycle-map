@@ -317,8 +317,8 @@ a {
 }
 
 .top-panel {
-  top: calc(var(--header-height) + 122px);
-  left: calc(var(--rail-width) + 24px);
+  top: calc(var(--header-height) + 28px);
+  left: calc(var(--rail-width) + 8px);
 }
 
 .side-panel {
@@ -932,6 +932,17 @@ a {
   text-decoration: underline;
 }
 
+.stacked-week-block {
+  display: grid;
+  gap: 12px;
+}
+
+.stacked-week-block + .stacked-week-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(23, 50, 47, 0.08);
+}
+
 .place-popup {
   position: relative;
   min-width: 320px;
@@ -1398,9 +1409,9 @@ a {
   }
 
   .top-panel {
-    top: 232px;
-    left: calc(var(--rail-width) + 16px);
-  }
+      top: 232px;
+      left: calc(var(--rail-width) + 8px);
+    }
 
   .map-type-toggle {
     top: 126px;

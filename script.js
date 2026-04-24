@@ -1599,7 +1599,20 @@ function renderSidePanel(menuId) {
   }
   elements.sidePanel.title.textContent = menuId === "carbon" ? "탄소감축" : menu.title;
   elements.sidePanel.root.dataset.panelMode = menuId;
+  elements.sidePanel.list.hidden = false;
   elements.sidePanel.detail.hidden = false;
+  if (menuId === "certify") {
+    clearInlinePanelDetails(elements.sidePanel);
+    elements.sidePanel.list.hidden = true;
+    renderAllCertificationWeeks(elements.sidePanel.detail);
+    return;
+  }
+  if (menuId === "carbon") {
+    clearInlinePanelDetails(elements.sidePanel);
+    elements.sidePanel.list.hidden = true;
+    renderAllCarbonWeeks(elements.sidePanel.detail);
+    return;
+  }
   renderPanelItems(elements.sidePanel, items, items[0]?.id);
 }
 
@@ -1703,7 +1716,7 @@ function getPanelItemSummary(panel, item) {
 
 function shouldUseInlineDetail(panel) {
   if (panel === elements.sidePanel) {
-    return ["treasure", "certify", "carbon"].includes(panel.root.dataset.panelMode);
+    return false;
   }
 
   if (panel === elements.topPanel) {
@@ -2348,6 +2361,85 @@ function handleMenuAction(action) {
 
 function getMenuItems(menu) {
   return typeof menu.getItems === "function" ? menu.getItems() : menu.items || [];
+}
+
+function renderAllCertificationWeeks(container) {
+  const weeks = getWeeklyTreasurePlan();
+  container.innerHTML = weeks
+    .map((week) => {
+      if (!week.isRevealed) {
+        return `
+          <section class="stacked-week-block">
+            <h3>${escapeHtml(`${week.week}주차 인증하기`)}</h3>
+            <p>${escapeHtml(`${week.revealLabel} 공개 후 인증할 수 있습니다.`)}</p>
+            <div class="week-summary">비공개 주차입니다.</div>
+          </section>
+        `;
+      }
+
+      return `
+        <section class="stacked-week-block">
+          <h3>${escapeHtml(`${week.week}주차 인증하기`)}</h3>
+          <p>장소명을 누르면 지도에 위치가 표시되고, 팝업에서 인증하기를 열 수 있습니다.</p>
+          <div class="weekly-place-list">
+            ${week.places
+              .map(
+                (place, index) => `
+                  <article class="weekly-place-card cert-place-card">
+                    <button class="text-place-link" type="button" data-focus-place="${escapeHtml(place.id)}">
+                      ${index + 1}. ${escapeHtml(place.title)}
+                    </button>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+
+  bindFocusPlaceButtons(container);
+}
+
+function renderAllCarbonWeeks(container) {
+  const weeks = getWeeklyTreasurePlan();
+  container.innerHTML = weeks
+    .map((week) => {
+      if (!week.isRevealed) {
+        return `
+          <section class="stacked-week-block">
+            <h3>${escapeHtml(`${week.week}주차 탄소감축`)}</h3>
+            <p>${escapeHtml(`${week.revealLabel} 공개 후 탄소감축량이 표시됩니다.`)}</p>
+            <div class="week-summary">비공개 주차입니다.</div>
+          </section>
+        `;
+      }
+
+      const stats = getWeeklyCarbonStats(week.week);
+      return `
+        <section class="stacked-week-block">
+          <h3>${escapeHtml(`${week.week}주차 탄소감축`)}</h3>
+          <div class="carbon-meter">
+            <strong>${escapeHtml(formatCarbon(stats.totalCarbonKg))}</strong>
+            <span>${escapeHtml(formatKm(stats.totalDistanceKm))} 입력 기준</span>
+          </div>
+          <div class="weekly-place-list">
+            ${stats.places
+              .map(
+                (place) => `
+                  <article class="carbon-place-row">
+                    <strong>${escapeHtml(place.title)}</strong>
+                    <span>${escapeHtml(formatCarbon(place.carbonKg))} · ${escapeHtml(formatKm(place.distanceKm))}</span>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
 }
 
 function renderWeeklyCertificationDetail(container, item) {

@@ -113,7 +113,8 @@ const TREASURE_PLACES_PER_WEEK = 4;
 const TREASURE_PLAN_STORAGE_KEY = "bicycle-challenge-weekly-treasures";
 const CERTIFICATION_STORAGE_KEY = "bicycle-challenge-certifications";
 const CARBON_KG_PER_KM = 0.21;
-const BAND_CERTIFICATION_URL = "https://www.band.us/band/94500191/post";
+const BAND_CERTIFICATION_URL =
+  "https://www.band.us/band/94500191/hashtag/%EB%B3%B4%EB%AC%BC%EC%B0%BE%EA%B8%B0_%EA%B2%8C%EC%8B%9C%ED%8C%90";
 let weeklyTreasurePlanCache = null;
 
 const topMenus = {
@@ -661,6 +662,8 @@ function openPlacePopup(place, position) {
 function createPlacePopupContent(place) {
   const container = document.createElement("div");
   container.className = "place-popup";
+  const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
+  const introText = place.intro || "자전거 챌린지 인증 장소입니다.";
 
   container.innerHTML = `
     <button class="place-popup-close" type="button" aria-label="장소 팝업 닫기">×</button>
@@ -668,33 +671,34 @@ function createPlacePopupContent(place) {
       <div class="place-popup-copy">
         <div class="place-popup-title-row">
           <strong class="place-popup-title">${escapeHtml(place.title)}</strong>
-          <span class="place-popup-pin" aria-hidden="true">➜</span>
+          <span class="place-popup-pin" aria-hidden="true">●</span>
         </div>
-        <span class="place-popup-kicker">시즌2 인증 장소</span>
+        <span class="place-popup-kicker">보물찾기 인증 장소</span>
         <p class="place-popup-address">${escapeHtml(getPlaceAddressText(place))}</p>
-        <div class="place-popup-links">
-          <button type="button" class="place-popup-link" data-popup-detail>상세보기</button>
-          <span>·</span>
-          <button type="button" class="place-popup-link" data-popup-route>길찾기</button>
-        </div>
+        <p class="place-popup-intro">${escapeHtml(introText)}</p>
+        ${
+          weekLabels.length
+            ? `<div class="place-popup-weeks">${weekLabels
+                .map((label) => `<span>${escapeHtml(label)}</span>`)
+                .join("")}</div>`
+            : ""
+        }
       </div>
     </div>
     <div class="place-popup-actions">
-      <button type="button" class="place-popup-action" data-popup-detail>상세</button>
-      <button type="button" class="place-popup-action" data-popup-certify>인증</button>
+      <button type="button" class="place-popup-action place-popup-action--brand" data-popup-certify>인증하기</button>
       <button type="button" class="place-popup-action place-popup-action--primary" data-popup-route>길찾기</button>
+      <button type="button" class="place-popup-action" data-popup-close>닫기</button>
     </div>
     <div class="place-popup-tail" aria-hidden="true"></div>
   `;
 
-  container.querySelector(".place-popup-close")?.addEventListener("click", () => {
+  const closePopup = () => {
     closePlacePopup();
-  });
-  container.querySelectorAll("[data-popup-detail]").forEach((button) => {
-    button.addEventListener("click", () => {
-      showPlaceCard(place);
-    });
-  });
+  };
+
+  container.querySelector(".place-popup-close")?.addEventListener("click", closePopup);
+  container.querySelector("[data-popup-close]")?.addEventListener("click", closePopup);
   container.querySelectorAll("[data-popup-certify]").forEach((button) => {
     button.addEventListener("click", () => {
       openBandCertificationPage();
@@ -738,7 +742,6 @@ function createSelectedPlaceMarkers(places) {
 
     kakao.maps.event.addListener(marker, "click", () => {
       openPlacePopup(place, marker.getPosition());
-      showPlaceCard(place);
       updateMapStatus(`${place.title} 위치를 표시하고 있습니다.`, { highlightWord: place.title });
     });
 
@@ -820,7 +823,6 @@ function focusPlace(placeId) {
   const markerPosition = new kakao.maps.LatLng(selected.place.coords[0], selected.place.coords[1]);
   mapState.map.panTo(markerPosition);
   openPlacePopup(selected.place, markerPosition);
-  showPlaceCard(selected.place);
   updateMapStatus(`${selected.place.title} 위치로 이동했습니다.`, { highlightWord: selected.place.title });
 }
 
@@ -898,34 +900,8 @@ function showPlaceCard(place) {
     return;
   }
 
-  const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
-  elements.placeCard.hidden = false;
-  elements.placeCard.innerHTML = `
-    <button class="place-card-close" type="button" data-close-place-card aria-label="장소 정보 닫기">×</button>
-    <p class="place-card-kicker">보물찾기 장소</p>
-    <h3>${escapeHtml(place.title)}</h3>
-    <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
-    <p class="place-card-intro">${escapeHtml(place.intro || "자전거 챌린지 인증 장소입니다.")}</p>
-    ${
-      weekLabels.length
-        ? `<div class="place-card-weeks">${weekLabels.map((label) => `<span>${escapeHtml(label)}</span>`).join("")}</div>`
-        : ""
-    }
-    <div class="place-card-actions">
-      <button type="button" class="place-card-action" data-band-certify>네이버 밴드 인증하기</button>
-      <button type="button" class="place-card-action is-light" data-close-place-card>닫기</button>
-    </div>
-  `;
-
-  elements.placeCard.querySelectorAll("[data-close-place-card]").forEach((button) => {
-    button.addEventListener("click", () => {
-      elements.placeCard.hidden = true;
-    });
-  });
-
-  elements.placeCard.querySelector("[data-band-certify]")?.addEventListener("click", () => {
-    openBandCertificationPage();
-  });
+  elements.placeCard.hidden = true;
+  elements.placeCard.innerHTML = "";
 }
 
 function bindRouteFinder() {
@@ -1156,15 +1132,6 @@ function openExternalPage(url, blockedMessage) {
     externalWindow.opener = null;
     return true;
   }
-
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.target = "_blank";
-  anchor.rel = "noopener noreferrer";
-  anchor.style.display = "none";
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
 
   if (!document.hidden && blockedMessage) {
     updateMapStatus(blockedMessage);

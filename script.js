@@ -1627,6 +1627,7 @@ function renderPanelItems(panel, items, defaultItemId) {
     const inlineIntro =
       isActive && item.intro ? `<div class="inline-spot-intro">${item.intro}</div>` : "";
     const itemSummary = resolvePanelItemSummary(panel, item);
+    const itemTag = resolvePanelItemTag(panel, item);
     const button = document.createElement("button");
     button.type = "button";
     button.className = "submenu-item";
@@ -1638,7 +1639,7 @@ function renderPanelItems(panel, items, defaultItemId) {
         <span>${itemSummary}</span>
         ${inlineIntro}
       </div>
-      <span class="submenu-item-tag">${item.tag || "메뉴"}</span>
+      <span class="submenu-item-tag">${itemTag}</span>
     `;
 
     if (isActive) {
@@ -1742,6 +1743,28 @@ function resolvePanelItemSummary(panel, item) {
   }
 
   return item.summary;
+}
+
+function resolvePanelItemTag(panel, item) {
+  if (panel === elements.sidePanel && item.week) {
+    if (!isWeekRevealed(item.week)) {
+      return "비공개";
+    }
+
+    if (panel.root.dataset.panelMode === "treasure") {
+      return "공개";
+    }
+
+    if (panel.root.dataset.panelMode === "certify") {
+      return "인증";
+    }
+
+    if (panel.root.dataset.panelMode === "carbon") {
+      return "CO2";
+    }
+  }
+
+  return item.tag || "메뉴";
 }
 
 function clearInlinePanelDetails(panel) {
@@ -1962,7 +1985,7 @@ function renderWeeklyTreasureDetail(container, item) {
   container.innerHTML = `
     <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
     <p>${escapeHtml(item.detailBody || item.summary)}</p>
-    <div class="week-summary">${item.week}주차 공개 장소 ${places.length}곳이 랜덤으로 배정되었습니다.</div>
+    <div class="week-summary">${item.week}주차 공개 장소 ${places.length}곳입니다.</div>
     <div class="weekly-place-list">
       ${places
         .map(

@@ -1388,6 +1388,10 @@ a {
     padding-right: 40px;
   }
 
+  .side-panel .panel-close {
+    display: none;
+  }
+
   .route-finder {
     margin-bottom: 12px;
     padding: 12px;

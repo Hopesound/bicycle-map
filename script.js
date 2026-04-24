@@ -352,6 +352,10 @@ function applyMobileInitialState() {
   updateActiveButtons();
 }
 
+function isMobileViewport() {
+  return window.matchMedia("(max-width: 680px)").matches;
+}
+
 function renderMapFallback() {
   elements.map.innerHTML = `
     <div style="display:grid;place-items:center;height:100%;padding:24px;color:#17322f;background:linear-gradient(180deg,#e7efe9 0%,#dde8e0 100%);font-weight:700;text-align:center;">
@@ -1085,6 +1089,21 @@ function renderPanelItems(panel, items, defaultItemId) {
     `;
 
     button.addEventListener("click", () => {
+      const shouldToggleDetailOff =
+        panel === elements.sidePanel &&
+        isMobileViewport() &&
+        button.classList.contains("is-active") &&
+        !panel.detail.hidden;
+
+      if (shouldToggleDetailOff) {
+        panel.list.querySelectorAll(".submenu-item").forEach((node) => {
+          node.classList.remove("is-active");
+        });
+        panel.list.querySelectorAll(".inline-spot-intro").forEach((node) => node.remove());
+        panel.detail.hidden = true;
+        return;
+      }
+
       panel.list.querySelectorAll(".submenu-item").forEach((node) => {
         node.classList.toggle("is-active", node === button);
       });
@@ -1103,6 +1122,7 @@ function renderPanelItems(panel, items, defaultItemId) {
   });
 
   if (activeItem) {
+    panel.detail.hidden = false;
     renderPanelDetail(panel.detail, activeItem);
   }
 }

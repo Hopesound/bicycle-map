@@ -115,6 +115,67 @@ const CERTIFICATION_STORAGE_KEY = "bicycle-challenge-certifications";
 const CARBON_KG_PER_KM = 0.21;
 const BAND_CERTIFICATION_URL =
   "https://www.band.us/band/94500191/hashtag/%EB%B3%B4%EB%AC%BC%EC%B0%BE%EA%B8%B0_%EA%B2%8C%EC%8B%9C%ED%8C%90";
+const FIXED_WEEKLY_TREASURE_PLAN = [
+  {
+    week: 1,
+    revealDate: "2026-04-24",
+    revealLabel: "4월 24일",
+    placeIds: [
+      "jbnu-museum",
+      "jeonbuk-env",
+      "songgwangsa",
+      "sangjang-park",
+      "gijije",
+      "kkotsingi",
+      "jeonju-arboretum",
+      "saechangi-bridge"
+    ]
+  },
+  {
+    week: 2,
+    revealDate: "2026-04-25",
+    revealLabel: "4월 25일",
+    placeIds: [
+      "goui-reservoir",
+      "gosan-miso-market",
+      "omokdae",
+      "sanggwan-forest",
+      "march-first",
+      "bibijeong",
+      "woosuk-hospital",
+      "sebyeongho"
+    ]
+  },
+  {
+    week: 3,
+    revealDate: "2026-04-26",
+    revealLabel: "4월 26일",
+    placeIds: [
+      "yeoyu-cafe",
+      "jeonju-archive",
+      "iksan-samil",
+      "wind-road",
+      "ajung-library",
+      "jeonju-fm",
+      "daedeok-elementary",
+      "chucheondae"
+    ]
+  },
+  {
+    week: 4,
+    revealDate: "2026-04-27",
+    revealLabel: "4월 27일",
+    placeIds: [
+      "deokjin-park",
+      "volunteer-center",
+      "medical-coop",
+      "eoeun-bridge",
+      "hari-bridge",
+      "bike-box",
+      "palbok-art"
+    ]
+  }
+];
 let weeklyTreasurePlanCache = null;
 
 const topMenus = {
@@ -564,15 +625,17 @@ function convertPolygonRings(rings) {
 }
 
 function renderSelectedPlaces() {
+  const visiblePlaces = getVisibleMapPlaces();
+
   if (!mapState.map || !window.kakao?.maps?.services) {
-    createSelectedPlaceMarkers(selectedPlaces.map((place) => ({ ...place, coords: place.fallback })));
+    createSelectedPlaceMarkers(visiblePlaces.map((place) => ({ ...place, coords: place.fallback })));
     return;
   }
 
   const geocoder = new kakao.maps.services.Geocoder();
   const placesService = new kakao.maps.services.Places();
 
-  resolveSelectedPlaces(selectedPlaces, geocoder, placesService).then((places) => {
+  resolveSelectedPlaces(visiblePlaces, geocoder, placesService).then((places) => {
     createSelectedPlaceMarkers(places);
   });
 }
@@ -653,17 +716,16 @@ function getCompactPlaceIntro(place) {
 }
 
 function getPlaceTravelCarbonText(place) {
-  if (!mapState.currentLocation || !Array.isArray(place.coords)) {
-    return "현재 위치 기준 탄소감축량 확인 중";
+  const records = getCertificationRecords().filter((record) => record.placeId === place.id);
+  const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
+
+  if (!records.length || totalDistanceKm <= 0) {
+    return "참가 거리 입력 후 탄소감축량 표시";
   }
 
-  const distanceKm = calculateDistanceKm(mapState.currentLocation, {
-    lat: place.coords[0],
-    lng: place.coords[1]
-  });
-  const carbonKg = distanceKm * CARBON_KG_PER_KM;
-
-  return `예상 탄소감축 ${formatCarbon(carbonKg)} · 약 ${formatKm(distanceKm)}`;
+  return `누적 탄소감축 ${formatCarbon(totalDistanceKm * CARBON_KG_PER_KM)} · 입력 ${formatKm(
+    totalDistanceKm
+  )}`;
 }
 
 function closePlacePopup() {
@@ -698,6 +760,7 @@ function createPlacePopupContent(place) {
   const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
   const introText = getCompactPlaceIntro(place);
   const carbonText = getPlaceTravelCarbonText(place);
+  const normalizedWeekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
 
   container.innerHTML = `
     <button class="place-popup-close" type="button" aria-label="장소 팝업 닫기">×</button>
@@ -731,6 +794,16 @@ function createPlacePopupContent(place) {
     closePlacePopup();
   };
 
+  container.querySelector(".place-popup-close")?.setAttribute("aria-label", "장소 팝업 닫기");
+  container.querySelector(".place-popup-close")?.replaceChildren("×");
+  container.querySelector(".place-popup-pin")?.replaceChildren("●");
+  container.querySelector(".place-popup-kicker")?.remove();
+  container.querySelector("[data-popup-certify]")?.replaceChildren("인증하기");
+  container.querySelector("[data-popup-route]")?.replaceChildren("길찾기");
+  container.querySelector("[data-popup-detail]")?.replaceChildren("상세설명");
+  container.querySelectorAll(".place-popup-weeks span").forEach((span, index) => {
+    span.textContent = normalizedWeekLabels[index] || span.textContent;
+  });
   container.querySelector(".place-popup-close")?.addEventListener("click", closePopup);
   container.querySelectorAll("[data-popup-detail]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1537,7 +1610,7 @@ function renderPanelItems(panel, items, defaultItemId) {
     const isActive = activeItem?.id === item.id;
     const inlineIntro =
       isActive && item.intro ? `<div class="inline-spot-intro">${item.intro}</div>` : "";
-    const itemSummary = getPanelItemSummary(panel, item);
+    const itemSummary = resolvePanelItemSummary(panel, item);
     const button = document.createElement("button");
     button.type = "button";
     button.className = "submenu-item";
@@ -1635,6 +1708,24 @@ function shouldUseInlineDetail(panel) {
   }
 
   return false;
+}
+
+function resolvePanelItemSummary(panel, item) {
+  if (panel === elements.sidePanel && item.week) {
+    if (!isWeekRevealed(item.week)) {
+      return `비공개 · ${getWeekRevealLabel(item.week)} 공개`;
+    }
+
+    if (panel.root.dataset.panelMode === "carbon") {
+      return `${formatCarbon(getWeeklyCarbonStats(item.week).totalCarbonKg)} 감축`;
+    }
+
+    if (panel.root.dataset.panelMode === "treasure") {
+      return `${getWeeklyPlaces(item.week).length}곳 공개`;
+    }
+  }
+
+  return item.summary;
 }
 
 function clearInlinePanelDetails(panel) {
@@ -1841,6 +1932,16 @@ function renderLoginDetail(container, item) {
 
 function renderWeeklyTreasureDetail(container, item) {
   const places = getWeeklyPlaces(item.week);
+  const weekPlan = getWeekPlan(item.week);
+
+  if (!weekPlan?.isRevealed) {
+    container.innerHTML = `
+      <h3>${escapeHtml(`${item.week}주차 보물찾기`)}</h3>
+      <p>${escapeHtml(`${getWeekRevealLabel(item.week)}에 공개됩니다.`)}</p>
+      <div class="week-summary">비공개 주차입니다. 공개 전에는 장소가 표시되지 않습니다.</div>
+    `;
+    return;
+  }
 
   container.innerHTML = `
     <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
@@ -1861,12 +1962,25 @@ function renderWeeklyTreasureDetail(container, item) {
     </div>
   `;
 
+  container.querySelectorAll(".weekly-place-card span").forEach((node, index) => {
+    node.textContent = getCompactPlaceIntro(places[index]);
+  });
   bindFocusPlaceButtons(container);
 }
 
 function renderWeeklyCertificationDetail(container, item) {
   const places = getWeeklyPlaces(item.week);
+  const weekPlan = getWeekPlan(item.week);
   const records = getCertificationRecords();
+
+  if (!weekPlan?.isRevealed) {
+    container.innerHTML = `
+      <h3>${escapeHtml(`${item.week}주차 인증하기`)}</h3>
+      <p>${escapeHtml(`${getWeekRevealLabel(item.week)} 공개 후 인증할 수 있습니다.`)}</p>
+      <div class="week-summary">비공개 주차입니다. 아직 인증 장소가 열리지 않았습니다.</div>
+    `;
+    return;
+  }
 
   container.innerHTML = `
     <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
@@ -1921,6 +2035,16 @@ function renderWeeklyCertificationDetail(container, item) {
 }
 
 function renderWeeklyCarbonDetail(container, item) {
+  const weekPlan = getWeekPlan(item.week);
+  if (!weekPlan?.isRevealed) {
+    container.innerHTML = `
+      <h3>${escapeHtml(`${item.week}주차 탄소감축`)}</h3>
+      <p>${escapeHtml(`${getWeekRevealLabel(item.week)} 공개 후 탄소감축량이 표시됩니다.`)}</p>
+      <div class="week-summary">비공개 주차입니다. 공개 이후 입력된 거리 기준으로 감축량을 계산합니다.</div>
+    `;
+    return;
+  }
+
   const stats = getWeeklyCarbonStats(item.week);
   const overallStats = getOverallCarbonStats();
 
@@ -2001,15 +2125,7 @@ function getWeeklyTreasurePlan() {
     return weeklyTreasurePlanCache;
   }
 
-  const savedPlan = readWeeklyTreasurePlan();
-  if (savedPlan) {
-    weeklyTreasurePlanCache = hydrateWeeklyTreasurePlan(savedPlan);
-    return weeklyTreasurePlanCache;
-  }
-
-  const createdPlan = createWeeklyTreasurePlan();
-  saveWeeklyTreasurePlan(createdPlan);
-  weeklyTreasurePlanCache = hydrateWeeklyTreasurePlan(createdPlan);
+  weeklyTreasurePlanCache = hydrateWeeklyTreasurePlan(FIXED_WEEKLY_TREASURE_PLAN);
   return weeklyTreasurePlanCache;
 }
 
@@ -2026,21 +2142,21 @@ function readWeeklyTreasurePlan() {
 }
 
 function createWeeklyTreasurePlan() {
-  const shuffledPlaces = shufflePlaces(selectedPlaces);
-  return Array.from({ length: WEEK_COUNT }, (_, index) => {
-    const start = index * TREASURE_PLACES_PER_WEEK;
-    return {
-      week: index + 1,
-      placeIds: shuffledPlaces.slice(start, start + TREASURE_PLACES_PER_WEEK).map((place) => place.id)
-    };
-  });
+  return FIXED_WEEKLY_TREASURE_PLAN;
 }
 
 function hydrateWeeklyTreasurePlan(plan) {
+  const todayKey = getSeoulDateKey();
   return plan.map((week) => ({
     week: Number(week.week),
+    revealDate: week.revealDate,
+    revealLabel: week.revealLabel,
+    isRevealed: todayKey >= week.revealDate,
     placeIds: week.placeIds,
-    places: week.placeIds.map((placeId) => getPlaceById(placeId)).filter(Boolean)
+    places:
+      todayKey >= week.revealDate
+        ? week.placeIds.map((placeId) => getPlaceById(placeId)).filter(Boolean)
+        : []
   }));
 }
 
@@ -2051,6 +2167,7 @@ function isValidTreasurePlan(plan) {
     plan.every(
       (week, index) =>
         Number(week.week) === index + 1 &&
+        typeof week.revealDate === "string" &&
         Array.isArray(week.placeIds) &&
         week.placeIds.length > 0 &&
         week.placeIds.every((placeId) => Boolean(getPlaceById(placeId)))
@@ -2075,8 +2192,34 @@ function shufflePlaces(places) {
   return result;
 }
 
+function getSeoulDateKey(date = new Date()) {
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(date);
+}
+
+function getWeekPlan(week) {
+  return getWeeklyTreasurePlan().find((item) => item.week === Number(week)) || null;
+}
+
+function isWeekRevealed(week) {
+  return Boolean(getWeekPlan(week)?.isRevealed);
+}
+
+function getWeekRevealLabel(week) {
+  return getWeekPlan(week)?.revealLabel || "";
+}
+
+function getVisibleMapPlaces() {
+  const visiblePlaceIds = new Set(
+    getWeeklyTreasurePlan()
+      .filter((week) => week.isRevealed)
+      .flatMap((week) => week.placeIds)
+  );
+
+  return selectedPlaces.filter((place) => visiblePlaceIds.has(place.id));
+}
+
 function getWeeklyPlaces(week) {
-  return getWeeklyTreasurePlan().find((item) => item.week === Number(week))?.places || [];
+  return getWeekPlan(week)?.places || [];
 }
 
 function getPlaceById(placeId) {
@@ -2133,6 +2276,11 @@ function formatCarbon(value) {
 
 function focusWeeklyPlaces(week) {
   if (!mapState.map) {
+    return;
+  }
+
+  if (!isWeekRevealed(week)) {
+    updateMapStatus(`${getWeekRevealLabel(week)} 공개 전까지는 장소가 비공개입니다.`);
     return;
   }
 

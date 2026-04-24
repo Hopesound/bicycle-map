@@ -167,6 +167,20 @@ a {
   transform: translateY(-1px);
 }
 
+.topnav-button[data-top-menu="login"] {
+  border: 1px solid rgba(10, 141, 120, 0.28);
+  background: rgba(10, 141, 120, 0.08);
+  color: var(--brand-deep);
+  box-shadow: 0 8px 18px rgba(11, 97, 87, 0.08);
+}
+
+.topnav-button[data-top-menu="login"]:hover,
+.topnav-button[data-top-menu="login"]:focus-visible,
+.topnav-button[data-top-menu="login"].is-active {
+  background: rgba(10, 141, 120, 0.16);
+  border-color: rgba(10, 141, 120, 0.38);
+}
+
 .side-rail {
   position: fixed;
   inset: 0 auto 0 0;
@@ -308,7 +322,7 @@ a {
 }
 
 .side-panel {
-  top: calc(var(--header-height) + 122px);
+  top: calc(var(--header-height) + 28px);
   left: calc(var(--rail-width) + 8px);
   height: min(760px, calc(100vh - var(--header-height) - 36px));
   overflow: hidden;

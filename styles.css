@@ -790,15 +790,22 @@ a {
 }
 
 .place-card {
-  display: none !important;
-  top: calc(var(--header-height) + 88px);
-  right: 24px;
-  width: min(360px, calc(100vw - var(--rail-width) - 48px));
+  top: calc(var(--header-height) + 92px);
+  left: 50%;
+  right: auto;
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(68vh, 560px);
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   border-radius: 24px;
   display: grid;
   gap: 10px;
   z-index: 1440;
+  transform: translateX(-50%);
+  background: rgba(250, 255, 252, 0.98);
+  box-shadow: 0 24px 44px rgba(7, 28, 28, 0.18);
+  border: 1px solid rgba(10, 141, 120, 0.14);
 }
 
 .place-card-kicker,
@@ -841,6 +848,7 @@ a {
   font-family: var(--font-display);
   font-size: 1.4rem;
   letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
 }
 
 .place-card-address,
@@ -848,6 +856,8 @@ a {
   margin: 0;
   color: var(--muted);
   line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
 }
 
 .place-card-weeks {
@@ -900,15 +910,19 @@ a {
   background: rgba(250, 255, 252, 0.98);
   box-shadow: 0 24px 44px rgba(7, 28, 28, 0.18);
   border: 1px solid rgba(10, 141, 120, 0.14);
+  overflow: hidden;
 }
 
 .place-popup-main {
   display: block;
+  min-width: 0;
 }
 
 .place-popup-copy {
   display: grid;
   gap: 10px;
+  min-width: 0;
+  padding-right: 20px;
 }
 
 .place-popup-title-row {
@@ -921,6 +935,8 @@ a {
   color: var(--brand-deep);
   font-size: 1.16rem;
   font-weight: 900;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
 }
 
 .place-popup-pin {
@@ -947,6 +963,8 @@ a {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
 }
 
 .place-popup-intro {
@@ -954,6 +972,8 @@ a {
   color: var(--ink);
   font-size: 0.92rem;
   line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: keep-all;
 }
 
 .place-popup-weeks {
@@ -1344,8 +1364,7 @@ a {
 
   .place-card {
     top: 194px;
-    right: 16px;
-    width: min(340px, calc(100vw - var(--rail-width) - 32px));
+    width: min(360px, calc(100vw - 32px));
   }
 
   .side-panel {
@@ -1536,6 +1555,7 @@ a {
     width: auto;
     max-height: 52vh;
     overflow-y: auto;
+    transform: none;
     padding: 16px;
     border-radius: 28px 28px 22px 22px;
   }

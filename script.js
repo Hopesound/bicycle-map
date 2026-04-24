@@ -520,11 +520,11 @@ function getMunicipalityStrokeColor(name) {
     return "";
   }
 
-  if (name === "완주군") {
+  if (name.includes("\uC644\uC8FC\uAD70")) {
     return MUNICIPALITY_STROKE_COLORS.wanju;
   }
 
-  if (name === "전주시" || name.startsWith("전주시 ")) {
+  if (name.includes("\uC804\uC8FC\uC2DC")) {
     return MUNICIPALITY_STROKE_COLORS.jeonju;
   }
 
@@ -688,7 +688,7 @@ function createPlacePopupContent(place) {
     <div class="place-popup-actions">
       <button type="button" class="place-popup-action place-popup-action--brand" data-popup-certify>인증하기</button>
       <button type="button" class="place-popup-action place-popup-action--primary" data-popup-route>길찾기</button>
-      <button type="button" class="place-popup-action" data-popup-close>닫기</button>
+      <button type="button" class="place-popup-action" data-popup-detail>상세설명</button>
     </div>
     <div class="place-popup-tail" aria-hidden="true"></div>
   `;
@@ -698,7 +698,11 @@ function createPlacePopupContent(place) {
   };
 
   container.querySelector(".place-popup-close")?.addEventListener("click", closePopup);
-  container.querySelector("[data-popup-close]")?.addEventListener("click", closePopup);
+  container.querySelectorAll("[data-popup-detail]").forEach((button) => {
+    button.addEventListener("click", () => {
+      showPlaceCard(place);
+    });
+  });
   container.querySelectorAll("[data-popup-certify]").forEach((button) => {
     button.addEventListener("click", () => {
       openBandCertificationPage();
@@ -900,8 +904,43 @@ function showPlaceCard(place) {
     return;
   }
 
-  elements.placeCard.hidden = true;
-  elements.placeCard.innerHTML = "";
+  closePlacePopup();
+  const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
+  const detailText = place.intro || "자전거 챌린지 인증 장소입니다.";
+
+  elements.placeCard.hidden = false;
+  elements.placeCard.innerHTML = `
+    <button class="place-card-close" type="button" data-close-place-card aria-label="상세 설명 닫기">×</button>
+    <p class="place-card-kicker">장소 상세 설명</p>
+    <h3>${escapeHtml(place.title)}</h3>
+    <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
+    <p class="place-card-intro">${escapeHtml(detailText)}</p>
+    <p class="place-card-intro">지도에 표시된 마커 위치를 기준으로 인증과 길찾기를 이용할 수 있습니다.</p>
+    ${
+      weekLabels.length
+        ? `<div class="place-card-weeks">${weekLabels.map((label) => `<span>${escapeHtml(label)}</span>`).join("")}</div>`
+        : ""
+    }
+    <div class="place-card-actions">
+      <button type="button" class="place-card-action" data-band-certify>인증하기</button>
+      <button type="button" class="place-card-action is-light" data-place-route>길찾기</button>
+      <button type="button" class="place-card-action is-light" data-close-place-card>닫기</button>
+    </div>
+  `;
+
+  elements.placeCard.querySelectorAll("[data-close-place-card]").forEach((button) => {
+    button.addEventListener("click", () => {
+      elements.placeCard.hidden = true;
+    });
+  });
+
+  elements.placeCard.querySelector("[data-band-certify]")?.addEventListener("click", () => {
+    openBandCertificationPage();
+  });
+
+  elements.placeCard.querySelector("[data-place-route]")?.addEventListener("click", () => {
+    openBikeRouteToPlace(place);
+  });
 }
 
 function bindRouteFinder() {

@@ -53,8 +53,8 @@ const selectedPlaces = [
     intro: "전주 시민의 생활 기록과 인근 생활권을 함께 연결해 볼 수 있는 문화·기록 거점입니다.",
     fallback: [35.8339, 127.1714]
   },
-  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", fallback: [35.9445, 126.9546] },
-  { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", intro: "가볍게 이동하며 쉬어갈 수 있는 산책·라이딩 친화형 길입니다.", fallback: [35.8271, 127.1519] },
+  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", fixedCoords: [35.900557, 126.976356], intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", fallback: [35.900557, 126.976356] },
+  { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", fixedCoords: [35.805012, 127.165439], intro: "가볍게 이동하며 쉬어갈 수 있는 산책·라이딩 친화형 길입니다.", fallback: [35.805012, 127.165439] },
   { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", intro: "아중호수와 독서 문화가 만나는 생활문화형 인증 장소입니다.", fallback: [35.8328, 127.1768] },
   { id: "jeonju-fm", title: "전주공동체라디오 전주FM", query: "전주공동체라디오 전주FM", intro: "지역 미디어와 시민 참여 메시지를 연결할 수 있는 커뮤니티 거점입니다.", fallback: [35.8148, 127.1211] },
   { id: "daedeok-elementary", title: "대덕초등학교", query: "대덕초등학교 완주", intro: "지역 생활권을 연결하는 교육 시설 주변 위치 표시 지점입니다.", fallback: [35.9139, 127.2386] },
@@ -66,7 +66,8 @@ const selectedPlaces = [
     query: "전주시자원봉사센터",
     address: "전북특별자치도 전주시 덕진구 전주천동로 455",
     intro: "시민 참여와 봉사 활동을 챌린지 캠페인과 연결하기 좋은 거점입니다.",
-    fallback: [35.8331, 127.1108]
+    fixedCoords: [35.833708, 127.12567],
+    fallback: [35.833708, 127.12567]
   },
   { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
   {
@@ -559,7 +560,11 @@ function initMap() {
   mapState.map = map;
   elements.keyNotice.hidden = true;
   requestCurrentLocation({ panTo: false, silent: true });
-  kakao.maps.event.addListener(map, "click", () => {
+  kakao.maps.event.addListener(map, "click", (mouseEvent) => {
+    if (openNearestPlaceFromMapClick(mouseEvent.latLng)) {
+      return;
+    }
+
     closePlacePopup();
   });
 
@@ -922,6 +927,46 @@ function createSelectedPlaceMarkers(places) {
 
     mapState.selectedPlaceMarkers.push({ place, marker });
   });
+}
+
+function openNearestPlaceFromMapClick(latLng) {
+  if (!latLng || !mapState.map || !mapState.selectedPlaceMarkers.length) {
+    return false;
+  }
+
+  const clickPoint = {
+    lat: latLng.getLat(),
+    lng: latLng.getLng()
+  };
+  const zoomLevel = typeof mapState.map.getLevel === "function" ? mapState.map.getLevel() : 5;
+  const thresholdKm = Math.min(0.35, Math.max(0.08, zoomLevel * 0.035));
+  const nearest = mapState.selectedPlaceMarkers.reduce(
+    (closest, item) => {
+      const distanceKm = calculateDistanceKm(clickPoint, {
+        lat: item.place.coords[0],
+        lng: item.place.coords[1]
+      });
+
+      if (!closest || distanceKm < closest.distanceKm) {
+        return { ...item, distanceKm };
+      }
+
+      return closest;
+    },
+    null
+  );
+
+  if (!nearest || nearest.distanceKm > thresholdKm) {
+    return false;
+  }
+
+  const markerPosition = nearest.marker.getPosition();
+  openPlacePopup(nearest.place, markerPosition);
+  updateMapStatus(`${nearest.place.title} 위치를 표시하고 있습니다.`, {
+    highlightWord: nearest.place.title,
+    suppressOnMobile: true
+  });
+  return true;
 }
 
 function createSelectedPlaceMarkerImage() {

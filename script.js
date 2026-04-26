@@ -20,7 +20,7 @@ const selectedPlaces = [
   { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", intro: "완주 소양면의 역사 사찰로, 숲길과 문화유산을 함께 경험할 수 있는 코스 거점입니다.", fallback: [35.9114, 127.1732] },
   { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", intro: "봉동 생활권에서 쉬어가기 좋은 근린공원형 인증 장소입니다.", fallback: [35.9415, 127.1254] },
   { id: "gijije", title: "기지제", query: "기지제 전주", intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.8077, 127.1018] },
-  { id: "kkotsingi", title: "전주시 공영자전거 꽃싱이 송천대여소", query: "꽃싱이 송천대여소 전주", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8784, 127.1182] },
+  { id: "kkotsingi", title: "전주시 공영자전거 백제교대여소", query: "전주시 공영자전거 백제교대여소", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8505, 127.124] },
   { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", intro: "다양한 식물과 산책로가 있는 녹지형 장소로 친환경 챌린지 메시지와 잘 어울립니다.", fallback: [35.8371, 127.0406] },
   {
     id: "saechangi-bridge",
@@ -33,7 +33,7 @@ const selectedPlaces = [
     fallback: [35.9109, 126.8401]
   },
   { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
-  { id: "sanggwan-forest", title: "완주군 상관편백숲 관광안내소", query: "상관편백숲 관광안내소", intro: "편백숲 치유 관광과 자전거 방문 인증을 연결하기 좋은 숲길 거점입니다.", fallback: [35.7621, 127.1859] },
+  { id: "sanggwan-forest", title: "상관역", query: "상관역 완주", intro: "완주 상관면으로 이어지는 철도 교통 거점입니다.", fallback: [35.7676, 127.2055] },
   { id: "march-first", title: "전주3.1운동발상지", query: "전주 3.1운동 발상지", intro: "지역 독립운동의 의미를 담은 역사형 인증 장소입니다.", fallback: [35.8199, 127.1442] },
   { id: "bibijeong", title: "비비정", query: "비비정 완주", intro: "만경강 풍경과 함께 쉬어갈 수 있는 완주 대표 전망 거점입니다.", fallback: [35.8687, 127.0744] },
   { id: "woosuk-hospital", title: "우석대학교 부속 전주한방병원", query: "우석대학교 부속 전주한방병원", intro: "지역 의료·건강 테마와 연결할 수 있는 도심 거점입니다.", fallback: [35.8137, 127.0892] },
@@ -121,14 +121,14 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-24",
     revealLabel: "4월 24일",
     placeIds: [
-      "jeonbuk-env",
-      "songgwangsa",
-      "sangjang-park",
-      "gijije",
-      "kkotsingi",
-      "jeonju-arboretum",
       "saechangi-bridge",
-      "palbok-art"
+      "iksan-samil",
+      "jeonbuk-env",
+      "sebyeongho",
+      "medical-coop",
+      "omokdae",
+      "bike-box",
+      "jeonju-fm"
     ]
   },
   {
@@ -136,14 +136,14 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-25",
     revealLabel: "4월 25일",
     placeIds: [
-      "gosan-miso-market",
-      "omokdae",
-      "sanggwan-forest",
-      "march-first",
-      "bibijeong",
+      "goui-reservoir",
+      "daedeok-elementary",
+      "yeoyu-cafe",
+      "songgwangsa",
+      "deokjin-park",
       "woosuk-hospital",
-      "sebyeongho",
-      "yeoyu-cafe"
+      "palbok-art",
+      "hari-bridge"
     ]
   },
   {
@@ -151,14 +151,14 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-26",
     revealLabel: "4월 26일",
     placeIds: [
-      "jeonju-archive",
-      "iksan-samil",
+      "sangjang-park",
+      "gosan-miso-market",
+      "sanggwan-forest",
+      "eoeun-bridge",
+      "bibijeong",
       "wind-road",
-      "ajung-library",
-      "jeonju-fm",
-      "daedeok-elementary",
-      "chucheondae",
-      "deokjin-park"
+      "jeonju-arboretum",
+      "volunteer-center"
     ]
   },
   {
@@ -166,13 +166,13 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     revealDate: "2026-04-27",
     revealLabel: "4월 27일",
     placeIds: [
-      "volunteer-center",
-      "medical-coop",
-      "eoeun-bridge",
-      "hari-bridge",
-      "bike-box",
       "jbnu-museum",
-      "goui-reservoir"
+      "gijije",
+      "kkotsingi",
+      "march-first",
+      "jeonju-archive",
+      "ajung-library",
+      "chucheondae"
     ]
   }
 ];
@@ -208,12 +208,12 @@ const topMenus = {
       },
       {
         id: "method-certify",
-        label: "2. 인증하기 등록",
-        summary: "사진, 거리, 댓글 입력",
+        label: "2. 참가거리 입력",
+        summary: "방문 후 거리 저장",
         tag: "STEP",
-        detailTitle: "인증 등록",
+        detailTitle: "참가거리 저장",
         detailBody:
-          "공개된 장소를 방문한 뒤 인증하기 메뉴에서 인증사진, 주행거리, 댓글을 입력해 기록합니다."
+          "공개된 장소를 방문한 뒤 장소 팝업의 참가거리에서 주행거리를 입력해 기록합니다."
       },
       {
         id: "method-carbon",
@@ -773,7 +773,6 @@ function createPlacePopupContent(place) {
   const container = document.createElement("div");
   container.className = "place-popup";
   const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
-  const introText = getCompactPlaceIntro(place);
   const carbonText = getPlaceTravelCarbonText(place);
   const normalizedWeekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
 
@@ -786,7 +785,6 @@ function createPlacePopupContent(place) {
           <span class="place-popup-pin" aria-hidden="true">●</span>
         </div>
         <span class="place-popup-kicker">보물찾기 인증 장소</span>
-        <p class="place-popup-intro">${escapeHtml(introText)}</p>
         <p class="place-popup-carbon">${escapeHtml(carbonText)}</p>
         ${
           weekLabels.length
@@ -798,7 +796,7 @@ function createPlacePopupContent(place) {
       </div>
     </div>
     <div class="place-popup-actions">
-      <button type="button" class="place-popup-action place-popup-action--brand" data-popup-certify>인증하기</button>
+      <button type="button" class="place-popup-action place-popup-action--brand" data-popup-distance>참가거리</button>
       <button type="button" class="place-popup-action place-popup-action--primary" data-popup-route>길찾기</button>
       <button type="button" class="place-popup-action" data-popup-detail>상세설명</button>
     </div>
@@ -813,7 +811,7 @@ function createPlacePopupContent(place) {
   container.querySelector(".place-popup-close")?.replaceChildren("×");
   container.querySelector(".place-popup-pin")?.replaceChildren("●");
   container.querySelector(".place-popup-kicker")?.remove();
-  container.querySelector("[data-popup-certify]")?.replaceChildren("인증하기");
+  container.querySelector("[data-popup-distance]")?.replaceChildren("참가거리");
   container.querySelector("[data-popup-route]")?.replaceChildren("길찾기");
   container.querySelector("[data-popup-detail]")?.replaceChildren("상세설명");
   container.querySelectorAll(".place-popup-weeks span").forEach((span, index) => {
@@ -825,9 +823,9 @@ function createPlacePopupContent(place) {
       showPlaceCard(place);
     });
   });
-  container.querySelectorAll("[data-popup-certify]").forEach((button) => {
+  container.querySelectorAll("[data-popup-distance]").forEach((button) => {
     button.addEventListener("click", () => {
-      openBandCertificationPage();
+      showDistanceEntry(place);
     });
   });
   container.querySelectorAll("[data-popup-route]").forEach((button) => {
@@ -1048,14 +1046,13 @@ function showPlaceCard(place) {
     <h3>${escapeHtml(place.title)}</h3>
     <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
     <p class="place-card-intro">${escapeHtml(detailText)}</p>
-    <p class="place-card-intro">지도에 표시된 마커 위치를 기준으로 인증과 길찾기를 이용할 수 있습니다.</p>
     ${
       weekLabels.length
         ? `<div class="place-card-weeks">${weekLabels.map((label) => `<span>${escapeHtml(label)}</span>`).join("")}</div>`
         : ""
     }
     <div class="place-card-actions">
-      <button type="button" class="place-card-action" data-band-certify>인증하기</button>
+      <button type="button" class="place-card-action" data-place-distance>참가거리</button>
       <button type="button" class="place-card-action is-light" data-place-route>길찾기</button>
       <button type="button" class="place-card-action is-light" data-close-place-card>닫기</button>
     </div>
@@ -1067,13 +1064,99 @@ function showPlaceCard(place) {
     });
   });
 
-  elements.placeCard.querySelector("[data-band-certify]")?.addEventListener("click", () => {
-    openBandCertificationPage();
+  elements.placeCard.querySelector("[data-place-distance]")?.addEventListener("click", () => {
+    showDistanceEntry(place);
   });
 
   elements.placeCard.querySelector("[data-place-route]")?.addEventListener("click", () => {
     openBikeRouteToPlace(place);
   });
+}
+
+function showDistanceEntry(place) {
+  if (!elements.placeCard) {
+    return;
+  }
+
+  closePlacePopup();
+  const records = getCertificationRecords().filter((record) => record.placeId === place.id);
+  const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
+  const totalCarbonKg = totalDistanceKm * CARBON_KG_PER_KM;
+
+  elements.placeCard.hidden = false;
+  elements.placeCard.innerHTML = `
+    <button class="place-card-close" type="button" data-close-place-card aria-label="참가거리 입력 닫기">×</button>
+    <p class="place-card-kicker">참가거리</p>
+    <h3>${escapeHtml(place.title)}</h3>
+    <div class="carbon-meter distance-entry-summary">
+      <strong>${escapeHtml(formatCarbon(totalCarbonKg))}</strong>
+      <span>누적 ${escapeHtml(formatKm(totalDistanceKm))}</span>
+    </div>
+    <form class="distance-entry-form" data-distance-form data-place-id="${escapeHtml(place.id)}">
+      <label>
+        참가거리(km)
+        <input name="distance" type="number" min="0.1" step="0.1" placeholder="예: 12.5" required />
+      </label>
+      <div class="distance-entry-preview" data-distance-preview>0.0kg CO2 감축</div>
+      <button class="place-card-action" type="submit">저장하기</button>
+    </form>
+  `;
+
+  elements.placeCard.querySelectorAll("[data-close-place-card]").forEach((button) => {
+    button.addEventListener("click", () => {
+      elements.placeCard.hidden = true;
+    });
+  });
+
+  const form = elements.placeCard.querySelector("[data-distance-form]");
+  const input = form?.querySelector('input[name="distance"]');
+  const preview = form?.querySelector("[data-distance-preview]");
+
+  input?.addEventListener("input", () => {
+    const distance = Number(input.value || 0);
+    if (preview) {
+      preview.textContent = `${formatCarbon(distance * CARBON_KG_PER_KM)} 감축`;
+    }
+  });
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const distance = Number(new FormData(form).get("distance") || 0);
+    if (!Number.isFinite(distance) || distance <= 0) {
+      updateMapStatus("참가거리를 0보다 크게 입력해주세요.");
+      return;
+    }
+
+    saveDistanceRecord(place, distance);
+    elements.placeCard.hidden = true;
+    refreshOpenSidePanel();
+    focusPlace(place.id);
+    updateMapStatus(
+      `${place.title} 참가거리 ${formatKm(distance)} 저장 · ${formatCarbon(distance * CARBON_KG_PER_KM)} 감축`,
+      { highlightWord: place.title }
+    );
+  });
+}
+
+function saveDistanceRecord(place, distance) {
+  const week = getWeeksForPlace(place.id).find((weekNumber) => isWeekRevealed(weekNumber)) || getWeeksForPlace(place.id)[0] || 0;
+  const records = getCertificationRecords();
+  records.unshift({
+    week,
+    placeId: place.id,
+    placeTitle: place.title,
+    photoName: "참가거리",
+    distance,
+    comment: "",
+    createdAt: new Date().toLocaleString("ko-KR")
+  });
+  saveCertificationRecords(records);
+}
+
+function refreshOpenSidePanel() {
+  if (state.openSideMenuId && elements.sidePanel.root.classList.contains("is-open")) {
+    renderSidePanel(state.openSideMenuId);
+  }
 }
 
 function bindRouteFinder() {
@@ -2221,6 +2304,19 @@ function renderWeekPlaceNameList(places) {
         .join("")}
     </div>
   `;
+}
+
+function getPlaceTravelCarbonText(place) {
+  const records = getCertificationRecords().filter((record) => record.placeId === place.id);
+  const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
+
+  if (!records.length || totalDistanceKm <= 0) {
+    return "참가거리 입력 후 탄소감축량 표시";
+  }
+
+  return `누적 탄소감축 ${formatCarbon(totalDistanceKm * CARBON_KG_PER_KM)} · 입력 ${formatKm(
+    totalDistanceKm
+  )}`;
 }
 
 function handleCertificationSubmit(event, item, container) {

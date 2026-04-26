@@ -204,16 +204,16 @@ const topMenus = {
         tag: "STEP",
         detailTitle: "보물찾기 장소 확인",
         detailBody:
-          "좌측 보물찾기 메뉴에서 1주차부터 4주차까지 랜덤으로 공개된 장소를 확인합니다. 장소를 누르면 지도에서 위치를 바로 볼 수 있습니다."
+          "보물찾기 메뉴에서 1주차부터 4주차까지 공개된 장소를 확인합니다. 공개된 주차를 누르면 장소 이름이 아래로 나오고, 장소명을 누르면 지도에서 위치를 볼 수 있습니다."
       },
       {
         id: "method-certify",
-        label: "2. 참가거리 입력",
-        summary: "방문 후 거리 저장",
+        label: "2. QR코드 인증",
+        summary: "QR, 사진, 후기 등록",
         tag: "STEP",
-        detailTitle: "참가거리 저장",
+        detailTitle: "공개 장소에서 QR코드 인증",
         detailBody:
-          "공개된 장소를 방문한 뒤 장소 팝업의 참가거리에서 주행거리를 입력해 기록합니다."
+          "공개된 장소에 도착하면 현장 QR코드를 찍어 인증 페이지를 엽니다. QR코드 인증과 함께 인증사진, 방문 후기, 참가거리를 입력하면 챌린지 참여 기록으로 남길 수 있습니다."
       },
       {
         id: "method-carbon",
@@ -222,7 +222,7 @@ const topMenus = {
         tag: "STEP",
         detailTitle: "탄소절감량 확인",
         detailBody:
-          "등록된 주행거리를 기준으로 주차별 예상 탄소절감량을 확인합니다. 계산 기준은 1km당 0.21kg CO2 절감입니다."
+          "입력한 참가거리를 기준으로 탄소감축 메뉴에서 주차별 감축량을 확인합니다. 계산 기준은 1km당 0.21kg CO2 절감입니다."
       }
     ]
   },
@@ -230,28 +230,44 @@ const topMenus = {
     title: "이벤트",
     items: [
       {
-        id: "event-bongdong-coffee",
-        label: "봉동 상장기공원 커피 이벤트",
-        summary: "인증 후 인근 커피숍 무료 커피 30잔",
-        tag: "EVENT",
+        id: "event-round-1",
+        label: "1차 이벤트",
+        summary: "무료커피받기 이벤트",
+        tag: "1차",
         detailType: "event-promo",
         action: { type: "focus-place", placeId: "sangjang-park" },
         detailTitle: "봉동 상장기공원 인증하고 무료 커피 받기",
         detailBody:
-          "2026년 5월 4일부터 2026년 5월 31일까지 3회차로 운영되는 시즌2 현장 이벤트입니다.",
-        eventPlaceId: "sangjang-park"
+          "봉동 상장기공원에서 보물찾기 인증을 완료하고 인근 커피숍에 방문하면 선착순 무료 커피 혜택을 받을 수 있습니다.",
+        eventPlaceId: "sangjang-park",
+        eventDate: "2026.05.04 - 2026.05.10",
+        eventReward: "선착순 무료 커피 30잔"
       },
       {
-        id: "event-bongdong-guide",
-        label: "참여 및 인증 안내",
-        summary: "밴드 인증 후 현장 확인 방식",
-        tag: "GUIDE",
+        id: "event-round-2",
+        label: "2차 이벤트",
+        summary: "재방문 인증 이벤트",
+        tag: "2차",
         detailType: "event-guide",
         action: { type: "focus-place", placeId: "sangjang-park" },
-        detailTitle: "이벤트 참여 및 인증 방법",
+        detailTitle: "2차 이벤트 안내",
         detailBody:
-          "봉동 상장기공원 현장 인증과 네이버 밴드 인증 화면을 기준으로 무료 커피 제공 여부를 확인합니다.",
-        eventPlaceId: "sangjang-park"
+          "2차 이벤트는 2026년 5월 11일부터 5월 18일까지 운영 예정입니다. 자세한 혜택과 인증 방식은 운영 공지에서 안내합니다.",
+        eventPlaceId: "sangjang-park",
+        eventDate: "2026.05.11 - 2026.05.18"
+      },
+      {
+        id: "event-round-3",
+        label: "3차 이벤트",
+        summary: "마감 주간 이벤트",
+        tag: "3차",
+        detailType: "event-guide",
+        action: { type: "focus-place", placeId: "sangjang-park" },
+        detailTitle: "3차 이벤트 안내",
+        detailBody:
+          "3차 이벤트는 2026년 5월 19일부터 5월 31일까지 운영 예정입니다. 시즌2 마감 주간 참여자를 위한 현장 혜택을 안내할 수 있습니다.",
+        eventPlaceId: "sangjang-park",
+        eventDate: "2026.05.19 - 2026.05.31"
       }
     ]
   },
@@ -259,22 +275,31 @@ const topMenus = {
     title: "커뮤니티",
     items: [
       {
-        id: "community-board",
-        label: "참여 소식",
-        summary: "댓글과 인증 기록 공유",
-        tag: "소식",
-        detailTitle: "참여 소식",
+        id: "community-faq",
+        label: "FAQ",
+        summary: "자주 묻는 질문",
+        tag: "FAQ",
+        detailTitle: "자주 묻는 질문",
         detailBody:
-          "참가자가 남긴 댓글과 인증 기록을 커뮤니티 콘텐츠로 확장할 수 있는 공간입니다."
+          "참여 방법, 장소 공개 일정, QR코드 인증, 탄소감축량 계산 기준처럼 참가자가 자주 궁금해하는 내용을 정리해 안내합니다."
       },
       {
-        id: "community-guide",
-        label: "운영자 안내",
-        summary: "장소 공개와 인증 관리",
-        tag: "안내",
-        detailTitle: "운영자 안내",
+        id: "community-qna",
+        label: "Q&A",
+        summary: "문의와 답변",
+        tag: "Q&A",
+        detailTitle: "질문과 답변",
         detailBody:
-          "현재 페이지는 정적 홈페이지이므로 인증 내용은 접속한 브라우저에 저장됩니다. 서버 연동을 추가하면 실제 커뮤니티 게시판으로 확장할 수 있습니다."
+          "참가 중 궁금한 점이나 장소 인증 관련 문의를 남기고 운영자가 답변할 수 있는 공간으로 활용합니다."
+      },
+      {
+        id: "community-notice",
+        label: "공지",
+        summary: "가끔 올라오는 안내",
+        tag: "공지",
+        detailTitle: "운영 공지",
+        detailBody:
+          "이벤트 일정, 장소 변경, QR코드 인증 안내, 커피 제공 수량 마감처럼 필요한 소식을 가끔 공지하는 영역입니다."
       }
     ]
   },
@@ -1951,68 +1976,33 @@ function renderMainImageDetail(container, item) {
 }
 
 function renderEventPromoDetail(container, item) {
-  const rounds = [
-    {
-      label: "1차 이벤트",
-      date: "2026.05.04 - 2026.05.10",
-      theme: "오픈 주간",
-      reward: "선착순 무료 커피 30잔"
-    },
-    {
-      label: "2차 이벤트",
-      date: "2026.05.11 - 2026.05.18",
-      theme: "재방문 유도 주간",
-      reward: "선착순 무료 커피 30잔"
-    },
-    {
-      label: "3차 이벤트",
-      date: "2026.05.19 - 2026.05.31",
-      theme: "마감 스페셜 주간",
-      reward: "선착순 무료 커피 30잔"
-    }
-  ];
-
   container.innerHTML = `
     <div class="event-hero">
-      <span class="event-badge">시즌2 오프라인 이벤트</span>
+      <span class="event-badge">1차 이벤트</span>
       <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
       <p>${escapeHtml(item.detailBody || item.summary)}</p>
       <div class="detail-meta">
         <span class="detail-pill">장소: 봉동 상장기공원</span>
-        <span class="detail-pill">혜택: 무료 커피 30잔</span>
-        <span class="detail-pill">기간: 2026.05.04 - 2026.05.31</span>
+        <span class="detail-pill">혜택: ${escapeHtml(item.eventReward || "무료 커피 30잔")}</span>
+        <span class="detail-pill">기간: ${escapeHtml(item.eventDate || "2026.05.04 - 2026.05.10")}</span>
       </div>
-    </div>
-    <div class="event-round-list">
-      ${rounds
-        .map(
-          (round) => `
-            <article class="event-round-card">
-              <strong>${escapeHtml(round.label)}</strong>
-              <span>${escapeHtml(round.date)}</span>
-              <span>${escapeHtml(round.theme)}</span>
-              <span>${escapeHtml(round.reward)}</span>
-            </article>
-          `
-        )
-        .join("")}
     </div>
     <div class="event-steps">
       <article class="event-step">
-        <strong>1. 봉동 상장기공원 방문</strong>
-        <span>지도에서 위치를 확인하고 봉동 상장기공원에 도착합니다.</span>
+        <strong>1. 보물찾기 장소 확인</strong>
+        <span>보물찾기 메뉴에서 이번 주 공개 장소를 확인하고 봉동 상장기공원 위치를 지도에서 찾습니다.</span>
       </article>
       <article class="event-step">
-        <strong>2. 인증하기 또는 밴드 인증</strong>
-        <span>인증사진, 주행거리, 댓글을 등록하고 네이버 밴드 인증 화면을 준비합니다.</span>
+        <strong>2. 현장 QR코드 인증</strong>
+        <span>공개된 장소에 도착하면 현장 QR코드를 찍고, QR코드 인증 화면에서 인증사진과 방문 후기를 등록합니다.</span>
       </article>
       <article class="event-step">
-        <strong>3. 인근 커피숍에서 확인</strong>
-        <span>현장 인증 또는 밴드 인증 화면을 제시하면 회차별 선착순 30잔 무료 커피 혜택을 받을 수 있습니다.</span>
+        <strong>3. 커피숍에서 인증 확인</strong>
+        <span>인근 커피숍에서 QR 인증 완료 화면을 보여주면 선착순 무료 커피 혜택을 받을 수 있습니다.</span>
       </article>
     </div>
     <div class="event-note">
-      회차별 운영 수량은 선착순 30잔 기준으로 안내했습니다. 운영처 사정에 따라 조기 마감 또는 안내 문구 조정이 필요하면 이벤트 문구만 바로 바꿀 수 있습니다.
+      1차 이벤트는 선착순 30잔 기준입니다. 준비 수량이 소진되면 조기 마감될 수 있습니다.
     </div>
     <div class="event-actions">
       <button class="detail-action" type="button" data-focus-event-place="${escapeHtml(item.eventPlaceId)}">봉동 상장기공원 위치 보기</button>
@@ -2029,16 +2019,16 @@ function renderEventGuideDetail(container, item) {
     <p>${escapeHtml(item.detailBody || item.summary)}</p>
     <div class="event-guide-list">
       <article class="weekly-place-card">
-        <strong>운영 방식</strong>
-        <span>봉동 상장기공원 방문 인증 후 인근 커피숍에서 인증 내역을 보여주면 무료 커피 제공 대상 여부를 확인합니다.</span>
+        <strong>운영 기간</strong>
+        <span>${escapeHtml(item.eventDate || "운영 일정은 공지로 안내합니다.")}</span>
       </article>
       <article class="weekly-place-card">
-        <strong>인증 기준</strong>
-        <span>인증사진 1장, 주행거리, 댓글이 포함된 인증 등록 또는 네이버 밴드 인증 화면을 기준으로 운영합니다.</span>
+        <strong>참여 방식</strong>
+        <span>공개 장소 방문, QR코드 인증, 인증사진과 후기 등록을 기준으로 참여 여부를 확인합니다.</span>
       </article>
       <article class="weekly-place-card">
-        <strong>운영 일정</strong>
-        <span>2026년 5월 4일, 5월 11일, 5월 19일 시작의 3회차 이벤트로 2026년 5월 31일까지 운영합니다.</span>
+        <strong>상세 공지</strong>
+        <span>회차별 혜택과 제공 수량은 이벤트 시작 전 커뮤니티 공지에서 안내할 수 있습니다.</span>
       </article>
     </div>
     <div class="event-actions">

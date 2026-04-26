@@ -998,6 +998,27 @@ a {
   overflow-wrap: anywhere;
 }
 
+.place-card-photo {
+  margin: 4px 0 2px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(10, 141, 120, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(23, 50, 47, 0.08);
+}
+
+.place-card-photo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.place-card-photo.is-empty {
+  display: none;
+}
+
 .place-card-address,
 .place-card-intro {
   margin: 0;
@@ -1104,6 +1125,10 @@ a {
 }
 
 .distance-entry-actions [data-distance-undo] {
+  grid-column: 1 / -1;
+}
+
+.distance-entry-actions [data-back-place-detail] {
   grid-column: 1 / -1;
 }
 

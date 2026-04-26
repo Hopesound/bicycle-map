@@ -64,11 +64,10 @@ const selectedPlaces = [
   {
     id: "volunteer-center",
     title: "전주시 자원봉사센터",
-    query: "전주시 자원봉사센터 전주천동로 455",
-    address: "봉사자 작은도서관 아래 자전거연습장",
-    fixedCoords: [35.83226, 127.10881],
+    query: "전주시자원봉사센터",
+    address: "전북특별자치도 전주시 덕진구 전주천동로 455",
     intro: "시민 참여와 봉사 활동을 챌린지 캠페인과 연결하기 좋은 거점입니다.",
-    fallback: [35.83226, 127.10881]
+    fallback: [35.8331, 127.1108]
   },
   { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
   { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", intro: "완주 하천 동선에서 위치를 확인하기 좋은 교량형 인증 지점입니다.", fallback: [35.9302, 127.2269] },
@@ -1069,6 +1068,9 @@ function showPlaceCard(place) {
     <button class="place-card-close" type="button" data-close-place-card aria-label="상세 설명 닫기">×</button>
     <p class="place-card-kicker">장소 상세 설명</p>
     <h3>${escapeHtml(place.title)}</h3>
+    <figure class="place-card-photo">
+      <img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />
+    </figure>
     <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
     <p class="place-card-intro">${escapeHtml(detailText)}</p>
     ${
@@ -1077,6 +1079,7 @@ function showPlaceCard(place) {
         : ""
     }
     <div class="place-card-actions">
+      <button type="button" class="place-card-action is-light" data-back-place-popup>이전</button>
       <button type="button" class="place-card-action" data-place-distance>참가거리</button>
       <button type="button" class="place-card-action is-light" data-place-route>길찾기</button>
       <button type="button" class="place-card-action is-light" data-close-place-card>닫기</button>
@@ -1093,9 +1096,16 @@ function showPlaceCard(place) {
     showDistanceEntry(place);
   });
 
+  elements.placeCard.querySelector("[data-back-place-popup]")?.addEventListener("click", () => {
+    elements.placeCard.hidden = true;
+    focusPlace(place.id);
+  });
+
   elements.placeCard.querySelector("[data-place-route]")?.addEventListener("click", () => {
     openBikeRouteToPlace(place);
   });
+
+  bindPlacePhotoFallback(elements.placeCard);
 }
 
 function showDistanceEntry(place) {
@@ -1130,6 +1140,7 @@ function showDistanceEntry(place) {
         <button class="place-card-action is-light" type="button" data-distance-undo ${
           canUndo ? "" : "disabled"
         }>최근 입력 되돌리기</button>
+        <button class="place-card-action is-light" type="button" data-back-place-detail>상세설명으로 돌아가기</button>
       </div>
     </form>
   `;
@@ -1173,6 +1184,10 @@ function showDistanceEntry(place) {
     });
   });
 
+  form?.querySelector("[data-back-place-detail]")?.addEventListener("click", () => {
+    showPlaceCard(place);
+  });
+
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
     const distance = Number(new FormData(form).get("distance") || 0);
@@ -1204,6 +1219,28 @@ function saveDistanceRecord(place, distance) {
     createdAt: new Date().toLocaleString("ko-KR")
   });
   saveCertificationRecords(records);
+}
+
+function getPlacePhotoUrl(place) {
+  return place.photo || `./img/places/${place.id}.jpg`;
+}
+
+function bindPlacePhotoFallback(container) {
+  container.querySelectorAll(".place-card-photo img").forEach((image) => {
+    image.addEventListener(
+      "error",
+      () => {
+        if (image.dataset.fallbackApplied === "true") {
+          image.closest(".place-card-photo")?.classList.add("is-empty");
+          return;
+        }
+
+        image.dataset.fallbackApplied = "true";
+        image.src = "./img/main.png";
+      },
+      { once: false }
+    );
+  });
 }
 
 function undoLatestDistanceRecord(place) {

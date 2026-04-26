@@ -1097,6 +1097,21 @@ a {
   width: 100%;
 }
 
+.distance-entry-actions {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 8px;
+}
+
+.distance-entry-actions [data-distance-undo] {
+  grid-column: 1 / -1;
+}
+
+.distance-entry-actions .place-card-action[disabled] {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
 .text-place-link {
   padding: 0;
   border: 0;

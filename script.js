@@ -66,9 +66,9 @@ const selectedPlaces = [
     title: "전주시 자원봉사센터",
     query: "전주시 자원봉사센터 전주천동로 455",
     address: "봉사자 작은도서관 아래 자전거연습장",
-    fixedCoords: [35.83235, 127.10892],
+    fixedCoords: [35.83226, 127.10881],
     intro: "시민 참여와 봉사 활동을 챌린지 캠페인과 연결하기 좋은 거점입니다.",
-    fallback: [35.83235, 127.10892]
+    fallback: [35.83226, 127.10881]
   },
   { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
   { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", intro: "완주 하천 동선에서 위치를 확인하기 좋은 교량형 인증 지점입니다.", fallback: [35.9302, 127.2269] },
@@ -1107,6 +1107,7 @@ function showDistanceEntry(place) {
   const records = getCertificationRecords().filter((record) => record.placeId === place.id);
   const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
   const totalCarbonKg = totalDistanceKm * CARBON_KG_PER_KM;
+  const canUndo = records.length > 0;
 
   elements.placeCard.hidden = false;
   elements.placeCard.innerHTML = `
@@ -1123,7 +1124,13 @@ function showDistanceEntry(place) {
         <input name="distance" type="number" min="0.1" step="0.1" placeholder="예: 12.5" required />
       </label>
       <div class="distance-entry-preview" data-distance-preview>0.0kg CO2 감축</div>
-      <button class="place-card-action" type="submit">저장하기</button>
+      <div class="distance-entry-actions">
+        <button class="place-card-action" type="submit">저장하기</button>
+        <button class="place-card-action is-light" type="reset">초기화</button>
+        <button class="place-card-action is-light" type="button" data-distance-undo ${
+          canUndo ? "" : "disabled"
+        }>최근 입력 되돌리기</button>
+      </div>
     </form>
   `;
 
@@ -1144,6 +1151,28 @@ function showDistanceEntry(place) {
     }
   });
 
+  form?.addEventListener("reset", () => {
+    window.setTimeout(() => {
+      if (preview) {
+        preview.textContent = "0.0kg CO2 감축";
+      }
+      input?.focus();
+    }, 0);
+  });
+
+  form?.querySelector("[data-distance-undo]")?.addEventListener("click", () => {
+    if (!undoLatestDistanceRecord(place)) {
+      updateMapStatus("되돌릴 참가거리 기록이 없습니다.");
+      return;
+    }
+
+    refreshOpenSidePanel();
+    showDistanceEntry(place);
+    updateMapStatus(`${place.title} 최근 참가거리 입력을 되돌렸습니다.`, {
+      highlightWord: place.title
+    });
+  });
+
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
     const distance = Number(new FormData(form).get("distance") || 0);
@@ -1153,9 +1182,8 @@ function showDistanceEntry(place) {
     }
 
     saveDistanceRecord(place, distance);
-    elements.placeCard.hidden = true;
     refreshOpenSidePanel();
-    focusPlace(place.id);
+    showDistanceEntry(place);
     updateMapStatus(
       `${place.title} 참가거리 ${formatKm(distance)} 저장 · ${formatCarbon(distance * CARBON_KG_PER_KM)} 감축`,
       { highlightWord: place.title }
@@ -1176,6 +1204,21 @@ function saveDistanceRecord(place, distance) {
     createdAt: new Date().toLocaleString("ko-KR")
   });
   saveCertificationRecords(records);
+}
+
+function undoLatestDistanceRecord(place) {
+  const records = getCertificationRecords();
+  const recordIndex = records.findIndex(
+    (record) => record.placeId === place.id && record.photoName === "참가거리"
+  );
+
+  if (recordIndex < 0) {
+    return false;
+  }
+
+  records.splice(recordIndex, 1);
+  saveCertificationRecords(records);
+  return true;
 }
 
 function refreshOpenSidePanel() {

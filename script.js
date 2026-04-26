@@ -122,6 +122,14 @@ const CERTIFICATION_STORAGE_KEY = "bicycle-challenge-certifications";
 const CARBON_KG_PER_KM = 0.21;
 const BAND_CERTIFICATION_URL =
   "https://www.band.us/band/94500191/hashtag/%EB%B3%B4%EB%AC%BC%EC%B0%BE%EA%B8%B0_%EA%B2%8C%EC%8B%9C%ED%8C%90";
+const PLACE_PHOTO_URLS = {
+  "eoeun-bridge": "./img/어은 쌍다리.jpg",
+  "gosan-miso-market": "./img/고산 미소시장.jpg",
+  "goui-reservoir": "./img/구이저수지.jpg",
+  gijije: "./img/기지제.png",
+  "daedeok-elementary": "./img/대덕초등학교.jpg",
+  "deokjin-park": "./img/덕진공원.png"
+};
 const FIXED_WEEKLY_TREASURE_PLAN = [
   {
     week: 1,
@@ -1111,14 +1119,8 @@ function createPlaceDetailContent(place) {
           <h3>${escapeHtml(place.title)}</h3>
           <span class="place-card-link-icon" aria-hidden="true">›</span>
         </div>
-        <div class="place-card-rating" aria-label="평점 0.0, 리뷰 0">
-          <strong>0.0</strong>
-          <span class="place-card-stars" aria-hidden="true">★★★★★</span>
-          <span>(0건)</span>
-          <span>리뷰 0</span>
-        </div>
         <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
-        <p class="place-card-intro">${escapeHtml(place.intro || "자전거 챌린지 장소입니다.")}</p>
+        <p class="place-card-intro">${escapeHtml(getCompactPlaceIntro(place))}</p>
       </div>
       <figure class="place-card-photo">
         <img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />
@@ -1210,13 +1212,28 @@ function showDistanceEntry(place) {
     }
   });
 
-  form?.addEventListener("reset", () => {
-    window.setTimeout(() => {
-      if (preview) {
-        preview.textContent = "0.0kg CO2 감축";
-      }
-      input?.focus();
-    }, 0);
+  form?.addEventListener("reset", (event) => {
+    event.preventDefault();
+    if (input) {
+      input.value = "";
+    }
+    if (preview) {
+      preview.textContent = "0.0kg CO2 감축";
+    }
+
+    const deleted = deleteLatestDistanceRecord(place);
+    refreshOpenSidePanel();
+
+    if (deleted) {
+      showDistanceEntry(place);
+      updateMapStatus(`${place.title} 최근 참가거리 입력을 삭제했습니다.`, {
+        highlightWord: place.title
+      });
+      return;
+    }
+
+    input?.focus();
+    updateMapStatus("입력 중인 참가거리를 초기화했습니다.");
   });
 
   elements.placeCard.querySelector("[data-back-place-detail]")?.addEventListener("click", () => {
@@ -1256,8 +1273,23 @@ function saveDistanceRecord(place, distance) {
   saveCertificationRecords(records);
 }
 
+function deleteLatestDistanceRecord(place) {
+  const records = getCertificationRecords();
+  const latestIndex = records.findIndex(
+    (record) => record.placeId === place.id && record.photoName === "참가거리"
+  );
+
+  if (latestIndex < 0) {
+    return false;
+  }
+
+  records.splice(latestIndex, 1);
+  saveCertificationRecords(records);
+  return true;
+}
+
 function getPlacePhotoUrl(place) {
-  return place.photo || `./img/places/${place.id}.jpg`;
+  return place.photo || PLACE_PHOTO_URLS[place.id] || "./img/main.png";
 }
 
 function bindPlacePhotoFallback(container) {

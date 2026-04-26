@@ -25,12 +25,11 @@ const selectedPlaces = [
   {
     id: "saechangi-bridge",
     title: "새창이다리",
-    query: "만경강교 옆 새창이다리",
-    address: "만경강교 옆 새창이다리",
+    query: "새창이다리",
+    address: "전북특별자치도 군산시 대야면 복교리 1328-29 인근 새창이다리",
     preferKeyword: true,
-    fixedCoords: [35.9109, 126.8401],
     intro: "만경강교 바로 옆에 놓인 새창이다리 실교량 위치 기준으로 표시합니다.",
-    fallback: [35.9109, 126.8401]
+    fallback: [35.9103, 126.8392]
   },
   { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
   { id: "sanggwan-forest", title: "상관역", query: "상관역 완주", intro: "완주 상관면으로 이어지는 철도 교통 거점입니다.", fallback: [35.7676, 127.2055] },

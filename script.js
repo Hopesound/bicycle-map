@@ -426,6 +426,7 @@ const mapState = {
   adminBoundaryPolygons: [],
   selectedPlaceMarkers: [],
   placePopupOverlay: null,
+  placeDetailOverlay: null,
   currentLocation: null,
   currentLocationMarker: null,
   routeDestinationMarker: null,
@@ -782,12 +783,20 @@ function closePlacePopup() {
   }
 }
 
+function closePlaceDetailOverlay() {
+  if (mapState.placeDetailOverlay) {
+    mapState.placeDetailOverlay.setMap(null);
+    mapState.placeDetailOverlay = null;
+  }
+}
+
 function openPlacePopup(place, position) {
   if (!mapState.map || !window.kakao?.maps) {
     return;
   }
 
   closePlacePopup();
+  closePlaceDetailOverlay();
   const content = createPlacePopupContent(place);
   const overlay = new kakao.maps.CustomOverlay({
     position,
@@ -1067,10 +1076,28 @@ function showPlaceCard(place) {
     return;
   }
 
+  elements.placeCard.hidden = true;
   closePlacePopup();
+  closePlaceDetailOverlay();
+  const markerPosition = new kakao.maps.LatLng(place.coords[0], place.coords[1]);
+  const content = createPlaceDetailContent(place);
+  const overlay = new kakao.maps.CustomOverlay({
+    position: markerPosition,
+    content,
+    clickable: true,
+    xAnchor: 0.5,
+    yAnchor: 1.08
+  });
 
-  elements.placeCard.hidden = false;
-  elements.placeCard.innerHTML = `
+  overlay.setMap(mapState.map);
+  mapState.placeDetailOverlay = overlay;
+}
+
+function createPlaceDetailContent(place) {
+  const container = document.createElement("div");
+  container.className = "place-card place-card--overlay";
+
+  container.innerHTML = `
     <button class="place-card-back" type="button" data-back-place-popup aria-label="이전 장소 팝업으로 돌아가기">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M9 7 4 12l5 5"></path>
@@ -1091,11 +1118,7 @@ function showPlaceCard(place) {
           <span>리뷰 0</span>
         </div>
         <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
-        <div class="place-card-links">
-          <button type="button" data-place-kakao-detail>상세보기</button>
-          <span aria-hidden="true">·</span>
-          <button type="button" data-close-place-card>정보 수정 제안</button>
-        </div>
+        <p class="place-card-intro">${escapeHtml(place.intro || "자전거 챌린지 장소입니다.")}</p>
       </div>
       <figure class="place-card-photo">
         <img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />
@@ -1108,38 +1131,27 @@ function showPlaceCard(place) {
     </div>
   `;
 
-  elements.placeCard.querySelectorAll("[data-close-place-card]").forEach((button) => {
+  container.querySelectorAll("[data-close-place-card]").forEach((button) => {
     button.addEventListener("click", () => {
-      elements.placeCard.hidden = true;
+      closePlaceDetailOverlay();
     });
   });
 
-  elements.placeCard.querySelector("[data-place-distance]")?.addEventListener("click", () => {
+  container.querySelector("[data-place-distance]")?.addEventListener("click", () => {
     showDistanceEntry(place);
   });
 
-  elements.placeCard.querySelector("[data-back-place-popup]")?.addEventListener("click", () => {
-    elements.placeCard.hidden = true;
+  container.querySelector("[data-back-place-popup]")?.addEventListener("click", () => {
+    closePlaceDetailOverlay();
     focusPlace(place.id);
   });
 
-  elements.placeCard.querySelector("[data-place-kakao-detail]")?.addEventListener("click", () => {
-    openKakaoPlaceSearch(place);
-  });
-
-  elements.placeCard.querySelector("[data-place-route]")?.addEventListener("click", () => {
+  container.querySelector("[data-place-route]")?.addEventListener("click", () => {
     openBikeRouteToPlace(place);
   });
 
-  bindPlacePhotoFallback(elements.placeCard);
-}
-
-function openKakaoPlaceSearch(place) {
-  const keyword = encodeURIComponent(place.query || place.title);
-  openExternalPage(
-    `https://map.kakao.com/link/search/${keyword}`,
-    "카카오맵 상세보기를 새 창으로 열지 못했습니다. 팝업 차단을 확인해주세요."
-  );
+  bindPlacePhotoFallback(container);
+  return container;
 }
 
 function showDistanceEntry(place) {
@@ -1148,6 +1160,7 @@ function showDistanceEntry(place) {
   }
 
   closePlacePopup();
+  closePlaceDetailOverlay();
   const records = getCertificationRecords().filter((record) => record.placeId === place.id);
   const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
   const totalCarbonKg = totalDistanceKm * CARBON_KG_PER_KM;

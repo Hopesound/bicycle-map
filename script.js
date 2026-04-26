@@ -247,7 +247,7 @@ const topMenus = {
       {
         id: "event-round-1",
         label: "1차",
-        summary: "무료커피받기 이벤트",
+        summary: "무료커피받기",
         tag: "1차",
         detailType: "event-promo",
         action: { type: "focus-place", placeId: "sangjang-park" },
@@ -261,11 +261,11 @@ const topMenus = {
       {
         id: "event-round-2",
         label: "2차",
-        summary: "재방문 인증 이벤트",
+        summary: "재방문 인증",
         tag: "2차",
         detailType: "event-guide",
         action: { type: "focus-place", placeId: "sangjang-park" },
-        detailTitle: "2차 이벤트 안내",
+        detailTitle: "2차 안내",
         detailBody:
           "2차 이벤트는 2026년 5월 11일부터 5월 18일까지 운영 예정입니다. 자세한 혜택과 인증 방식은 운영 공지에서 안내합니다.",
         eventPlaceId: "sangjang-park",
@@ -274,11 +274,11 @@ const topMenus = {
       {
         id: "event-round-3",
         label: "3차",
-        summary: "마감 주간 이벤트",
+        summary: "마감 주간",
         tag: "3차",
         detailType: "event-guide",
         action: { type: "focus-place", placeId: "sangjang-park" },
-        detailTitle: "3차 이벤트 안내",
+        detailTitle: "3차 안내",
         detailBody:
           "3차 이벤트는 2026년 5월 19일부터 5월 31일까지 운영 예정입니다. 시즌2 마감 주간 참여자를 위한 현장 혜택을 안내할 수 있습니다.",
         eventPlaceId: "sangjang-park",
@@ -1117,7 +1117,6 @@ function createPlaceDetailContent(place) {
       <div class="place-card-info">
         <div class="place-card-title-row">
           <h3>${escapeHtml(place.title)}</h3>
-          <span class="place-card-link-icon" aria-hidden="true">›</span>
         </div>
         <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
         <p class="place-card-intro">${escapeHtml(getCompactPlaceIntro(place))}</p>
@@ -1129,7 +1128,6 @@ function createPlaceDetailContent(place) {
     <div class="place-card-actions">
       <button type="button" class="place-card-action" data-place-distance>참가거리</button>
       <button type="button" class="place-card-action is-light" data-place-route>길찾기</button>
-      <button type="button" class="place-card-action is-light" data-close-place-card>닫기</button>
     </div>
   `;
 
@@ -2110,7 +2108,7 @@ function renderMainImageDetail(container, item) {
 function renderEventPromoDetail(container, item) {
   container.innerHTML = `
     <div class="event-hero">
-      <span class="event-badge">1차 이벤트</span>
+      <span class="event-badge">${escapeHtml(item.label || "1차")}</span>
       <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
       <p>${escapeHtml(item.detailBody || item.summary)}</p>
       <div class="detail-meta">

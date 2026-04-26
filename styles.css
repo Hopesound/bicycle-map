@@ -627,8 +627,24 @@ a {
 
 .side-panel[data-panel-mode="treasure"] .inline-panel-detail,
 .top-panel[data-panel-mode="event"] .inline-panel-detail {
-  max-height: 360px;
+  max-height: min(420px, calc(72vh - 170px));
   overflow-y: auto;
+  padding-right: 10px;
+  overscroll-behavior: contain;
+}
+
+.top-panel[data-panel-mode="event"] .inline-panel-detail::-webkit-scrollbar {
+  width: 8px;
+}
+
+.top-panel[data-panel-mode="event"] .inline-panel-detail::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.top-panel[data-panel-mode="event"] .inline-panel-detail::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.36);
 }
 
 .submenu-detail h3 {
@@ -1104,6 +1120,11 @@ a {
   align-items: start;
 }
 
+.place-card.place-card--overlay .place-card-layout {
+  grid-template-columns: minmax(0, 1fr) 118px;
+  gap: 16px 18px;
+}
+
 .place-card-info {
   display: grid;
   gap: 8px;
@@ -1115,6 +1136,10 @@ a {
   align-items: center;
   gap: 7px;
   min-width: 0;
+}
+
+.place-card.place-card--overlay .place-card-title-row {
+  padding-right: 78px;
 }
 
 .place-card-title-row h3 {
@@ -1180,6 +1205,11 @@ a {
   border-radius: 4px;
   background: rgba(10, 141, 120, 0.08);
   box-shadow: inset 0 0 0 1px rgba(23, 50, 47, 0.08);
+}
+
+.place-card.place-card--overlay .place-card-photo {
+  margin-top: 38px;
+  width: 118px;
 }
 
 .place-card-photo img {
@@ -2219,6 +2249,20 @@ a {
     width: 82px;
   }
 
+  .place-card.place-card--overlay .place-card-layout {
+    grid-template-columns: minmax(0, 1fr) 76px;
+    gap: 8px;
+  }
+
+  .place-card.place-card--overlay .place-card-title-row {
+    padding-right: 66px;
+  }
+
+  .place-card.place-card--overlay .place-card-photo {
+    width: 76px;
+    margin-top: 34px;
+  }
+
   .place-card-title-row h3 {
     font-size: 1.05rem;
   }
@@ -2234,7 +2278,7 @@ a {
 
   .side-panel[data-panel-mode="treasure"] .inline-panel-detail,
   .top-panel[data-panel-mode="event"] .inline-panel-detail {
-    max-height: 34vh;
+    max-height: 42vh;
   }
 
   .event-round-card strong,

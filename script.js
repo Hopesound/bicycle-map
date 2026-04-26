@@ -70,7 +70,15 @@ const selectedPlaces = [
     fallback: [35.8331, 127.1108]
   },
   { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
-  { id: "eoeun-bridge", title: "어은 쌍다리", query: "어은 쌍다리 완주", intro: "완주 하천 동선에서 위치를 확인하기 좋은 교량형 인증 지점입니다.", fallback: [35.9302, 127.2269] },
+  {
+    id: "eoeun-bridge",
+    title: "어은 쌍다리",
+    query: "어은쌍다리 전주 진북동",
+    address: "전북특별자치도 전주시 덕진구 진북동 1124-169",
+    preferKeyword: true,
+    intro: "전주천을 사이에 두고 어은골과 중앙동을 잇는 오래된 교량형 인증 지점입니다.",
+    fallback: [35.8248, 127.1348]
+  },
   { id: "hari-bridge", title: "하리교", query: "하리교 전주", intro: "전주 남부권 이동 동선과 연결되는 교량형 위치 표시 장소입니다.", fallback: [35.7861, 127.1143] },
   { id: "bike-box", title: "바이크박스", query: "바이크박스 전주", intro: "자전거 이용자에게 친숙한 정비·라이딩 관련 거점으로 활용할 수 있습니다.", fallback: [35.8201, 127.1501] },
   { id: "palbok-art", title: "팔복예술공장", query: "팔복예술공장", intro: "산업공간을 문화예술 거점으로 재생한 전주 대표 복합문화 장소입니다.", fallback: [35.8464, 127.1029] }
@@ -1060,24 +1068,33 @@ function showPlaceCard(place) {
   }
 
   closePlacePopup();
-  const weekLabels = getWeeksForPlace(place.id).map((week) => `${week}주차`);
-  const detailText = place.intro || "자전거 챌린지 인증 장소입니다.";
 
   elements.placeCard.hidden = false;
   elements.placeCard.innerHTML = `
     <button class="place-card-close" type="button" data-close-place-card aria-label="상세 설명 닫기">×</button>
-    <p class="place-card-kicker">장소 상세 설명</p>
-    <h3>${escapeHtml(place.title)}</h3>
-    <figure class="place-card-photo">
-      <img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />
-    </figure>
-    <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
-    <p class="place-card-intro">${escapeHtml(detailText)}</p>
-    ${
-      weekLabels.length
-        ? `<div class="place-card-weeks">${weekLabels.map((label) => `<span>${escapeHtml(label)}</span>`).join("")}</div>`
-        : ""
-    }
+    <div class="place-card-layout">
+      <div class="place-card-info">
+        <div class="place-card-title-row">
+          <h3>${escapeHtml(place.title)}</h3>
+          <span class="place-card-link-icon" aria-hidden="true">›</span>
+        </div>
+        <div class="place-card-rating" aria-label="평점 0.0, 리뷰 0">
+          <strong>0.0</strong>
+          <span class="place-card-stars" aria-hidden="true">★★★★★</span>
+          <span>(0건)</span>
+          <span>리뷰 0</span>
+        </div>
+        <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
+        <div class="place-card-links">
+          <button type="button" data-place-kakao-detail>상세보기</button>
+          <span aria-hidden="true">·</span>
+          <button type="button" data-close-place-card>정보 수정 제안</button>
+        </div>
+      </div>
+      <figure class="place-card-photo">
+        <img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />
+      </figure>
+    </div>
     <div class="place-card-actions">
       <button type="button" class="place-card-action is-light" data-back-place-popup>이전</button>
       <button type="button" class="place-card-action" data-place-distance>참가거리</button>
@@ -1096,6 +1113,10 @@ function showPlaceCard(place) {
     showDistanceEntry(place);
   });
 
+  elements.placeCard.querySelector("[data-place-kakao-detail]")?.addEventListener("click", () => {
+    openKakaoPlaceSearch(place);
+  });
+
   elements.placeCard.querySelector("[data-back-place-popup]")?.addEventListener("click", () => {
     elements.placeCard.hidden = true;
     focusPlace(place.id);
@@ -1108,6 +1129,14 @@ function showPlaceCard(place) {
   bindPlacePhotoFallback(elements.placeCard);
 }
 
+function openKakaoPlaceSearch(place) {
+  const keyword = encodeURIComponent(place.query || place.title);
+  openExternalPage(
+    `https://map.kakao.com/link/search/${keyword}`,
+    "카카오맵 상세보기를 새 창으로 열지 못했습니다. 팝업 차단을 확인해주세요."
+  );
+}
+
 function showDistanceEntry(place) {
   if (!elements.placeCard) {
     return;
@@ -1117,16 +1146,21 @@ function showDistanceEntry(place) {
   const records = getCertificationRecords().filter((record) => record.placeId === place.id);
   const totalDistanceKm = records.reduce((sum, record) => sum + Number(record.distance || 0), 0);
   const totalCarbonKg = totalDistanceKm * CARBON_KG_PER_KM;
-  const canUndo = records.length > 0;
 
   elements.placeCard.hidden = false;
   elements.placeCard.innerHTML = `
+    <button class="place-card-back" type="button" data-back-place-detail aria-label="상세설명으로 돌아가기">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 7 4 12l5 5"></path>
+        <path d="M5 12h9a5 5 0 0 1 5 5v1"></path>
+      </svg>
+    </button>
     <button class="place-card-close" type="button" data-close-place-card aria-label="참가거리 입력 닫기">×</button>
     <p class="place-card-kicker">참가거리</p>
     <h3>${escapeHtml(place.title)}</h3>
     <div class="carbon-meter distance-entry-summary">
       <strong>${escapeHtml(formatCarbon(totalCarbonKg))}</strong>
-      <span>누적 ${escapeHtml(formatKm(totalDistanceKm))}</span>
+      <span>전체 누적 ${escapeHtml(formatKm(totalDistanceKm))}</span>
     </div>
     <form class="distance-entry-form" data-distance-form data-place-id="${escapeHtml(place.id)}">
       <label>
@@ -1137,10 +1171,6 @@ function showDistanceEntry(place) {
       <div class="distance-entry-actions">
         <button class="place-card-action" type="submit">저장하기</button>
         <button class="place-card-action is-light" type="reset">초기화</button>
-        <button class="place-card-action is-light" type="button" data-distance-undo ${
-          canUndo ? "" : "disabled"
-        }>최근 입력 되돌리기</button>
-        <button class="place-card-action is-light" type="button" data-back-place-detail>상세설명으로 돌아가기</button>
       </div>
     </form>
   `;
@@ -1171,20 +1201,7 @@ function showDistanceEntry(place) {
     }, 0);
   });
 
-  form?.querySelector("[data-distance-undo]")?.addEventListener("click", () => {
-    if (!undoLatestDistanceRecord(place)) {
-      updateMapStatus("되돌릴 참가거리 기록이 없습니다.");
-      return;
-    }
-
-    refreshOpenSidePanel();
-    showDistanceEntry(place);
-    updateMapStatus(`${place.title} 최근 참가거리 입력을 되돌렸습니다.`, {
-      highlightWord: place.title
-    });
-  });
-
-  form?.querySelector("[data-back-place-detail]")?.addEventListener("click", () => {
+  elements.placeCard.querySelector("[data-back-place-detail]")?.addEventListener("click", () => {
     showPlaceCard(place);
   });
 
@@ -1241,21 +1258,6 @@ function bindPlacePhotoFallback(container) {
       { once: false }
     );
   });
-}
-
-function undoLatestDistanceRecord(place) {
-  const records = getCertificationRecords();
-  const recordIndex = records.findIndex(
-    (record) => record.placeId === place.id && record.photoName === "참가거리"
-  );
-
-  if (recordIndex < 0) {
-    return false;
-  }
-
-  records.splice(recordIndex, 1);
-  saveCertificationRecords(records);
-  return true;
 }
 
 function refreshOpenSidePanel() {

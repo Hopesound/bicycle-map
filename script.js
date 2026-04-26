@@ -1094,7 +1094,7 @@ function showPlaceCard(place) {
     content,
     clickable: true,
     xAnchor: 0.5,
-    yAnchor: 1.08
+    yAnchor: 1.28
   });
 
   overlay.setMap(mapState.map);
@@ -2106,9 +2106,10 @@ function renderMainImageDetail(container, item) {
 }
 
 function renderEventPromoDetail(container, item) {
+  const eventLabel = `${item.label || "1차"} 이벤트`;
   container.innerHTML = `
     <div class="event-hero">
-      <span class="event-badge">${escapeHtml(item.label || "1차")}</span>
+      <span class="event-badge">${escapeHtml(eventLabel)}</span>
       <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
       <p>${escapeHtml(item.detailBody || item.summary)}</p>
       <div class="detail-meta">

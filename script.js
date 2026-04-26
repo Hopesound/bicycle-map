@@ -238,7 +238,7 @@ const topMenus = {
     items: [
       {
         id: "event-round-1",
-        label: "1차 이벤트",
+        label: "1차",
         summary: "무료커피받기 이벤트",
         tag: "1차",
         detailType: "event-promo",
@@ -252,7 +252,7 @@ const topMenus = {
       },
       {
         id: "event-round-2",
-        label: "2차 이벤트",
+        label: "2차",
         summary: "재방문 인증 이벤트",
         tag: "2차",
         detailType: "event-guide",
@@ -265,7 +265,7 @@ const topMenus = {
       },
       {
         id: "event-round-3",
-        label: "3차 이벤트",
+        label: "3차",
         summary: "마감 주간 이벤트",
         tag: "3차",
         detailType: "event-guide",
@@ -1071,6 +1071,12 @@ function showPlaceCard(place) {
 
   elements.placeCard.hidden = false;
   elements.placeCard.innerHTML = `
+    <button class="place-card-back" type="button" data-back-place-popup aria-label="이전 장소 팝업으로 돌아가기">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 7 4 12l5 5"></path>
+        <path d="M5 12h9a5 5 0 0 1 5 5v1"></path>
+      </svg>
+    </button>
     <button class="place-card-close" type="button" data-close-place-card aria-label="상세 설명 닫기">×</button>
     <div class="place-card-layout">
       <div class="place-card-info">
@@ -1096,7 +1102,6 @@ function showPlaceCard(place) {
       </figure>
     </div>
     <div class="place-card-actions">
-      <button type="button" class="place-card-action is-light" data-back-place-popup>이전</button>
       <button type="button" class="place-card-action" data-place-distance>참가거리</button>
       <button type="button" class="place-card-action is-light" data-place-route>길찾기</button>
       <button type="button" class="place-card-action is-light" data-close-place-card>닫기</button>
@@ -1113,13 +1118,13 @@ function showPlaceCard(place) {
     showDistanceEntry(place);
   });
 
-  elements.placeCard.querySelector("[data-place-kakao-detail]")?.addEventListener("click", () => {
-    openKakaoPlaceSearch(place);
-  });
-
   elements.placeCard.querySelector("[data-back-place-popup]")?.addEventListener("click", () => {
     elements.placeCard.hidden = true;
     focusPlace(place.id);
+  });
+
+  elements.placeCard.querySelector("[data-place-kakao-detail]")?.addEventListener("click", () => {
+    openKakaoPlaceSearch(place);
   });
 
   elements.placeCard.querySelector("[data-place-route]")?.addEventListener("click", () => {
@@ -1937,7 +1942,7 @@ function shouldUseInlineDetail(panel) {
   }
 
   if (panel === elements.topPanel) {
-    return state.openTopMenuId === "event";
+    return false;
   }
 
   return false;

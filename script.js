@@ -199,13 +199,13 @@ const topMenus = {
     items: [
       {
         id: "intro-main-image",
-        label: "메인 이미지",
-        summary: "시즌2 대표 화면",
+        label: "소개 영상",
+        summary: "시즌2 소개 영상",
         tag: "소개",
         detailType: "main-image",
         detailTitle: "탄소를 감축하는 자전거 챌린지 season2",
         detailBody:
-          "첫 화면에 표시되는 메인 이미지를 챌린지 소개에서도 다시 확인할 수 있습니다."
+          "챌린지 소개 영상을 보며 시즌2 참여 방식과 보물찾기 흐름을 확인할 수 있습니다."
       }
     ]
   },
@@ -2143,9 +2143,17 @@ function renderMainImageDetail(container, item) {
   container.innerHTML = `
     <h3>${escapeHtml(item.detailTitle || item.label)}</h3>
     <p>${escapeHtml(item.detailBody || item.summary)}</p>
-    <div class="panel-main-image">
-      <img src="./img/main.png" alt="탄소를 감축하는 자전거 챌린지 season2 메인 이미지" />
+    <div class="panel-main-video">
+      <iframe
+        src="https://www.youtube.com/embed/_lR-49BVw64?rel=0"
+        title="탄소를 감축하는 자전거 챌린지 season2 소개 영상"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
     </div>
+    <a class="panel-video-link" href="https://youtu.be/_lR-49BVw64" target="_blank" rel="noopener noreferrer">
+      YouTube에서 영상 열기
+    </a>
   `;
 }
 

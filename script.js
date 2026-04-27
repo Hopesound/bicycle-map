@@ -141,7 +141,7 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
       "jeonbuk-env",
       "sebyeongho",
       "medical-coop",
-      "omokdae",
+      "kkotsingi",
       "bike-box",
       "jeonju-fm"
     ]
@@ -183,7 +183,7 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     placeIds: [
       "jbnu-museum",
       "gijije",
-      "kkotsingi",
+      "omokdae",
       "march-first",
       "jeonju-archive",
       "ajung-library",
@@ -337,7 +337,7 @@ const topMenus = {
 
 const sideMenus = {
   course: {
-    title: "코스검색",
+    title: "장소검색",
     items: []
   },
   treasure: {
@@ -477,7 +477,7 @@ async function bootstrap() {
 
 function syncStaticMenuLabels() {
   const sideLabels = {
-    course: "코스검색",
+    course: "장소검색",
     treasure: "보물찾기",
     certify: "인증하기",
     carbon: "탄소감축"
@@ -815,7 +815,7 @@ function openPlacePopup(place, position) {
     content,
     clickable: true,
     xAnchor: 0.5,
-    yAnchor: 1.18
+    yAnchor: 1.45
   });
 
   overlay.setMap(mapState.map);
@@ -1361,61 +1361,102 @@ function refreshOpenSidePanel() {
 function bindRouteFinder() {
   elements.routeSearchForm?.addEventListener("submit", handleRouteSearchSubmit);
 
-  elements.routeLocateButton?.addEventListener("click", async () => {
-    const currentLocation = await requestCurrentLocation({ panTo: true });
-    if (currentLocation) {
-      elements.routeSearchMeta.textContent = "현재 위치를 확인했습니다. 도착 장소를 입력해 자전거 길찾기를 시작하세요.";
-      updateMapStatus("현재 위치를 확인했습니다.");
-    }
+  elements.routeLocateButton?.addEventListener("click", () => {
+    fitVisiblePlaces();
   });
 
   elements.routeOpenButton?.addEventListener("click", () => {
-    if (state.routeSearchUrl) {
-      openExternalRoute(state.routeSearchUrl);
+    if (state.routeSearchDestination?.id) {
+      focusPlace(state.routeSearchDestination.id);
     }
   });
 }
 
-async function handleRouteSearchSubmit(event) {
+function handleRouteSearchSubmit(event) {
   event.preventDefault();
 
   const keyword = elements.routeSearchInput?.value.trim();
   if (!keyword) {
-    elements.routeSearchMeta.textContent = "도착 장소 이름을 입력해주세요.";
+    elements.routeSearchMeta.textContent = "찾을 장소 이름을 입력해주세요.";
     elements.routeSearchActions.hidden = true;
     return;
   }
 
-  const currentLocation = mapState.currentLocation || (await requestCurrentLocation({ panTo: false }));
-  if (!currentLocation) {
-    elements.routeSearchMeta.textContent = "현재 위치를 확인해야 자전거 코스를 찾을 수 있습니다.";
+  if (!mapState.selectedPlaceMarkers.length) {
+    elements.routeSearchMeta.textContent = "공개 장소 마커를 불러오는 중입니다. 잠시 후 다시 검색해주세요.";
     elements.routeSearchActions.hidden = true;
     return;
   }
 
-  const destination = await resolveRouteDestination(keyword, currentLocation);
-  if (!destination) {
-    elements.routeSearchMeta.textContent = "검색 결과가 없습니다. 장소명이나 주소를 다시 입력해주세요.";
+  const results = searchVisiblePlaces(keyword);
+  if (!results.length) {
+    elements.routeSearchMeta.textContent = "현재 공개된 장소 중 검색 결과가 없습니다. 장소명을 다시 입력해주세요.";
     elements.routeSearchActions.hidden = true;
     return;
   }
 
-  state.routeSearchDestination = destination;
-  state.routeSearchUrl = buildKakaoBikeRouteUrl(currentLocation, destination.coords);
-  updateRoutePreview(currentLocation, destination);
-
-  const distanceText = formatRouteDistance(
-    calculateDistanceKm(currentLocation, {
-      lat: destination.coords[0],
-      lng: destination.coords[1]
-    })
-  );
-  elements.routeSearchMeta.innerHTML = `${escapeHtml(destination.title)} · 현재 위치에서 약 ${escapeHtml(distanceText)} 떨어져 있습니다.`;
-  elements.routeOpenButton.textContent = `${destination.title} 자전거 길찾기`;
+  const selected = results[0].place;
+  state.routeSearchDestination = selected;
+  state.routeSearchUrl = "";
+  focusPlace(selected.id);
+  elements.routeSearchMeta.innerHTML = `${escapeHtml(selected.title)} 위치로 이동했습니다. ${
+    results.length > 1 ? `비슷한 결과 ${results.length}개 중 첫 번째 장소입니다.` : "현재 공개된 장소에서 찾았습니다."
+  }`;
+  elements.routeOpenButton.textContent = `${selected.title} 다시 보기`;
   elements.routeSearchActions.hidden = false;
-  updateMapStatus(`${destination.title} 자전거 코스를 준비했습니다.`, {
-    highlightWord: destination.title
+  updateMapStatus(`${selected.title} 위치로 이동했습니다.`, {
+    highlightWord: selected.title,
+    suppressOnMobile: true
   });
+}
+
+function searchVisiblePlaces(keyword) {
+  const normalizedKeyword = normalizeSearchText(keyword);
+  const markers = mapState.selectedPlaceMarkers;
+
+  return markers
+    .map(({ place }) => {
+      const haystacks = [place.title, place.address, place.query, place.intro].map(normalizeSearchText);
+      const exactTitle = haystacks[0] === normalizedKeyword;
+      const startsWithTitle = haystacks[0].startsWith(normalizedKeyword);
+      const includesTitle = haystacks[0].includes(normalizedKeyword);
+      const includesOther = haystacks.slice(1).some((value) => value.includes(normalizedKeyword));
+
+      if (!exactTitle && !startsWithTitle && !includesTitle && !includesOther) {
+        return null;
+      }
+
+      const score = exactTitle ? 0 : startsWithTitle ? 1 : includesTitle ? 2 : 3;
+      return { place, score };
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.score - right.score || left.place.title.localeCompare(right.place.title, "ko"));
+}
+
+function normalizeSearchText(value) {
+  return String(value || "")
+    .toLocaleLowerCase("ko-KR")
+    .replace(/\s+/g, "");
+}
+
+function fitVisiblePlaces() {
+  if (!mapState.map) {
+    return;
+  }
+
+  const markers = mapState.selectedPlaceMarkers;
+  if (!markers.length) {
+    elements.routeSearchMeta.textContent = "아직 공개된 장소 마커를 불러오는 중입니다.";
+    return;
+  }
+
+  const bounds = new kakao.maps.LatLngBounds();
+  markers.forEach(({ place }) => {
+    bounds.extend(new kakao.maps.LatLng(place.coords[0], place.coords[1]));
+  });
+  mapState.map.setBounds(bounds);
+  elements.routeSearchMeta.textContent = `현재 공개된 장소 ${markers.length}곳을 지도에 표시했습니다.`;
+  elements.routeSearchActions.hidden = true;
 }
 
 function requestCurrentLocation(options = {}) {
@@ -1517,7 +1558,7 @@ function resolveRouteDestination(keyword, currentLocation) {
           title: destination.place_name,
           address: destination.road_address_name || destination.address_name || keyword,
           query: keyword,
-          intro: "코스찾기로 선택한 도착 장소입니다.",
+          intro: "장소검색으로 선택한 도착 장소입니다.",
           coords: [Number(destination.y), Number(destination.x)]
         });
       },

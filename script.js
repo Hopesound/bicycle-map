@@ -1402,8 +1402,7 @@ function handleRouteSearchSubmit(event) {
   elements.routeSearchMeta.innerHTML = `${escapeHtml(selected.title)} 위치로 이동했습니다. ${
     results.length > 1 ? `비슷한 결과 ${results.length}개 중 첫 번째 장소입니다.` : "현재 공개된 장소에서 찾았습니다."
   }`;
-  elements.routeOpenButton.textContent = `${selected.title} 다시 보기`;
-  elements.routeSearchActions.hidden = false;
+  elements.routeSearchActions.hidden = true;
   updateMapStatus(`${selected.title} 위치로 이동했습니다.`, {
     highlightWord: selected.title,
     suppressOnMobile: true

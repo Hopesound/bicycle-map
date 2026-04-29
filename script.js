@@ -19,7 +19,7 @@ const selectedPlaces = [
   { id: "jeonbuk-env", title: "전북환경운동연합", query: "전북환경운동연합 전주", intro: "지역 환경 활동과 탄소 감축 메시지를 연결하기 좋은 시민사회 거점입니다.", fallback: [35.8185, 127.1537] },
   { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", intro: "완주 소양면의 역사 사찰로, 숲길과 문화유산을 함께 경험할 수 있는 코스 거점입니다.", fallback: [35.9114, 127.1732] },
   { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", intro: "봉동 생활권에서 쉬어가기 좋은 근린공원형 인증 장소입니다.", fallback: [35.9415, 127.1254] },
-  { id: "gijije", title: "기지제", query: "기지제 전주", fixedCoords: [35.840887, 127.067217], intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.840887, 127.067217] },
+  { id: "gijije", title: "기지제", query: "기지제 전주", fixedCoords: [35.840731, 127.067138], intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.840731, 127.067138] },
   { id: "kkotsingi", title: "전주시 공영자전거 백제교대여소", query: "전주시 공영자전거 백제교대여소", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8505, 127.124] },
   { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", intro: "다양한 식물과 산책로가 있는 녹지형 장소로 친환경 챌린지 메시지와 잘 어울립니다.", fallback: [35.8371, 127.0406] },
   {

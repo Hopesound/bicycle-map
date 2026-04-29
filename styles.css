@@ -1073,7 +1073,7 @@ a {
   left: auto;
   right: auto;
   bottom: auto;
-  width: min(520px, calc(100vw - 28px));
+  width: min(560px, calc(100vw - 28px));
   max-height: none;
   overflow: visible;
   padding: 20px 22px 18px;
@@ -1174,12 +1174,12 @@ a {
 }
 
 .place-card.place-card--overlay .place-card-layout {
-  grid-template-columns: minmax(0, 1fr) 118px;
+  grid-template-columns: minmax(0, 1fr) 112px;
   grid-template-areas:
     "title title"
     "address photo"
     "intro photo";
-  gap: 8px 18px;
+  gap: 8px 20px;
 }
 
 .place-card-info {
@@ -1273,7 +1273,7 @@ a {
   grid-area: photo;
   align-self: start;
   margin-top: 0;
-  width: 118px;
+  width: 112px;
 }
 
 .place-card-photo img {
@@ -1281,6 +1281,14 @@ a {
   height: 100%;
   display: block;
   object-fit: cover;
+}
+
+.place-card-photo a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
 }
 
 .place-card-photo.is-empty {
@@ -1304,7 +1312,9 @@ a {
   grid-area: address;
   max-width: 100%;
   min-width: 0;
-  word-break: normal;
+  padding-right: 4px;
+  color: #3b4743;
+  word-break: keep-all;
 }
 
 .place-card-intro {
@@ -1319,7 +1329,9 @@ a {
   grid-area: intro;
   max-width: 100%;
   min-width: 0;
-  word-break: normal;
+  padding-right: 4px;
+  color: var(--muted);
+  word-break: keep-all;
 }
 
 .place-card-weeks {
@@ -1778,6 +1790,60 @@ a {
   color: var(--muted);
   font-size: 0.82rem;
   line-height: 1.5;
+}
+
+.route-search-results {
+  display: grid;
+  gap: 8px;
+}
+
+.route-search-results:empty {
+  display: none;
+}
+
+.route-search-results-title {
+  margin: 0;
+  color: var(--brand-deep);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.route-search-result-list {
+  display: grid;
+  gap: 7px;
+}
+
+.route-search-result {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(23, 50, 47, 0.08);
+}
+
+.route-search-result strong {
+  color: var(--brand-deep);
+  font-size: 0.9rem;
+}
+
+.route-search-result span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.route-search-result:hover,
+.route-search-result:focus-visible,
+.route-search-result.is-active {
+  background: rgba(232, 248, 244, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(10, 141, 120, 0.28);
 }
 
 .route-search-actions[hidden] {
@@ -2350,6 +2416,11 @@ a {
   .place-card.place-card--overlay .place-card-photo {
     width: 76px;
     margin-top: 0;
+  }
+
+  .place-card.place-card--overlay .place-card-address,
+  .place-card.place-card--overlay .place-card-intro {
+    padding-right: 0;
   }
 
   .place-card-title-row h3 {

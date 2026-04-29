@@ -19,7 +19,7 @@ const selectedPlaces = [
   { id: "jeonbuk-env", title: "전북환경운동연합", query: "전북환경운동연합 전주", intro: "지역 환경 활동과 탄소 감축 메시지를 연결하기 좋은 시민사회 거점입니다.", fallback: [35.8185, 127.1537] },
   { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", intro: "완주 소양면의 역사 사찰로, 숲길과 문화유산을 함께 경험할 수 있는 코스 거점입니다.", fallback: [35.9114, 127.1732] },
   { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", intro: "봉동 생활권에서 쉬어가기 좋은 근린공원형 인증 장소입니다.", fallback: [35.9415, 127.1254] },
-  { id: "gijije", title: "기지제", query: "기지제 전주", intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.8077, 127.1018] },
+  { id: "gijije", title: "기지제", query: "기지제 전주", fixedCoords: [35.840887, 127.067217], intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.840887, 127.067217] },
   { id: "kkotsingi", title: "전주시 공영자전거 백제교대여소", query: "전주시 공영자전거 백제교대여소", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8505, 127.124] },
   { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", intro: "다양한 식물과 산책로가 있는 녹지형 장소로 친환경 챌린지 메시지와 잘 어울립니다.", fallback: [35.8371, 127.0406] },
   {
@@ -28,6 +28,7 @@ const selectedPlaces = [
     query: "새창이다리",
     address: "전북특별자치도 군산시 대야면 복교리 1328-29 인근 새창이다리",
     preferKeyword: true,
+    photoPageUrl: "https://maps.app.goo.gl/T8co1LAemmH7QsbJA",
     intro: "만경강교 바로 옆에 놓인 새창이다리 실교량 위치 기준으로 표시합니다.",
     fallback: [35.9103, 126.8392]
   },
@@ -53,7 +54,7 @@ const selectedPlaces = [
     intro: "전주 시민의 생활 기록과 인근 생활권을 함께 연결해 볼 수 있는 문화·기록 거점입니다.",
     fallback: [35.8339, 127.1714]
   },
-  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", fixedCoords: [35.900557, 126.976356], intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", fallback: [35.900557, 126.976356] },
+  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", address: "전북특별자치도 익산시 석탄동 134-1", fixedCoords: [35.900557, 126.976356], photoPageUrl: "https://place.map.kakao.com/9077744", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", fallback: [35.900557, 126.976356] },
   { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", fixedCoords: [35.805012, 127.165439], intro: "가볍게 이동하며 쉬어갈 수 있는 산책·라이딩 친화형 길입니다.", fallback: [35.805012, 127.165439] },
   { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", intro: "아중호수와 독서 문화가 만나는 생활문화형 인증 장소입니다.", fallback: [35.8328, 127.1768] },
   { id: "jeonju-fm", title: "전주공동체라디오 전주FM", query: "전주공동체라디오 전주FM", intro: "지역 미디어와 시민 참여 메시지를 연결할 수 있는 커뮤니티 거점입니다.", fallback: [35.8148, 127.1211] },
@@ -406,6 +407,7 @@ const elements = {
   routeSearchForm: document.getElementById("routeSearchForm"),
   routeSearchInput: document.getElementById("routeSearchInput"),
   routeSearchMeta: document.getElementById("routeSearchMeta"),
+  routeSearchResults: document.getElementById("routeSearchResults"),
   routeSearchActions: document.getElementById("routeSearchActions"),
   routeOpenButton: document.getElementById("routeOpenButton"),
   routeLocateButton: document.getElementById("routeLocateButton"),
@@ -1165,9 +1167,7 @@ function createPlaceDetailContent(place) {
         <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
         <p class="place-card-intro">${escapeHtml(getCompactPlaceIntro(place))}</p>
       </div>
-      <figure class="place-card-photo">
-        <img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />
-      </figure>
+      ${createPlacePhotoMarkup(place)}
     </div>
     <div class="place-card-actions">
       <button type="button" class="place-card-action" data-place-distance>참가거리</button>
@@ -1334,6 +1334,27 @@ function getPlacePhotoUrl(place) {
   return place.photo || PLACE_PHOTO_URLS[place.id] || "./img/main.png";
 }
 
+function getPlacePhotoPageUrl(place) {
+  return place.photoPageUrl || "";
+}
+
+function createPlacePhotoMarkup(place) {
+  const imageMarkup = `<img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />`;
+  const photoPageUrl = getPlacePhotoPageUrl(place);
+
+  if (!photoPageUrl) {
+    return `<figure class="place-card-photo">${imageMarkup}</figure>`;
+  }
+
+  return `
+    <figure class="place-card-photo">
+      <a href="${escapeHtml(photoPageUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(`${place.title} 참고 이미지 새 창으로 열기`)}">
+        ${imageMarkup}
+      </a>
+    </figure>
+  `;
+}
+
 function bindPlacePhotoFallback(container) {
   container.querySelectorAll(".place-card-photo img").forEach((image) => {
     image.addEventListener(
@@ -1378,12 +1399,14 @@ function handleRouteSearchSubmit(event) {
   const keyword = elements.routeSearchInput?.value.trim();
   if (!keyword) {
     elements.routeSearchMeta.textContent = "찾을 장소 이름을 입력해주세요.";
+    clearPlaceSearchResults();
     elements.routeSearchActions.hidden = true;
     return;
   }
 
   if (!mapState.selectedPlaceMarkers.length) {
     elements.routeSearchMeta.textContent = "공개 장소 마커를 불러오는 중입니다. 잠시 후 다시 검색해주세요.";
+    clearPlaceSearchResults();
     elements.routeSearchActions.hidden = true;
     return;
   }
@@ -1391,6 +1414,7 @@ function handleRouteSearchSubmit(event) {
   const results = searchVisiblePlaces(keyword);
   if (!results.length) {
     elements.routeSearchMeta.textContent = "현재 공개된 장소 중 검색 결과가 없습니다. 장소명을 다시 입력해주세요.";
+    clearPlaceSearchResults();
     elements.routeSearchActions.hidden = true;
     return;
   }
@@ -1402,6 +1426,7 @@ function handleRouteSearchSubmit(event) {
   elements.routeSearchMeta.innerHTML = `${escapeHtml(selected.title)} 위치로 이동했습니다. ${
     results.length > 1 ? `비슷한 결과 ${results.length}개 중 첫 번째 장소입니다.` : "현재 공개된 장소에서 찾았습니다."
   }`;
+  renderPlaceSearchResults(results, selected.id);
   elements.routeSearchActions.hidden = true;
   updateMapStatus(`${selected.title} 위치로 이동했습니다.`, {
     highlightWord: selected.title,
@@ -1455,7 +1480,47 @@ function fitVisiblePlaces() {
   });
   mapState.map.setBounds(bounds);
   elements.routeSearchMeta.textContent = `현재 공개된 장소 ${markers.length}곳을 지도에 표시했습니다.`;
+  clearPlaceSearchResults();
   elements.routeSearchActions.hidden = true;
+}
+
+function renderPlaceSearchResults(results, selectedPlaceId) {
+  if (!elements.routeSearchResults) {
+    return;
+  }
+
+  elements.routeSearchResults.innerHTML = `
+    <p class="route-search-results-title">검색 결과</p>
+    <div class="route-search-result-list">
+      ${results
+        .slice(0, 6)
+        .map(
+          ({ place }) => `
+            <button class="route-search-result${place.id === selectedPlaceId ? " is-active" : ""}" type="button" data-search-place="${escapeHtml(place.id)}">
+              <strong>${escapeHtml(place.title)}</strong>
+              <span>${escapeHtml(getPlaceAddressText(place))}</span>
+            </button>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+
+  elements.routeSearchResults.querySelectorAll("[data-search-place]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.routeSearchDestination = getPlaceById(button.dataset.searchPlace);
+      focusPlace(button.dataset.searchPlace);
+      elements.routeSearchResults
+        .querySelectorAll(".route-search-result")
+        .forEach((node) => node.classList.toggle("is-active", node === button));
+    });
+  });
+}
+
+function clearPlaceSearchResults() {
+  if (elements.routeSearchResults) {
+    elements.routeSearchResults.innerHTML = "";
+  }
 }
 
 function requestCurrentLocation(options = {}) {

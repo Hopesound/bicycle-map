@@ -129,7 +129,13 @@ const PLACE_PHOTO_URLS = {
   "goui-reservoir": "./img/구이저수지.jpg",
   gijije: "./img/기지제.png",
   "daedeok-elementary": "./img/대덕초등학교.jpg",
-  "deokjin-park": "./img/덕진공원.png"
+  "deokjin-park": "./img/덕진공원.png",
+  "saechangi-bridge": "./img/새창이다리.jpg",
+  "iksan-samil": "./img/익산 삼일교회(참새방앗간).jpg",
+  bibijeong: "./img/비비정.jpg",
+  "hari-bridge": "./img/하리교.jpg",
+  songgwangsa: "./img/완주군 송광사.png",
+  "ajung-library": "./img/아중호수도서관.png"
 };
 const FIXED_WEEKLY_TREASURE_PLAN = [
   {

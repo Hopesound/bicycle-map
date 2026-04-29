@@ -1073,7 +1073,7 @@ a {
   left: auto;
   right: auto;
   bottom: auto;
-  width: min(430px, calc(100vw - 28px));
+  width: min(520px, calc(100vw - 28px));
   max-height: none;
   overflow: visible;
   padding: 20px 22px 18px;
@@ -1175,13 +1175,21 @@ a {
 
 .place-card.place-card--overlay .place-card-layout {
   grid-template-columns: minmax(0, 1fr) 118px;
-  gap: 16px 18px;
+  grid-template-areas:
+    "title title"
+    "address photo"
+    "intro photo";
+  gap: 8px 18px;
 }
 
 .place-card-info {
   display: grid;
   gap: 8px;
   min-width: 0;
+}
+
+.place-card.place-card--overlay .place-card-info {
+  display: contents;
 }
 
 .place-card-title-row {
@@ -1192,6 +1200,7 @@ a {
 }
 
 .place-card.place-card--overlay .place-card-title-row {
+  grid-area: title;
   padding-right: 78px;
 }
 
@@ -1261,7 +1270,9 @@ a {
 }
 
 .place-card.place-card--overlay .place-card-photo {
-  margin-top: 38px;
+  grid-area: photo;
+  align-self: start;
+  margin-top: 0;
   width: 118px;
 }
 
@@ -1289,12 +1300,26 @@ a {
   font-size: 0.9rem;
 }
 
+.place-card.place-card--overlay .place-card-address {
+  grid-area: address;
+  max-width: 100%;
+  min-width: 0;
+  word-break: normal;
+}
+
 .place-card-intro {
   display: -webkit-box;
   font-size: 0.86rem;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
+}
+
+.place-card.place-card--overlay .place-card-intro {
+  grid-area: intro;
+  max-width: 100%;
+  min-width: 0;
+  word-break: normal;
 }
 
 .place-card-weeks {
@@ -2311,6 +2336,10 @@ a {
 
   .place-card.place-card--overlay .place-card-layout {
     grid-template-columns: minmax(0, 1fr) 76px;
+    grid-template-areas:
+      "title title"
+      "address photo"
+      "intro photo";
     gap: 8px;
   }
 
@@ -2320,7 +2349,7 @@ a {
 
   .place-card.place-card--overlay .place-card-photo {
     width: 76px;
-    margin-top: 34px;
+    margin-top: 0;
   }
 
   .place-card-title-row h3 {

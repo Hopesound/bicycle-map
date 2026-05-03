@@ -160,8 +160,8 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
   },
   {
     week: 2,
-    revealDate: "2026-04-25",
-    revealLabel: "4월 25일",
+    revealDate: "2026-05-10T20:00:00+09:00",
+    revealLabel: "5월 10일 20시",
     placeIds: [
       "goui-reservoir",
       "daedeok-elementary",
@@ -175,8 +175,8 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
   },
   {
     week: 3,
-    revealDate: "2026-04-26",
-    revealLabel: "4월 26일",
+    revealDate: "2026-05-17T20:00:00+09:00",
+    revealLabel: "5월 17일 20시",
     placeIds: [
       "sangjang-park",
       "gosan-miso-market",
@@ -190,8 +190,8 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
   },
   {
     week: 4,
-    revealDate: "2026-04-27",
-    revealLabel: "4월 27일",
+    revealDate: "2026-05-24T20:00:00+09:00",
+    revealLabel: "5월 24일 20시",
     placeIds: [
       "jbnu-museum",
       "gijije",
@@ -2700,18 +2700,27 @@ function createWeeklyTreasurePlan() {
 }
 
 function hydrateWeeklyTreasurePlan(plan) {
-  const todayKey = getSeoulDateKey();
-  return plan.map((week) => ({
-    week: Number(week.week),
-    revealDate: week.revealDate,
-    revealLabel: week.revealLabel,
-    isRevealed: todayKey >= week.revealDate,
-    placeIds: week.placeIds,
-    places:
-      todayKey >= week.revealDate
-        ? week.placeIds.map((placeId) => getPlaceById(placeId)).filter(Boolean)
-        : []
-  }));
+  const now = Date.now();
+  return plan.map((week) => {
+    const isRevealed = now >= getRevealTimestamp(week);
+    return {
+      week: Number(week.week),
+      revealDate: week.revealDate,
+      revealLabel: week.revealLabel,
+      isRevealed,
+      placeIds: week.placeIds,
+      places: isRevealed ? week.placeIds.map((placeId) => getPlaceById(placeId)).filter(Boolean) : []
+    };
+  });
+}
+
+function getRevealTimestamp(week) {
+  const revealDate = String(week.revealDate || "");
+  const normalizedRevealDate = /^\d{4}-\d{2}-\d{2}$/.test(revealDate)
+    ? `${revealDate}T00:00:00+09:00`
+    : revealDate;
+  const timestamp = Date.parse(normalizedRevealDate);
+  return Number.isFinite(timestamp) ? timestamp : Number.POSITIVE_INFINITY;
 }
 
 function isValidTreasurePlan(plan) {

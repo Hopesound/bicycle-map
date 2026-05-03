@@ -2492,8 +2492,7 @@ function renderWeeklyCarbonDetail(container, item) {
   if (!weekPlan?.isRevealed) {
     container.innerHTML = `
       <h3>${escapeHtml(`${item.week}주차 탄소감축`)}</h3>
-      <p>${escapeHtml(`${getWeekRevealLabel(item.week)} 공개 후 탄소감축량이 표시됩니다.`)}</p>
-      <div class="week-summary">비공개 주차입니다. 공개 이후 입력된 거리 기준으로 감축량을 계산합니다.</div>
+      <div class="week-summary">비공개</div>
     `;
     return;
   }
@@ -2957,8 +2956,7 @@ function renderAllCarbonWeeks(container) {
         return `
           <section class="stacked-week-block">
             <h3>${escapeHtml(`${week.week}주차 탄소감축`)}</h3>
-            <p>${escapeHtml(`${week.revealLabel} 공개 후 탄소감축량이 표시됩니다.`)}</p>
-            <div class="week-summary">비공개 주차입니다.</div>
+            <div class="week-summary">비공개</div>
           </section>
         `;
       }
@@ -3030,8 +3028,7 @@ function renderWeeklyCarbonDetail(container, item) {
   if (!weekPlan?.isRevealed) {
     container.innerHTML = `
       <h3>${escapeHtml(`${item.week}주차 탄소감축`)}</h3>
-      <p>${escapeHtml(`${getWeekRevealLabel(item.week)} 공개 후 탄소감축량이 표시됩니다.`)}</p>
-      <div class="week-summary">비공개 주차입니다. 공개 이후 입력된 거리 기준으로 감축량을 계산합니다.</div>
+      <div class="week-summary">비공개</div>
     `;
     return;
   }

@@ -146,7 +146,7 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
       "saechangi-bridge",
       "iksan-samil",
       "jeonbuk-env",
-      "sebyeongho",
+      "yeoyu-cafe",
       "medical-coop",
       "kkotsingi",
       "bike-box",
@@ -160,7 +160,7 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
     placeIds: [
       "goui-reservoir",
       "daedeok-elementary",
-      "yeoyu-cafe",
+      "sebyeongho",
       "songgwangsa",
       "deokjin-park",
       "woosuk-hospital",
@@ -254,9 +254,10 @@ const topMenus = {
       {
         id: "event-round-1",
         label: "1차",
-        summary: "무료커피받기",
-        tag: "1차",
-        detailType: "event-promo",
+        summary: "비공개",
+        tag: "비공개",
+        detailType: "event-private",
+        isPrivate: true,
         action: { type: "focus-place", placeId: "sangjang-park" },
         detailTitle: "봉동 상장기공원 인증하고 무료 커피 받기",
         detailBody:
@@ -268,9 +269,10 @@ const topMenus = {
       {
         id: "event-round-2",
         label: "2차",
-        summary: "재방문 인증",
-        tag: "2차",
-        detailType: "event-guide",
+        summary: "비공개",
+        tag: "비공개",
+        detailType: "event-private",
+        isPrivate: true,
         action: { type: "focus-place", placeId: "sangjang-park" },
         detailTitle: "2차 안내",
         detailBody:
@@ -281,9 +283,10 @@ const topMenus = {
       {
         id: "event-round-3",
         label: "3차",
-        summary: "마감 주간",
-        tag: "3차",
-        detailType: "event-guide",
+        summary: "비공개",
+        tag: "비공개",
+        detailType: "event-private",
+        isPrivate: true,
         action: { type: "focus-place", placeId: "sangjang-park" },
         detailTitle: "3차 안내",
         detailBody:
@@ -2108,7 +2111,9 @@ function renderPanelItems(panel, items, defaultItemId) {
         panel.detail.hidden = false;
         renderPanelDetail(panel.detail, item);
       }
-      handleMenuAction(item.action);
+      if (!item.isPrivate) {
+        handleMenuAction(item.action);
+      }
     });
 
     panel.list.appendChild(button);
@@ -2210,6 +2215,11 @@ function renderPanelDetail(container, item) {
     return;
   }
 
+  if (item.detailType === "event-private") {
+    renderEventPrivateDetail(container, item);
+    return;
+  }
+
   if (item.detailType === "event-guide") {
     renderEventGuideDetail(container, item);
     return;
@@ -2265,6 +2275,17 @@ function renderMainImageDetail(container, item) {
     <a class="panel-video-link" href="https://youtu.be/_lR-49BVw64" target="_blank" rel="noopener noreferrer">
       YouTube에서 영상 열기
     </a>
+  `;
+}
+
+function renderEventPrivateDetail(container, item) {
+  container.innerHTML = `
+    <div class="event-hero event-hero--private">
+      <span class="event-badge">비공개</span>
+      <h3>${escapeHtml(`${item.label || "이벤트"} 이벤트`)}</h3>
+      <p>현재 비공개 이벤트입니다. 공개 일정과 참여 방법은 추후 공지됩니다.</p>
+      <div class="week-summary">비공개</div>
+    </div>
   `;
 }
 

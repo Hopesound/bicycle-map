@@ -2842,7 +2842,9 @@ function focusWeeklyPlaces(week) {
   }
 
   if (!isWeekRevealed(week)) {
-    updateMapStatus(`${getWeekRevealLabel(week)} 공개 전까지는 장소가 비공개입니다.`);
+    updateMapStatus(`${getWeekRevealLabel(week)} 공개 전까지는 장소가 비공개입니다.`, {
+      suppressOnMobile: true
+    });
     return;
   }
 

@@ -377,6 +377,24 @@ a {
   overflow: hidden;
 }
 
+.top-panel[data-panel-mode="method"] {
+  height: min(620px, calc(100vh - var(--header-height) - 56px));
+  overflow: hidden;
+}
+
+.top-panel[data-panel-mode="method"] .submenu-list {
+  flex: 0 0 auto;
+}
+
+.top-panel[data-panel-mode="method"] .submenu-detail {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding-right: 10px;
+  overscroll-behavior: contain;
+}
+
 .side-panel {
   top: calc(var(--header-height) + 28px);
   left: calc(var(--rail-width) + 8px);
@@ -2167,6 +2185,11 @@ a {
   }
 
   .top-panel[data-panel-mode="event"] {
+    height: 58vh;
+    max-height: 58vh;
+  }
+
+  .top-panel[data-panel-mode="method"] {
     height: 58vh;
     max-height: 58vh;
   }

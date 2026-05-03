@@ -135,7 +135,12 @@ const PLACE_PHOTO_URLS = {
   bibijeong: "./img/비비정.jpg",
   "hari-bridge": "./img/하리교.jpg",
   songgwangsa: "./img/완주군 송광사.png",
-  "ajung-library": "./img/아중호수도서관.png"
+  "ajung-library": "./img/아중호수도서관.png",
+  kkotsingi: "./img/전주시 공영자전거 백제교대여소.jpg",
+  "bike-box": "./img/바이크박스.jpg",
+  "jeonbuk-env": "./img/전북환경운동연합.jpg",
+  "medical-coop": "./img/전주의료사협빌딩.jpg",
+  "jeonju-fm": "./img/전주공동체라디오 전주FM.jpg"
 };
 const FIXED_WEEKLY_TREASURE_PLAN = [
   {
@@ -2847,7 +2852,7 @@ function focusWeeklyPlaces(week) {
     bounds.extend(new kakao.maps.LatLng(place.coords[0], place.coords[1]));
   });
   mapState.map.setBounds(bounds);
-  updateMapStatus(`${week}주차 보물찾기 장소를 표시했습니다.`);
+  updateMapStatus(`${week}주차 보물찾기 장소를 표시했습니다.`, { suppressOnMobile: true });
 }
 
 function getCertificationRecords() {

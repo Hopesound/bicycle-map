@@ -749,6 +749,7 @@ a {
 
 .event-round-list,
 .event-guide-list,
+.event-visit-list,
 .event-steps {
   display: grid;
   gap: 12px;
@@ -774,6 +775,16 @@ a {
 .event-round-card span,
 .event-step span {
   line-height: 1.55;
+}
+
+.event-visit-place {
+  color: #fff;
+  font-weight: 900;
+}
+
+.event-visit-card .mini-action {
+  justify-self: start;
+  margin-top: 4px;
 }
 
 .event-note {

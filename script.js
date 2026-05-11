@@ -21,7 +21,7 @@ const selectedPlaces = [
   { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", intro: "완주 소양면의 역사 사찰로, 숲길과 문화유산을 함께 경험할 수 있는 코스 거점입니다.", treasureHint: "보물힌트: 일주문 앞 연등탑 기둥", fallback: [35.9114, 127.1732] },
   { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", intro: "봉동 생활권에서 쉬어가기 좋은 근린공원형 인증 장소입니다.", fallback: [35.9415, 127.1254] },
   { id: "gijije", title: "기지제", query: "기지제 전주", fixedCoords: [35.840731, 127.067138], intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.840731, 127.067138] },
-  { id: "kkotsingi", title: "전주시 공영자전거 백제교대여소", query: "전주시 공영자전거 백제교대여소", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8505, 127.124] },
+  { id: "kkotsingi", title: "전주시 공영자전거 백제교대여소", query: "전주시 공영자전거 백제교대여소", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", treasureHint: "보물힌트: 출입문", fallback: [35.8505, 127.124] },
   { id: "jeonju-arboretum", title: "전주수목원", query: "전주수목원", intro: "다양한 식물과 산책로가 있는 녹지형 장소로 친환경 챌린지 메시지와 잘 어울립니다.", fallback: [35.8371, 127.0406] },
   {
     id: "saechangi-bridge",
@@ -31,6 +31,7 @@ const selectedPlaces = [
     preferKeyword: true,
     photoPageUrl: "https://maps.app.goo.gl/T8co1LAemmH7QsbJA",
     intro: "만경강교 바로 옆에 놓인 새창이다리 실교량 위치 기준으로 표시합니다.",
+    treasureHint: "보물힌트: 입구 왼쪽",
     fallback: [35.9103, 126.8392]
   },
   { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
@@ -64,7 +65,7 @@ const selectedPlaces = [
     intro: "전주 시민의 생활 기록과 인근 생활권을 함께 연결해 볼 수 있는 문화·기록 거점입니다.",
     fallback: [35.8339, 127.1714]
   },
-  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", address: "전북특별자치도 익산시 석탄동 134-1", fixedCoords: [35.900557, 126.976356], photoPageUrl: "https://place.map.kakao.com/9077744", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", treasureHint: "보물힌트: 의자 뒤", fallback: [35.900557, 126.976356] },
+  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", address: "전북특별자치도 익산시 석탄동 134-1", fixedCoords: [35.900557, 126.976356], photoPageUrl: "https://place.map.kakao.com/9077744", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", treasureHint: "보물힌트: 검은 의자 뒤", fallback: [35.900557, 126.976356] },
   { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", fixedCoords: [35.805012, 127.165439], intro: "가볍게 이동하며 쉬어갈 수 있는 산책·라이딩 친화형 길입니다.", fallback: [35.805012, 127.165439] },
   { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", intro: "아중호수와 독서 문화가 만나는 생활문화형 인증 장소입니다.", fallback: [35.8328, 127.1768] },
   { id: "jeonju-fm", title: "전주공동체라디오 전주FM", query: "전주공동체라디오 전주FM", intro: "지역 미디어와 시민 참여 메시지를 연결할 수 있는 커뮤니티 거점입니다.", fallback: [35.8148, 127.1211] },
@@ -80,7 +81,7 @@ const selectedPlaces = [
     fixedCoords: [35.833708, 127.12567],
     fallback: [35.833708, 127.12567]
   },
-  { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", fallback: [35.8176, 127.1104] },
+  { id: "medical-coop", title: "전주의료사협빌딩", query: "전주의료사협빌딩", intro: "건강한 이동과 지역 의료 협동의 메시지를 함께 담을 수 있는 장소입니다.", treasureHint: "보물힌트: 출입문 밖 배너", fallback: [35.8176, 127.1104] },
   {
     id: "eoeun-bridge",
     title: "어은 쌍다리",
@@ -91,7 +92,7 @@ const selectedPlaces = [
     fallback: [35.8248, 127.1348]
   },
   { id: "hari-bridge", title: "하리교", query: "하리교 전주", intro: "전주 남부권 이동 동선과 연결되는 교량형 위치 표시 장소입니다.", treasureHint: "보물힌트: 자전거 전용도로 표지판 기둥", fallback: [35.7861, 127.1143] },
-  { id: "bike-box", title: "바이크박스", query: "바이크박스 전주", intro: "자전거 이용자에게 친숙한 정비·라이딩 관련 거점으로 활용할 수 있습니다.", fallback: [35.8201, 127.1501] },
+  { id: "bike-box", title: "바이크박스", query: "바이크박스 전주", intro: "자전거 이용자에게 친숙한 정비·라이딩 관련 거점으로 활용할 수 있습니다.", treasureHint: "보물힌트: 출입문 앞 기둥", fallback: [35.8201, 127.1501] },
   { id: "palbok-art", title: "팔복예술공장", query: "팔복예술공장", intro: "산업공간을 문화예술 거점으로 재생한 전주 대표 복합문화 장소입니다.", treasureHint: "보물힌트: 정문 앞 조형물", fallback: [35.8464, 127.1029] }
 ];
 
@@ -270,17 +271,28 @@ const topMenus = {
       {
         id: "event-round-1",
         label: "1차",
-        summary: "비공개",
-        tag: "비공개",
-        detailType: "event-private",
-        isPrivate: true,
-        action: { type: "focus-place", placeId: "sangjang-park" },
-        detailTitle: "봉동 상장기공원 인증하고 무료 커피 받기",
-        detailBody:
-          "봉동 상장기공원에서 보물찾기 인증을 완료하고 인근 커피숍에 방문하면 선착순 무료 커피 혜택을 받을 수 있습니다.",
-        eventPlaceId: "sangjang-park",
-        eventDate: "2026.05.04 - 2026.05.10",
-        eventReward: "선착순 무료 커피 30잔"
+        summary: "방문이벤트",
+        tag: "공개",
+        detailType: "event-visit",
+        detailTitle: "1차 이벤트",
+        detailBody: "챌린지 참여 라이더를 위한 방문이벤트입니다.",
+        visitEvents: [
+          {
+            title: "첫번째 방문이벤트",
+            place: "전주공동체라디오 방송국",
+            date: "5월 16일(토), 5월 23일(토)",
+            time: "오전 10시 ~ 오후 4시",
+            body: "전주공동체라디오 방송국을 방문하시는 라이더님께 시원한 커피 또는 음료를 제공합니다.",
+            placeId: "jeonju-fm"
+          },
+          {
+            title: "두번째 방문이벤트",
+            place: "우석대한방병원",
+            body:
+              "우석대한방병원 1층 접수데스크를 찾아 \"자전거 챌린지 참여자\"라고 밝히시면, 시원한 음료를 제공받을 수 있습니다.",
+            placeId: "woosuk-hospital"
+          }
+        ]
       },
       {
         id: "event-round-2",
@@ -2247,6 +2259,11 @@ function renderPanelDetail(container, item) {
     return;
   }
 
+  if (item.detailType === "event-visit") {
+    renderEventVisitDetail(container, item);
+    return;
+  }
+
   if (item.detailType === "event-guide") {
     renderEventGuideDetail(container, item);
     return;
@@ -2314,6 +2331,40 @@ function renderEventPrivateDetail(container, item) {
       <div class="week-summary">비공개</div>
     </div>
   `;
+}
+
+function renderEventVisitDetail(container, item) {
+  const visitEvents = item.visitEvents || [];
+  container.innerHTML = `
+    <div class="event-hero">
+      <span class="event-badge">방문이벤트</span>
+      <h3>${escapeHtml(item.detailTitle || `${item.label || "1차"} 이벤트`)}</h3>
+      <p>${escapeHtml(item.detailBody || item.summary)}</p>
+    </div>
+    <div class="event-visit-list">
+      ${visitEvents
+        .map(
+          (event) => `
+            <article class="event-step event-visit-card">
+              <strong>${escapeHtml(event.title)}</strong>
+              <span class="event-visit-place">${escapeHtml(event.place)}</span>
+              ${event.date ? `<span><b>날짜:</b> ${escapeHtml(event.date)}</span>` : ""}
+              ${event.time ? `<span><b>시간:</b> ${escapeHtml(event.time)}</span>` : ""}
+              <span>${escapeHtml(event.body)}</span>
+              ${
+                event.placeId
+                  ? `<button class="mini-action" type="button" data-focus-event-place="${escapeHtml(
+                      event.placeId
+                    )}">${escapeHtml(event.place)} 위치 보기</button>`
+                  : ""
+              }
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+  bindEventDetailActions(container);
 }
 
 function renderEventPromoDetail(container, item) {

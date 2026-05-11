@@ -1196,7 +1196,8 @@ a {
   grid-template-areas:
     "title title"
     "address photo"
-    "intro photo";
+    "intro photo"
+    "hint photo";
   gap: 8px 20px;
 }
 
@@ -1314,7 +1315,8 @@ a {
 }
 
 .place-card-address,
-.place-card-intro {
+.place-card-intro,
+.place-card-hint {
   margin: 0;
   color: var(--muted);
   line-height: 1.6;
@@ -1349,6 +1351,24 @@ a {
   min-width: 0;
   padding-right: 4px;
   color: var(--muted);
+  word-break: keep-all;
+}
+
+.place-card-hint {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 145, 88, 0.12);
+  color: #85451f;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.place-card.place-card--overlay .place-card-hint {
+  grid-area: hint;
+  max-width: 100%;
+  min-width: 0;
+  padding-right: 12px;
   word-break: keep-all;
 }
 
@@ -2409,6 +2429,7 @@ a {
   .event-note,
   .place-card-address,
   .place-card-intro,
+  .place-card-hint,
   .place-card-action,
   .mini-action {
     font-size: 0.82rem;
@@ -2428,7 +2449,8 @@ a {
     grid-template-areas:
       "title title"
       "address photo"
-      "intro photo";
+      "intro photo"
+      "hint hint";
     gap: 8px;
   }
 
@@ -2442,7 +2464,8 @@ a {
   }
 
   .place-card.place-card--overlay .place-card-address,
-  .place-card.place-card--overlay .place-card-intro {
+  .place-card.place-card--overlay .place-card-intro,
+  .place-card.place-card--overlay .place-card-hint {
     padding-right: 0;
   }
 

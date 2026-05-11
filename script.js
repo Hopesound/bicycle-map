@@ -5,6 +5,7 @@ const selectedPlaces = [
     query: "구이저수지 완주",
     address: "전북특별자치도 완주군 구이면 구이로 1488-31",
     intro: "완주 구이면에 있는 대표 저수지로, 수변 경관과 휴식 동선을 함께 활용하기 좋은 자전거 챌린지 거점입니다.",
+    treasureHint: "보물힌트: QR코드는 둑방길에 오르자마자 보이는 완주군 정신보건센터 표지판 아래 기둥에 붙어 있습니다.",
     fallback: [35.7398, 127.1032]
   },
   {
@@ -17,7 +18,7 @@ const selectedPlaces = [
   },
   { id: "jbnu-museum", title: "전북대 자연사박물관", query: "전북대 자연사박물관", intro: "대학 캠퍼스 안에서 자연사 자료를 만날 수 있는 교육형 방문 거점입니다.", fallback: [35.8473, 127.1293] },
   { id: "jeonbuk-env", title: "전북환경운동연합", query: "전북환경운동연합 전주", intro: "지역 환경 활동과 탄소 감축 메시지를 연결하기 좋은 시민사회 거점입니다.", fallback: [35.8185, 127.1537] },
-  { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", intro: "완주 소양면의 역사 사찰로, 숲길과 문화유산을 함께 경험할 수 있는 코스 거점입니다.", fallback: [35.9114, 127.1732] },
+  { id: "songgwangsa", title: "완주군 송광사", query: "송광사 완주", intro: "완주 소양면의 역사 사찰로, 숲길과 문화유산을 함께 경험할 수 있는 코스 거점입니다.", treasureHint: "보물힌트: 송광사 일주문 앞에 부처님오신날을 맞아 큰 연등탑이 설치되어 있습니다. QR코드는 이 탑의 기둥에 붙어 있습니다.", fallback: [35.9114, 127.1732] },
   { id: "sangjang-park", title: "봉동 상장기공원", query: "상장기공원 봉동", intro: "봉동 생활권에서 쉬어가기 좋은 근린공원형 인증 장소입니다.", fallback: [35.9415, 127.1254] },
   { id: "gijije", title: "기지제", query: "기지제 전주", fixedCoords: [35.840731, 127.067138], intro: "혁신도시 주변 수변 경관을 볼 수 있는 산책·라이딩 거점입니다.", fallback: [35.840731, 127.067138] },
   { id: "kkotsingi", title: "전주시 공영자전거 백제교대여소", query: "전주시 공영자전거 백제교대여소", intro: "공영자전거와 바로 연결되는 대여 거점으로 챌린지 시작점으로 활용하기 좋습니다.", fallback: [35.8505, 127.124] },
@@ -34,10 +35,20 @@ const selectedPlaces = [
   },
   { id: "omokdae", title: "오목대", query: "오목대 전주", intro: "전주 한옥마을을 내려다볼 수 있는 역사·전망 거점입니다.", fallback: [35.8113, 127.1538] },
   { id: "sanggwan-forest", title: "상관역", query: "상관역 완주", intro: "완주 상관면으로 이어지는 철도 교통 거점입니다.", fallback: [35.7676, 127.2055] },
+  {
+    id: "sinri-station-park",
+    title: "상관면 신리역공원",
+    query: "상관면 신리역공원",
+    address: "전북특별자치도 완주군 상관면 신리로 104 인근",
+    intro: "옛 신리역 주변에 조성된 상관면 생활권 공원입니다.",
+    treasureHint:
+      "보물힌트: 옛날 신리역이 있던 곳으로 지금은 공원이 조성되어 있으며, QR코드는 버스정류장 출입문 근처에 있습니다.",
+    fallback: [35.772996, 127.206552]
+  },
   { id: "march-first", title: "전주3.1운동발상지", query: "전주 3.1운동 발상지", intro: "지역 독립운동의 의미를 담은 역사형 인증 장소입니다.", fallback: [35.8199, 127.1442] },
   { id: "bibijeong", title: "비비정", query: "비비정 완주", intro: "만경강 풍경과 함께 쉬어갈 수 있는 완주 대표 전망 거점입니다.", fallback: [35.8687, 127.0744] },
-  { id: "woosuk-hospital", title: "우석대학교 부속 전주한방병원", query: "우석대학교 부속 전주한방병원", intro: "지역 의료·건강 테마와 연결할 수 있는 도심 거점입니다.", fallback: [35.8137, 127.0892] },
-  { id: "sebyeongho", title: "세병호", query: "세병호 전주", intro: "전주 북부권의 수변 경관을 즐길 수 있는 호수형 방문 장소입니다.", fallback: [35.8816, 127.1461] },
+  { id: "woosuk-hospital", title: "우석대학교 부속 전주한방병원", query: "우석대학교 부속 전주한방병원", intro: "지역 의료·건강 테마와 연결할 수 있는 도심 거점입니다.", treasureHint: "보물힌트: QR코드는 유리창에 붙어 있는 맨 아래편 큐알코드를 잘 찾아보세요.", fallback: [35.8137, 127.0892] },
+  { id: "sebyeongho", title: "세병호", query: "세병호 전주", intro: "전주 북부권의 수변 경관을 즐길 수 있는 호수형 방문 장소입니다.", treasureHint: "보물힌트: 호수 뒤편으로 보이는 스위첸 아파트와 더샵아파트 위치를 잘 찾아보세요.", fallback: [35.8816, 127.1461] },
   {
     id: "yeoyu-cafe",
     title: "무인카페여유",
@@ -54,13 +65,13 @@ const selectedPlaces = [
     intro: "전주 시민의 생활 기록과 인근 생활권을 함께 연결해 볼 수 있는 문화·기록 거점입니다.",
     fallback: [35.8339, 127.1714]
   },
-  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", address: "전북특별자치도 익산시 석탄동 134-1", fixedCoords: [35.900557, 126.976356], photoPageUrl: "https://place.map.kakao.com/9077744", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", fallback: [35.900557, 126.976356] },
+  { id: "iksan-samil", title: "익산 삼일교회(참새방앗간)", query: "삼일교회 익산", address: "전북특별자치도 익산시 석탄동 134-1", fixedCoords: [35.900557, 126.976356], photoPageUrl: "https://place.map.kakao.com/9077744", intro: "익산권 커뮤니티 방문 지점으로 확장 코스와 연결할 수 있는 장소입니다.", treasureHint: "보물힌트: QR코드는 의자 뒤에 있습니다.", fallback: [35.900557, 126.976356] },
   { id: "wind-road", title: "바람쐬는길", query: "바람쐬는길 전주", fixedCoords: [35.805012, 127.165439], intro: "가볍게 이동하며 쉬어갈 수 있는 산책·라이딩 친화형 길입니다.", fallback: [35.805012, 127.165439] },
   { id: "ajung-library", title: "아중호수도서관", query: "아중호수도서관", intro: "아중호수와 독서 문화가 만나는 생활문화형 인증 장소입니다.", fallback: [35.8328, 127.1768] },
   { id: "jeonju-fm", title: "전주공동체라디오 전주FM", query: "전주공동체라디오 전주FM", intro: "지역 미디어와 시민 참여 메시지를 연결할 수 있는 커뮤니티 거점입니다.", fallback: [35.8148, 127.1211] },
-  { id: "daedeok-elementary", title: "대덕초등학교", query: "대덕초등학교 완주", intro: "지역 생활권을 연결하는 교육 시설 주변 위치 표시 지점입니다.", fallback: [35.9139, 127.2386] },
+  { id: "daedeok-elementary", title: "대덕초등학교", query: "대덕초등학교 완주", intro: "지역 생활권을 연결하는 교육 시설 주변 위치 표시 지점입니다.", treasureHint: "보물힌트: QR코드는 자전거인들이 많이 찾는 길에 위치한 대덕초등학교 정문 입구에 있습니다.", fallback: [35.9139, 127.2386] },
   { id: "chucheondae", title: "추천대", query: "추천대 완주", intro: "완주권 역사·경관 동선과 연결할 수 있는 방문 거점입니다.", fallback: [35.9589, 127.2656] },
-  { id: "deokjin-park", title: "덕진공원", query: "덕진공원", intro: "전주 대표 공원으로 수변 경관과 휴식 동선이 좋은 시민 친화형 장소입니다.", fallback: [35.8482, 127.1201] },
+  { id: "deokjin-park", title: "덕진공원", query: "덕진공원", intro: "전주 대표 공원으로 수변 경관과 휴식 동선이 좋은 시민 친화형 장소입니다.", treasureHint: "보물힌트: QR코드는 출입구 왼편 현판 안에 숨겨져 있으며, 후문 쪽에는 연화정 도서관과 다리가 바라보이는 72번 가로등 기둥에 붙어 있습니다.", fallback: [35.8482, 127.1201] },
   {
     id: "volunteer-center",
     title: "전주시 자원봉사센터",
@@ -80,9 +91,9 @@ const selectedPlaces = [
     intro: "전주천을 사이에 두고 어은골과 중앙동을 잇는 오래된 교량형 인증 지점입니다.",
     fallback: [35.8248, 127.1348]
   },
-  { id: "hari-bridge", title: "하리교", query: "하리교 전주", intro: "전주 남부권 이동 동선과 연결되는 교량형 위치 표시 장소입니다.", fallback: [35.7861, 127.1143] },
+  { id: "hari-bridge", title: "하리교", query: "하리교 전주", intro: "전주 남부권 이동 동선과 연결되는 교량형 위치 표시 장소입니다.", treasureHint: "보물힌트: 삼례가 아닌 전주 쪽(진미동)에서 다리가 바라보이는 \"자전거 전용도로\" 표지판 기둥에 붙어 있습니다.", fallback: [35.7861, 127.1143] },
   { id: "bike-box", title: "바이크박스", query: "바이크박스 전주", intro: "자전거 이용자에게 친숙한 정비·라이딩 관련 거점으로 활용할 수 있습니다.", fallback: [35.8201, 127.1501] },
-  { id: "palbok-art", title: "팔복예술공장", query: "팔복예술공장", intro: "산업공간을 문화예술 거점으로 재생한 전주 대표 복합문화 장소입니다.", fallback: [35.8464, 127.1029] }
+  { id: "palbok-art", title: "팔복예술공장", query: "팔복예술공장", intro: "산업공간을 문화예술 거점으로 재생한 전주 대표 복합문화 장소입니다.", treasureHint: "보물힌트: QR코드는 팔복예술공장 입구 조형물에 붙어 있습니다. 꼭 정문 앞 조형물을 살펴보세요.", fallback: [35.8464, 127.1029] }
 ];
 
 const routePlaces = [
@@ -170,7 +181,8 @@ const FIXED_WEEKLY_TREASURE_PLAN = [
       "deokjin-park",
       "woosuk-hospital",
       "palbok-art",
-      "hari-bridge"
+      "hari-bridge",
+      "sinri-station-park"
     ]
   },
   {
@@ -1180,6 +1192,7 @@ function createPlaceDetailContent(place) {
         </div>
         <p class="place-card-address">${escapeHtml(getPlaceAddressText(place))}</p>
         <p class="place-card-intro">${escapeHtml(getCompactPlaceIntro(place))}</p>
+        ${createPlaceHintMarkup(place)}
       </div>
       ${createPlacePhotoMarkup(place)}
     </div>
@@ -1352,6 +1365,14 @@ function getPlacePhotoPageUrl(place) {
   return place.photoPageUrl || "";
 }
 
+function createPlaceHintMarkup(place) {
+  if (!place.treasureHint) {
+    return "";
+  }
+
+  return `<p class="place-card-hint">${escapeHtml(place.treasureHint)}</p>`;
+}
+
 function createPlacePhotoMarkup(place) {
   const imageMarkup = `<img src="${escapeHtml(getPlacePhotoUrl(place))}" alt="${escapeHtml(`${place.title} 대표 사진`)}" />`;
   const photoPageUrl = getPlacePhotoPageUrl(place);
@@ -1454,7 +1475,9 @@ function searchVisiblePlaces(keyword) {
 
   return markers
     .map(({ place }) => {
-      const haystacks = [place.title, place.address, place.query, place.intro].map(normalizeSearchText);
+      const haystacks = [place.title, place.address, place.query, place.intro, place.treasureHint].map(
+        normalizeSearchText
+      );
       const exactTitle = haystacks[0] === normalizedKeyword;
       const startsWithTitle = haystacks[0].startsWith(normalizedKeyword);
       const includesTitle = haystacks[0].includes(normalizedKeyword);

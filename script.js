@@ -283,14 +283,16 @@ const topMenus = {
             date: "5월 16일(토), 5월 23일(토)",
             time: "오전 10시 ~ 오후 4시",
             body: "전주공동체라디오 방송국을 방문하시는 라이더님께 시원한 커피 또는 음료를 제공합니다.",
-            placeId: "jeonju-fm"
+            placeId: "jeonju-fm",
+            buttonLabel: "전주공동체라디오 전주FM 위치 보기"
           },
           {
             title: "두번째 방문이벤트",
             place: "우석대한방병원",
             body:
               "우석대한방병원 1층 접수데스크를 찾아 \"자전거 챌린지 참여자\"라고 밝히시면, 시원한 음료를 제공받을 수 있습니다.",
-            placeId: "woosuk-hospital"
+            placeId: "woosuk-hospital",
+            buttonLabel: "우석대학교 부속 전주한방병원 위치 보기"
           }
         ]
       },
@@ -2355,7 +2357,7 @@ function renderEventVisitDetail(container, item) {
                 event.placeId
                   ? `<button class="mini-action" type="button" data-focus-event-place="${escapeHtml(
                       event.placeId
-                    )}">${escapeHtml(event.place)} 위치 보기</button>`
+                    )}">${escapeHtml(event.buttonLabel || `${event.place} 위치 보기`)}</button>`
                   : ""
               }
             </article>
@@ -2434,10 +2436,13 @@ function renderEventGuideDetail(container, item) {
 }
 
 function bindEventDetailActions(container, item) {
-  container.querySelector("[data-focus-event-place]")?.addEventListener("click", () => {
-    if (item.eventPlaceId) {
-      focusPlace(item.eventPlaceId);
-    }
+  container.querySelectorAll("[data-focus-event-place]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const placeId = button.dataset.focusEventPlace || item?.eventPlaceId;
+      if (placeId) {
+        focusPlace(placeId);
+      }
+    });
   });
 
   container.querySelector("[data-open-event-band]")?.addEventListener("click", () => {
